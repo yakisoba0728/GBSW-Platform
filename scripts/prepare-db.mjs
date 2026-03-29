@@ -13,12 +13,44 @@ try {
 }
 
 try {
-  await run('docker', ['compose', 'up', '-d', 'db']);
+  await run('docker', ['compose', 'up', '-d', 'db', 'pgadmin']);
   console.log(
     `Waiting for PostgreSQL on ${config.postgresHost}:${config.postgresPort}...`,
   );
   await waitForPort(config.postgresHost, config.postgresPort);
-  console.log('Database is ready.');
+  console.log(`Waiting for pgAdmin on 127.0.0.1:${config.pgAdminPort}...`);
+  await waitForPort('127.0.0.1', config.pgAdminPort);
+  const pgAdminStorageUser = toPgAdminStorageUserName(config.pgAdminEmail);
+  const pgPassFilePath = `/var/lib/pgadmin/storage/${pgAdminStorageUser}/.pgpass`;
+  await run('docker', [
+    'exec',
+    'gbsw-platform-pgadmin',
+    'sh',
+    '-lc',
+    [
+      'umask 077',
+      `mkdir -p '/var/lib/pgadmin/storage/${pgAdminStorageUser}'`,
+      `printf '%s\\n' 'db:5432:${config.postgresDatabase}:${config.postgresUser}:${config.postgresPassword}' > '${pgPassFilePath}'`,
+      `chown pgadmin:root '${pgPassFilePath}'`,
+      `chmod 600 '${pgPassFilePath}'`,
+      'rm -f /var/lib/pgadmin/.pgpass',
+    ].join(' && '),
+  ]);
+  await delay(1_000);
+  await run('docker', [
+    'exec',
+    'gbsw-platform-pgadmin',
+    '/venv/bin/python',
+    '-W',
+    'ignore::SyntaxWarning',
+    '/pgadmin4/setup.py',
+    'load-servers',
+    '/pgadmin4/gbsw-servers.json',
+    '--user',
+    config.pgAdminEmail,
+    '--replace',
+  ]);
+  console.log('Database services are ready.');
 } catch (error) {
   console.error(getErrorMessage(error));
   process.exit(1);
@@ -83,4 +115,17 @@ function getErrorMessage(error) {
   }
 
   return 'Failed to prepare the database.';
+}
+
+function toPgAdminStorageUserName(value) {
+  let normalized = value;
+
+  if (normalized.length === 0 || /^\d/.test(normalized)) {
+    normalized = `pga_user_${normalized}`;
+  }
+
+  return normalized
+    .replaceAll('@', '_')
+    .replaceAll('/', 'slash')
+    .replaceAll('\\', 'slash');
 }

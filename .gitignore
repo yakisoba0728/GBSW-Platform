@@ -4,5 +4,6 @@ node_modules
 dist
 coverage
 .DS_Store
+.claude
 .env
 !.env.example

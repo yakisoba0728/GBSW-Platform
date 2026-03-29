@@ -25,15 +25,10 @@ try {
     ['exec', 'next', 'dev', '--port', `${config.webPort}`],
     webDir,
   );
-  startProcess(
-    'Prisma Studio',
-    ['exec', 'prisma', 'studio', '--schema', 'prisma/schema.prisma', '--port', `${config.studioPort}`],
-    apiDir,
-  );
 
   console.log(`Web: http://localhost:${config.webPort}`);
   console.log(`API: http://localhost:${config.apiPort}`);
-  console.log(`Prisma Studio: http://localhost:${config.studioPort}`);
+  console.log(`pgAdmin: http://localhost:${config.pgAdminPort}`);
 
   await new Promise(() => {});
 } catch (error) {
@@ -103,9 +98,9 @@ async function shutdown(code) {
   }
 
   try {
-    await run('docker', ['compose', 'stop', 'db']);
+    await run('docker', ['compose', 'stop', 'db', 'pgadmin']);
   } catch (error) {
-    console.error('Failed to stop db container cleanly', error);
+    console.error('Failed to stop docker containers cleanly', error);
   }
 
   process.exit(code);

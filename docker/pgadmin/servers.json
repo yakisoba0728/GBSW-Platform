@@ -1,0 +1,18 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "GBSW Platform DB",
+      "Group": "Servers",
+      "Host": "db",
+      "Port": 5432,
+      "MaintenanceDB": "gbsw_platform",
+      "Username": "gbsw",
+      "SSLMode": "prefer",
+      "ConnectionParameters": {
+        "passfile": ".pgpass",
+        "sslmode": "prefer",
+        "connect_timeout": 10
+      }
+    }
+  }
+}

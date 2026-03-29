@@ -27,9 +27,13 @@ export function loadEnv() {
   return {
     apiPort: parsePort('API_PORT', 3001),
     envPath,
+    pgAdminEmail: process.env.PGADMIN_DEFAULT_EMAIL ?? 'admin@gbsw.com',
+    pgAdminPort: parsePort('PGADMIN_PORT', 5050),
+    postgresDatabase: process.env.POSTGRES_DB ?? 'gbsw_platform',
     postgresHost: process.env.POSTGRES_HOST ?? '127.0.0.1',
+    postgresPassword: process.env.POSTGRES_PASSWORD ?? 'gbsw',
     postgresPort: parsePort('POSTGRES_PORT', 5432),
-    studioPort: parsePort('PRISMA_STUDIO_PORT', 5555),
+    postgresUser: process.env.POSTGRES_USER ?? 'gbsw',
     webPort: parsePort('WEB_PORT', 3000),
   };
 }

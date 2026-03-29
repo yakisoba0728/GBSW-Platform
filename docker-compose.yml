@@ -20,5 +20,21 @@ services:
       timeout: 5s
       retries: 20
 
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: gbsw-platform-pgadmin
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@gbsw.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-gbswadmin}
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+      - ./docker/pgadmin/servers.json:/pgadmin4/gbsw-servers.json:ro
+
 volumes:
   postgres-data:
+  pgadmin-data:

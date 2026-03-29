@@ -10,10 +10,9 @@
     "dev": "node scripts/dev.mjs",
     "build": "pnpm --filter @gbsw/api build && pnpm --filter @gbsw/web build",
     "lint": "pnpm --filter @gbsw/api lint && pnpm --filter @gbsw/web lint",
-    "db:up": "docker compose up -d db",
+    "db:up": "docker compose up -d db pgadmin",
     "db:down": "docker compose down",
-    "db:prepare": "node scripts/prepare-db.mjs",
-    "studio": "pnpm --dir apps/api exec prisma studio --schema prisma/schema.prisma --port 5555"
+    "db:prepare": "node scripts/prepare-db.mjs"
   },
   "devDependencies": {
     "dotenv": "^17.3.1"
