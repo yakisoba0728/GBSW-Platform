@@ -1,0 +1,21 @@
+{
+  "name": "gbsw-platform",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "pnpm --filter @gbsw/api build && pnpm --filter @gbsw/web build",
+    "lint": "pnpm --filter @gbsw/api lint && pnpm --filter @gbsw/web lint",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "db:prepare": "node scripts/prepare-db.mjs",
+    "studio": "pnpm --dir apps/api exec prisma studio --schema prisma/schema.prisma --port 5555"
+  },
+  "devDependencies": {
+    "dotenv": "^17.3.1"
+  }
+}
