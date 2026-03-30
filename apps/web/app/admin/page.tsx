@@ -1,13 +1,22 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { isValidSuperAdminSession, SUPER_ADMIN_SESSION_COOKIE } from '@/lib/super-admin-auth'
+import {
+  AUTH_SESSION_COOKIE,
+  getRedirectPathForRole,
+  readAuthSession,
+} from '@/lib/auth-session'
 import AdminDashboard from './components/AdminDashboard'
 
 export default async function AdminPage() {
-  const token = (await cookies()).get(SUPER_ADMIN_SESSION_COOKIE)?.value
+  const token = (await cookies()).get(AUTH_SESSION_COOKIE)?.value
+  const session = readAuthSession(token)
 
-  if (!isValidSuperAdminSession(token)) {
+  if (!session) {
     redirect('/')
+  }
+
+  if (session.role !== 'super-admin') {
+    redirect(getRedirectPathForRole(session.role))
   }
 
   return <AdminDashboard />

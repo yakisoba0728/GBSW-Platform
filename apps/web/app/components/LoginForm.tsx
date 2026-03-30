@@ -42,7 +42,12 @@ export default function LoginForm() {
         return
       }
 
-      router.push('/admin')
+      const redirectTo =
+        typeof payload?.redirectTo === 'string' && payload.redirectTo.length > 0
+          ? payload.redirectTo
+          : '/'
+
+      router.push(redirectTo)
       router.refresh()
     } catch {
       setErrorMessage('로그인 요청 중 문제가 발생했습니다.')

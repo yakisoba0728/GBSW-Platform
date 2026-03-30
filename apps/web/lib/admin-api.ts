@@ -1,9 +1,7 @@
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
-import {
-  SUPER_ADMIN_SESSION_COOKIE,
-  isValidSuperAdminSession,
-} from './super-admin-auth'
+import { getApiBaseUrl } from './api-base-url'
+import { AUTH_SESSION_COOKIE, readAuthSession } from './auth-session'
 
 type AdminPath =
   | '/admin/students'
@@ -29,9 +27,10 @@ async function proxyAdminRequest(
   pathname: AdminPath,
   method: 'GET' | 'POST',
 ) {
-  const token = (await cookies()).get(SUPER_ADMIN_SESSION_COOKIE)?.value
+  const token = (await cookies()).get(AUTH_SESSION_COOKIE)?.value
+  const session = readAuthSession(token)
 
-  if (!isValidSuperAdminSession(token)) {
+  if (!session || session.role !== 'super-admin') {
     return NextResponse.json(
       { message: '최고관리자 로그인이 필요합니다.' },
       { status: 401 },
@@ -66,13 +65,4 @@ async function proxyAdminRequest(
       { status: 502 },
     )
   }
-}
-
-function getApiBaseUrl() {
-  const value =
-    process.env.API_INTERNAL_URL ??
-    process.env.NEXT_PUBLIC_API_URL ??
-    `http://127.0.0.1:${process.env.API_PORT ?? '3001'}`
-
-  return value.endsWith('/') ? value.slice(0, -1) : value
 }

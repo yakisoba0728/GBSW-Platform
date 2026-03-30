@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
+import LogoutButton from '@/app/components/LogoutButton'
 import Sidebar from './Sidebar'
 import CreateTab from './CreateTab'
 import StudentsTab from './StudentsTab'
@@ -25,15 +26,10 @@ const TABS: TabId[] = ['create', 'students', 'teachers']
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<TabId>('create')
 
-  async function handleLogout() {
-    await fetch('/api/auth/logout', { method: 'POST' })
-    window.location.href = '/'
-  }
-
   return (
     <div className="flex min-h-screen" style={{ backgroundColor: 'var(--admin-bg)' }}>
       {/* Sidebar — desktop only */}
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} onLogout={handleLogout} />
+      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Main area */}
       <div className="flex-1 flex flex-col min-w-0">
@@ -96,6 +92,11 @@ export default function AdminDashboard() {
 
         {/* Content */}
         <main className="flex-1 p-5 md:p-8">
+          <div className="mb-4 flex justify-end md:hidden">
+            <LogoutButton className="rounded-lg border px-3 py-2 text-sm">
+              로그아웃
+            </LogoutButton>
+          </div>
           {activeTab === 'create' && <CreateTab />}
           {activeTab === 'students' && <StudentsTab />}
           {activeTab === 'teachers' && <TeachersTab />}

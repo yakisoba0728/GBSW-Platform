@@ -4,8 +4,8 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Prisma, School } from '@prisma/client';
-import { randomBytes, scryptSync } from 'node:crypto';
 import { PrismaService } from '../prisma/prisma.service';
+import { hashPassword } from '../auth/password';
 
 @Injectable()
 export class AdminService {
@@ -273,13 +273,6 @@ function extractPhoneLast4(phone: string) {
 
 function extractPhoneDigits(phone: string) {
   return phone.replaceAll(/\D/g, '');
-}
-
-function hashPassword(password: string) {
-  const salt = randomBytes(16).toString('hex');
-  const hash = scryptSync(password, salt, 64).toString('hex');
-
-  return `${salt}:${hash}`;
 }
 
 function isUniqueConstraintError(error: unknown) {

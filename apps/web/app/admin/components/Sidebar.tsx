@@ -1,10 +1,10 @@
 import Image from 'next/image'
+import LogoutButton from '@/app/components/LogoutButton'
 import type { TabId } from './AdminDashboard'
 
 interface Props {
   activeTab: TabId
   onTabChange: (tab: TabId) => void
-  onLogout: () => void
 }
 
 const NAV_ITEMS: { id: TabId; label: string; icon: React.ReactNode }[] = [
@@ -44,7 +44,7 @@ const NAV_ITEMS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   },
 ]
 
-export default function Sidebar({ activeTab, onTabChange, onLogout }: Props) {
+export default function Sidebar({ activeTab, onTabChange }: Props) {
   return (
     <aside
       className="hidden md:flex w-[220px] flex-shrink-0 flex-col border-r"
@@ -116,8 +116,7 @@ export default function Sidebar({ activeTab, onTabChange, onLogout }: Props) {
         className="px-2.5 py-3 border-t"
         style={{ borderColor: 'var(--admin-border)' }}
       >
-        <button
-          onClick={onLogout}
+        <LogoutButton
           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-left transition-colors duration-150 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
           style={{
             fontFamily: 'var(--font-noto-sans-kr), sans-serif',
@@ -130,7 +129,7 @@ export default function Sidebar({ activeTab, onTabChange, onLogout }: Props) {
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
           로그아웃
-        </button>
+        </LogoutButton>
       </div>
     </aside>
   )
