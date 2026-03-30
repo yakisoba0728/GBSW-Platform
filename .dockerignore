@@ -5,3 +5,7 @@ node_modules
 dist
 coverage
 .env
+.env.production
+apps/web/.next
+apps/api/dist
+apps/*/node_modules

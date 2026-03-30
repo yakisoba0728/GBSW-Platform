@@ -49,3 +49,46 @@ pnpm build
 docker build -f apps/web/Dockerfile .
 docker build -f apps/api/Dockerfile .
 ```
+
+## 운영 배포
+
+외부 Nginx가 서버에서 리버스 프록시를 맡고, 이 프로젝트는 Docker Compose로 `web`, `api`, `db`를 올리는 구성을 권장합니다.
+
+### 1. 운영 환경변수 준비
+
+```bash
+cp .env.production.example .env.production
+```
+
+- `POSTGRES_PASSWORD`
+- `AUTH_SESSION_SECRET`
+- `SUPER_ADMIN_PASSWORD`
+- `NEXT_PUBLIC_API_URL`
+
+위 값은 반드시 운영용으로 변경하세요.
+
+### 2. 운영 컨테이너 기동
+
+```bash
+docker compose --env-file .env.production -f docker-compose.production.yml up -d --build
+```
+
+필요할 때만 pgAdmin을 띄우려면:
+
+```bash
+docker compose --env-file .env.production -f docker-compose.production.yml --profile admin up -d
+```
+
+### 3. Nginx 연결
+
+예시 설정은 [deploy/nginx/gbsw-platform.conf.example](/Users/yakihyuk0728/Documents/GitHub/GBSW-Platform/deploy/nginx/gbsw-platform.conf.example)에 있습니다.
+
+- Nginx는 `127.0.0.1:3000`의 Next.js 앱만 프록시하면 됩니다.
+- Nest API는 외부에 직접 노출하지 않고, Next 서버가 내부적으로 `api` 컨테이너에 연결합니다.
+
+### 4. 운영 확인
+
+```bash
+docker compose --env-file .env.production -f docker-compose.production.yml ps
+docker compose --env-file .env.production -f docker-compose.production.yml logs -f
+```
