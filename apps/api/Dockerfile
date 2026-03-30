@@ -1,7 +1,7 @@
 FROM node:22-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 
 FROM base AS deps
 WORKDIR /app
@@ -16,8 +16,9 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY . .
-RUN pnpm --filter @gbsw/api exec prisma generate --schema prisma/schema.prisma
-RUN pnpm --filter @gbsw/api build
+WORKDIR /app/apps/api
+RUN ./node_modules/.bin/prisma generate --schema prisma/schema.prisma
+RUN ./node_modules/.bin/nest build
 
 FROM base AS runner
 WORKDIR /app
