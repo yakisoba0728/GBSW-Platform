@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
+import { useRouter } from 'next/navigation'
 
 const ThemeToggle = dynamic(() => import('./ThemeToggle'), {
   ssr: false,
@@ -10,9 +11,45 @@ const ThemeToggle = dynamic(() => import('./ThemeToggle'), {
 })
 
 export default function LoginForm() {
+  const router = useRouter()
   const [showPw, setShowPw] = useState(false)
   const [id, setId] = useState('')
   const [pw, setPw] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setErrorMessage('')
+    setIsSubmitting(true)
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id,
+          password: pw,
+        }),
+      })
+
+      const payload = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        setErrorMessage(payload?.message ?? '로그인에 실패했습니다.')
+        return
+      }
+
+      router.push('/admin')
+      router.refresh()
+    } catch {
+      setErrorMessage('로그인 요청 중 문제가 발생했습니다.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <div className="flex-1 flex flex-col bg-brand-offwhite dark:bg-brand-ink transition-colors duration-300 min-h-screen">
@@ -57,7 +94,7 @@ export default function LoginForm() {
           </div>
 
           {/* Form */}
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
 
             {/* ID field */}
             <div
@@ -85,6 +122,7 @@ export default function LoginForm() {
                   placeholder="아이디를 입력하세요"
                   value={id}
                   onChange={(e) => setId(e.target.value)}
+                  disabled={isSubmitting}
                   style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
                   className="w-full pl-9 pr-4 py-3 rounded-xl text-sm outline-none transition-all duration-200
                     bg-white dark:bg-white/[0.06]
@@ -123,6 +161,7 @@ export default function LoginForm() {
                   placeholder="비밀번호를 입력하세요"
                   value={pw}
                   onChange={(e) => setPw(e.target.value)}
+                  disabled={isSubmitting}
                   style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
                   className="w-full pl-9 pr-10 py-3 rounded-xl text-sm outline-none transition-all duration-200
                     bg-white dark:bg-white/[0.06]
@@ -164,10 +203,11 @@ export default function LoginForm() {
             >
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="group relative w-full py-3 px-6 rounded-xl font-semibold text-sm text-white overflow-hidden
                   bg-brand-accent hover:brightness-110 active:scale-[0.98]
-                  transition-all duration-200
-                  shadow-[0_4px_20px_rgba(67,56,202,0.28)] dark:shadow-[0_4px_24px_rgba(99,102,241,0.22)]"
+                  transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-70
+                  shadow-[0_2px_10px_rgba(67,56,202,0.16)] dark:shadow-[0_2px_12px_rgba(99,102,241,0.14)]"
                 style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
               >
                 <span
@@ -177,9 +217,18 @@ export default function LoginForm() {
                     animation: 'shimmer 1.8s linear infinite',
                   }}
                 />
-                <span className="relative">로그인</span>
+                <span className="relative">{isSubmitting ? '로그인 중...' : '로그인'}</span>
               </button>
             </div>
+
+            {errorMessage ? (
+              <p
+                className="text-sm text-red-500"
+                style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
+              >
+                {errorMessage}
+              </p>
+            ) : null}
           </form>
 
           {/* Divider + links */}

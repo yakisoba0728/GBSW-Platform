@@ -9,7 +9,7 @@
   --fg: #1a1830;
 
   /* Left panel (BrandPanel) */
-  --panel-bg: linear-gradient(158deg, #edeaf8 0%, #e6e3f3 60%, #ece9f9 100%);
+  --panel-bg: linear-gradient(158deg, #eae7f5 0%, #e2ddf0 60%, #e8e4f5 100%);
   --panel-dot: rgba(67, 56, 202, 0.07);
   --panel-glow-top: rgba(99, 102, 241, 0.15);
   --panel-glow-bottom: rgba(67, 56, 202, 0.12);
@@ -22,6 +22,16 @@
   --panel-logo-opacity: 0.6;
   --panel-logo-brightness: 0.95;
   --panel-wordmark: rgba(26, 24, 48, 0.45);
+
+  /* Admin page */
+  --admin-bg: #f7f6f3;
+  --admin-sidebar-bg: #f0edf8;
+  --admin-header-bg: rgba(247, 246, 243, 0.88);
+  --admin-border: #e4e1ec;
+  --admin-text: #1a1830;
+  --admin-text-muted: #6b7280;
+  --admin-accent: #3730a3;
+  --admin-accent-bg: rgba(55, 48, 163, 0.06);
 }
 
 .dark {
@@ -41,6 +51,16 @@
   --panel-logo-opacity: 0.5;
   --panel-logo-brightness: 1.05;
   --panel-wordmark: rgba(255, 255, 255, 0.30);
+
+  /* Admin page */
+  --admin-bg: #0e0e18;
+  --admin-sidebar-bg: #111118;
+  --admin-header-bg: rgba(14, 14, 24, 0.88);
+  --admin-border: rgba(255, 255, 255, 0.07);
+  --admin-text: #e2e1f0;
+  --admin-text-muted: rgba(255, 255, 255, 0.38);
+  --admin-accent: #818cf8;
+  --admin-accent-bg: rgba(129, 140, 248, 0.08);
 }
 
 /* ─── Base reset ─────────────────────────────────────────────── */

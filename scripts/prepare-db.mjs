@@ -50,6 +50,25 @@ try {
     config.pgAdminEmail,
     '--replace',
   ]);
+  await run('pnpm', [
+    '--filter',
+    '@gbsw/api',
+    'exec',
+    'prisma',
+    'generate',
+    '--schema',
+    'prisma/schema.prisma',
+  ]);
+  await run('pnpm', [
+    '--filter',
+    '@gbsw/api',
+    'exec',
+    'prisma',
+    'migrate',
+    'deploy',
+    '--schema',
+    'prisma/schema.prisma',
+  ]);
   console.log('Database services are ready.');
 } catch (error) {
   console.error(getErrorMessage(error));
