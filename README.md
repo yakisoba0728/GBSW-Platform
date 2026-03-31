@@ -79,6 +79,10 @@ docker compose --env-file .env.production -f docker-compose.production.yml up -d
 docker compose --env-file .env.production -f docker-compose.production.yml --profile admin up -d
 ```
 
+pgAdmin은 기본적으로 `127.0.0.1:${PGADMIN_PORT}`에만 바인딩됩니다. 서버 정의와 DB 비밀번호 파일은 컨테이너 시작 시 운영 환경변수 기준으로 자동 생성되므로, 별도 서버 등록 없이 바로 사용할 수 있습니다.
+
+Docker Compose의 `Bake/buildx` 경고를 없애고 싶다면 Docker 공식 패키지로 설치하거나 업그레이드하세요. 공식 Ubuntu 설치 문서에는 `docker-buildx-plugin`과 `docker-compose-plugin` 패키지를 함께 설치하도록 안내되어 있습니다.
+
 ### 3. Nginx 연결
 
 예시 설정은 [deploy/nginx/gbsw-platform.conf.example](/Users/yakihyuk0728/Documents/GitHub/GBSW-Platform/deploy/nginx/gbsw-platform.conf.example)에 있습니다.
