@@ -37,7 +37,7 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${blackHanSans.variable} ${notoSansKR.variable}`}
       suppressHydrationWarning
     >
-      <body>
+      <body suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
         </ThemeProvider>

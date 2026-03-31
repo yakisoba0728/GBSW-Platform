@@ -1,108 +1,57 @@
 'use client'
 
-import { useState } from 'react'
-import dynamic from 'next/dynamic'
-import LogoutButton from '@/app/components/LogoutButton'
-import Sidebar from './Sidebar'
+import DashboardLayout, { type DashboardNavItem } from '@/app/components/DashboardLayout'
 import CreateTab from './CreateTab'
 import StudentsTab from './StudentsTab'
 import TeachersTab from './TeachersTab'
 
-const ThemeToggle = dynamic(() => import('@/app/components/ThemeToggle'), {
-  ssr: false,
-  loading: () => <div className="w-9 h-9 rounded-lg" aria-hidden="true" />,
-})
-
-export type TabId = 'create' | 'students' | 'teachers'
-
-const TAB_TITLES: Record<TabId, string> = {
-  create: '계정 생성',
-  students: '학생 관리',
-  teachers: '교사 관리',
-}
-
-const TABS: TabId[] = ['create', 'students', 'teachers']
+const NAV_ITEMS: DashboardNavItem[] = [
+  {
+    id: 'create',
+    label: '계정 생성',
+    icon: (
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="16" />
+        <line x1="8" y1="12" x2="16" y2="12" />
+      </svg>
+    ),
+  },
+  {
+    id: 'students',
+    label: '학생 관리',
+    icon: (
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    ),
+  },
+  {
+    id: 'teachers',
+    label: '교사 관리',
+    icon: (
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+        <polyline points="16 11 18 13 22 9" />
+      </svg>
+    ),
+  },
+]
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<TabId>('create')
-
   return (
-    <div className="flex min-h-screen" style={{ backgroundColor: 'var(--admin-bg)' }}>
-      {/* Sidebar — desktop only */}
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-
-      {/* Main area */}
-      <div className="flex-1 flex flex-col min-w-0">
-
-        {/* Header */}
-        <header
-          className="flex items-center justify-between h-14 px-5 md:px-6 sticky top-0 z-10 border-b"
-          style={{
-            backgroundColor: 'var(--admin-header-bg)',
-            borderColor: 'var(--admin-border)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-          }}
-        >
-          <span
-            className="text-sm font-semibold"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              color: 'var(--admin-text)',
-            }}
-          >
-            {TAB_TITLES[activeTab]}
-          </span>
-          <ThemeToggle />
-        </header>
-
-        {/* Mobile tab bar — below header */}
-        <div
-          className="flex md:hidden border-b overflow-x-auto"
-          style={{
-            borderColor: 'var(--admin-border)',
-            backgroundColor: 'var(--admin-sidebar-bg)',
-            scrollbarWidth: 'none',
-          }}
-        >
-          {TABS.map((tab) => {
-            const isActive = activeTab === tab
-            return (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className="relative flex-shrink-0 px-5 py-2.5 text-xs transition-colors duration-150"
-                style={{
-                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                  color: isActive ? 'var(--admin-accent)' : 'var(--admin-text-muted)',
-                  fontWeight: isActive ? 600 : 400,
-                }}
-              >
-                {TAB_TITLES[tab]}
-                {isActive && (
-                  <span
-                    className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full"
-                    style={{ backgroundColor: 'var(--admin-accent)' }}
-                  />
-                )}
-              </button>
-            )
-          })}
-        </div>
-
-        {/* Content */}
-        <main className="flex-1 p-5 md:p-8">
-          <div className="mb-4 flex justify-end md:hidden">
-            <LogoutButton className="rounded-lg border px-3 py-2 text-sm">
-              로그아웃
-            </LogoutButton>
-          </div>
+    <DashboardLayout roleLabel="최고관리자" navItems={NAV_ITEMS} defaultTab="create">
+      {(activeTab) => (
+        <>
           {activeTab === 'create' && <CreateTab />}
           {activeTab === 'students' && <StudentsTab />}
           {activeTab === 'teachers' && <TeachersTab />}
-        </main>
-
-      </div>
-    </div>
+        </>
+      )}
+    </DashboardLayout>
   )
 }

@@ -236,35 +236,32 @@ export default function LoginForm() {
             ) : null}
           </form>
 
-          {/* Divider + links */}
+          {/* 학생회 문의 안내 */}
           <div
             className="mt-8 opacity-init-0 animate-fade-in-up anim-delay-320"
             style={{ animationFillMode: 'forwards' }}
           >
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
-              <span className="text-xs text-brand-muted" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>또는</span>
-              <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
-            </div>
-            <div
-              className="mt-5 flex items-center justify-center gap-5 text-xs text-brand-muted"
+            <p
+              className="text-center text-xs text-brand-muted"
               style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
             >
-              <a href="#" className="hover:text-brand-accent dark:hover:text-brand-accent-dark transition-colors duration-150">아이디 찾기</a>
-              <span className="w-px h-3 bg-gray-300 dark:bg-white/15" />
-              <a href="#" className="hover:text-brand-accent dark:hover:text-brand-accent-dark transition-colors duration-150">비밀번호 찾기</a>
-              <span className="w-px h-3 bg-gray-300 dark:bg-white/15" />
-              <a href="#" className="hover:text-brand-accent dark:hover:text-brand-accent-dark transition-colors duration-150">문의하기</a>
-            </div>
+              정보를 찾을 수 없나요?{' '}
+              <span className="text-brand-accent dark:text-brand-accent-dark font-medium">
+                학생회로 문의해 주세요.
+              </span>
+            </p>
           </div>
 
         </div>
       </div>
 
       {/* Mobile bottom */}
-      <div className="md:hidden flex items-center justify-center pb-8">
+      <div className="md:hidden flex flex-col items-center justify-center gap-0.5 pb-8">
         <p className="text-xs text-brand-muted/50" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
           ⓒ 2026. 경북소프트웨어마이스터고등학교 All Rights Reserved.
+        </p>
+        <p className="text-xs text-brand-muted/30" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
+          Made by <span className="text-brand-muted/50">김동혁</span>
         </p>
       </div>
     </div>

@@ -88,9 +88,9 @@ export function getRedirectPathForRole(role: AuthRole) {
     case 'super-admin':
       return '/admin'
     case 'student':
-      return '/student'
+      return '/'
     case 'teacher':
-      return '/teacher'
+      return '/'
   }
 }
 

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 
 type LogoutButtonProps = {
@@ -13,19 +14,29 @@ export default function LogoutButton({
   className,
   style,
 }: LogoutButtonProps) {
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
   async function handleLogout() {
-    await fetch('/api/auth/logout', { method: 'POST' })
-    window.location.href = '/'
+    if (isLoggingOut) return
+    setIsLoggingOut(true)
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+    } catch {
+      // 네트워크 오류여도 '/'로 이동 (graceful degradation)
+    } finally {
+      window.location.href = '/'
+    }
   }
 
   return (
     <button
       type="button"
       onClick={handleLogout}
+      disabled={isLoggingOut}
       className={className}
       style={style}
     >
-      {children ?? '로그아웃'}
+      {isLoggingOut ? '로그아웃 중...' : (children ?? '로그아웃')}
     </button>
   )
 }

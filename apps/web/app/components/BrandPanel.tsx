@@ -17,26 +17,6 @@ export default function BrandPanel() {
         }}
       />
 
-      {/* Ambient glow — top */}
-      <div
-        className="absolute -top-40 -left-20 w-[420px] h-[420px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, var(--panel-glow-top) 0%, transparent 68%)' }}
-      />
-      {/* Ambient glow — bottom */}
-      <div
-        className="absolute -bottom-28 -right-10 w-72 h-72 rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, var(--panel-glow-bottom) 0%, transparent 70%)' }}
-      />
-
-      {/* Atmospheric SVG */}
-      <div
-        className="absolute bottom-12 right-4 pointer-events-none select-none z-0"
-        style={{ opacity: 'var(--panel-atmo-opacity)', color: 'var(--panel-text-muted)' }}
-        aria-hidden="true"
-      >
-        <AtmosphericSVG />
-      </div>
-
       {/* Right-edge fade */}
       <div
         className="absolute right-0 top-0 h-full w-28 pointer-events-none z-20"
@@ -66,14 +46,6 @@ export default function BrandPanel() {
 
         {/* Logo */}
         <div className="relative w-fit">
-          <div
-            className="absolute inset-0 rounded-full pointer-events-none"
-            style={{
-              background: 'radial-gradient(circle, rgba(129,140,248,0.2) 0%, transparent 70%)',
-              transform: 'scale(1.8)',
-            }}
-            aria-hidden="true"
-          />
           <Image
             src="/gbsw-logo.png"
             alt="경북소프트웨어마이스터고등학교 로고"
@@ -134,25 +106,17 @@ export default function BrandPanel() {
         >
           ⓒ 2026. 경북소프트웨어마이스터고등학교 All Rights Reserved.
         </p>
+        <p
+          className="mt-1 text-xs"
+          style={{
+            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+            color: 'var(--panel-text-sub)',
+            opacity: 0.5,
+          }}
+        >
+          Made by <span style={{ opacity: 0.85 }}>김동혁</span>
+        </p>
       </div>
     </div>
-  )
-}
-
-function AtmosphericSVG() {
-  return (
-    <svg width="260" height="260" viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="130" cy="130" r="120" stroke="currentColor" strokeWidth="0.8" strokeDasharray="3 7"/>
-      <circle cx="130" cy="130" r="88"  stroke="currentColor" strokeWidth="0.8" strokeDasharray="2 6"/>
-      <circle cx="130" cy="130" r="56"  stroke="currentColor" strokeWidth="0.8" strokeDasharray="2 5"/>
-      <circle cx="130" cy="130" r="24"  stroke="currentColor" strokeWidth="1"/>
-      <line x1="130" y1="10"  x2="130" y2="250" stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 8"/>
-      <line x1="10"  y1="130" x2="250" y2="130" stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 8"/>
-      <circle cx="130" cy="42"  r="3" fill="currentColor"/>
-      <circle cx="218" cy="130" r="3" fill="currentColor"/>
-      <circle cx="130" cy="218" r="3" fill="currentColor"/>
-      <circle cx="42"  cy="130" r="3" fill="currentColor"/>
-      <circle cx="130" cy="130" r="5" fill="currentColor"/>
-    </svg>
   )
 }
