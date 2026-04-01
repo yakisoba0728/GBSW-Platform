@@ -25,6 +25,7 @@ FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=builder --chown=node:node /prod/api ./
+RUN ./node_modules/.bin/prisma generate --schema prisma/schema.prisma
 USER node
 EXPOSE 3001
 CMD ["sh", "-lc", "./node_modules/.bin/prisma migrate deploy --schema prisma/schema.prisma && node dist/main"]
