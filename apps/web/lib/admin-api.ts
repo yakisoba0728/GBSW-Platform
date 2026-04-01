@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { getApiBaseUrl } from './api-base-url'
+import { getInternalApiSecret } from './runtime-env'
 import { AUTH_SESSION_COOKIE, readAuthSession } from './auth-session'
 
 type AdminPath =
@@ -45,9 +46,7 @@ async function proxyAdminRequest(
       method,
       headers: {
         'Content-Type': 'application/json',
-        'x-super-admin-id': process.env.SUPER_ADMIN_ID ?? 'admin',
-        'x-super-admin-password':
-          process.env.SUPER_ADMIN_PASSWORD ?? 'admin1234',
+        'x-internal-api-secret': getInternalApiSecret(),
       },
       body: method === 'POST' ? JSON.stringify(body ?? {}) : undefined,
       cache: 'no-store',

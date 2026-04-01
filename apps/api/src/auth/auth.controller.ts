@@ -9,4 +9,9 @@ export class AuthController {
   login(@Body() body: Record<string, unknown>) {
     return this.authService.login(body);
   }
+
+  @Post('change-password')
+  changePassword(@Body() body: Record<string, unknown>) {
+    return this.authService.changePassword(body);
+  }
 }

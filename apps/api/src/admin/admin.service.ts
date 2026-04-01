@@ -4,6 +4,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Prisma, School } from '@prisma/client';
+import { randomBytes } from 'node:crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { hashPassword } from '../auth/password';
 
@@ -56,7 +57,7 @@ export class AdminService {
       classNumber,
       studentNumber,
     );
-    const initialPassword = buildInitialPassword(studentId, phone);
+    const temporaryPassword = buildTemporaryPassword();
 
     try {
       const student = await this.prisma.student.create({
@@ -69,7 +70,8 @@ export class AdminService {
           majorSubject,
           name,
           phone,
-          passwordHash: hashPassword(initialPassword),
+          passwordHash: hashPassword(temporaryPassword),
+          mustChangePassword: true,
         },
       });
 
@@ -79,7 +81,10 @@ export class AdminService {
           studentId: student.studentId,
           name: student.name,
           school: student.school,
-          initialPassword,
+          majorSubject,
+          mustChangePassword: true,
+          temporaryPassword,
+          initialPassword: temporaryPassword,
         },
       };
     } catch (error) {
@@ -95,7 +100,7 @@ export class AdminService {
     const teacherId = parseTeacherId(body.teacherId);
     const name = parseRequiredText(body.name, '이름');
     const phone = parsePhone(body.phone);
-    const initialPassword = buildInitialPassword(teacherId, phone);
+    const temporaryPassword = buildTemporaryPassword();
 
     try {
       const teacher = await this.prisma.teacher.create({
@@ -103,7 +108,8 @@ export class AdminService {
           teacherId,
           name,
           phone,
-          passwordHash: hashPassword(initialPassword),
+          passwordHash: hashPassword(temporaryPassword),
+          mustChangePassword: true,
         },
       });
 
@@ -112,7 +118,9 @@ export class AdminService {
         teacher: {
           teacherId: teacher.teacherId,
           name: teacher.name,
-          initialPassword,
+          mustChangePassword: true,
+          temporaryPassword,
+          initialPassword: temporaryPassword,
         },
       };
     } catch (error) {
@@ -257,18 +265,8 @@ function parseBoolean(value: unknown) {
   return false;
 }
 
-function buildInitialPassword(id: string, phone: string) {
-  return `${id}${extractPhoneLast4(phone)}`;
-}
-
-function extractPhoneLast4(phone: string) {
-  const digits = extractPhoneDigits(phone);
-
-  if (digits.length < 4) {
-    throw new BadRequestException('전화번호를 올바르게 입력해주세요.');
-  }
-
-  return digits.slice(-4);
+function buildTemporaryPassword() {
+  return randomBytes(12).toString('base64url');
 }
 
 function extractPhoneDigits(phone: string) {

@@ -27,6 +27,7 @@ model Student {
   name          String
   phone         String
   passwordHash  String   @map("password_hash")
+  mustChangePassword Boolean @default(true) @map("must_change_password")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
@@ -39,6 +40,7 @@ model Teacher {
   name         String
   phone        String
   passwordHash String        @map("password_hash")
+  mustChangePassword Boolean @default(true) @map("must_change_password")
   status       TeacherStatus @default(ACTIVE)
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")

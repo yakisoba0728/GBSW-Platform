@@ -5,12 +5,13 @@ import {
 } from '@nestjs/common';
 import { TeacherStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { verifyPassword } from './password';
+import { hashPassword, verifyPassword } from './password';
 
 type AuthenticatedUser = {
   accountId: string;
   name: string;
   role: 'student' | 'teacher';
+  mustChangePassword: boolean;
 };
 
 @Injectable()
@@ -19,7 +20,7 @@ export class AuthService {
 
   async login(body: Record<string, unknown>) {
     const id = parseRequiredText(body.id, '아이디');
-    const password = parseRequiredText(body.password, '비밀번호');
+    const password = parseRequiredPassword(body.password, '비밀번호');
     const user = await this.findAuthenticatedUser(id, password);
 
     if (!user) {
@@ -34,6 +35,28 @@ export class AuthService {
     };
   }
 
+  async changePassword(body: Record<string, unknown>) {
+    const accountId = parseRequiredText(body.accountId, '계정 아이디');
+    const role = parseAccountRole(body.role);
+    const currentPassword = parseRequiredPassword(
+      body.currentPassword,
+      '현재 비밀번호',
+    );
+    const newPassword = parseRequiredPassword(body.newPassword, '새 비밀번호');
+
+    validateNewPassword(newPassword);
+
+    if (role === 'student') {
+      return this.changeStudentPassword(
+        accountId,
+        currentPassword,
+        newPassword,
+      );
+    }
+
+    return this.changeTeacherPassword(accountId, currentPassword, newPassword);
+  }
+
   private async findAuthenticatedUser(id: string, password: string) {
     const student = await this.prisma.student.findUnique({
       where: {
@@ -43,6 +66,7 @@ export class AuthService {
         studentId: true,
         name: true,
         passwordHash: true,
+        mustChangePassword: true,
       },
     });
 
@@ -51,6 +75,7 @@ export class AuthService {
         accountId: student.studentId,
         name: student.name,
         role: 'student',
+        mustChangePassword: student.mustChangePassword,
       } satisfies AuthenticatedUser;
     }
 
@@ -63,6 +88,7 @@ export class AuthService {
         name: true,
         passwordHash: true,
         status: true,
+        mustChangePassword: true,
       },
     });
 
@@ -75,10 +101,94 @@ export class AuthService {
         accountId: teacher.teacherId,
         name: teacher.name,
         role: 'teacher',
+        mustChangePassword: teacher.mustChangePassword,
       } satisfies AuthenticatedUser;
     }
 
     return null;
+  }
+
+  private async changeStudentPassword(
+    accountId: string,
+    currentPassword: string,
+    newPassword: string,
+  ) {
+    const student = await this.prisma.student.findUnique({
+      where: {
+        studentId: accountId,
+      },
+      select: {
+        studentId: true,
+        passwordHash: true,
+      },
+    });
+
+    if (!student || !verifyPassword(currentPassword, student.passwordHash)) {
+      throw new UnauthorizedException('현재 비밀번호가 일치하지 않습니다.');
+    }
+
+    await this.prisma.student.update({
+      where: {
+        studentId: student.studentId,
+      },
+      data: {
+        passwordHash: hashPassword(newPassword),
+        mustChangePassword: false,
+      },
+    });
+
+    return {
+      ok: true,
+      user: {
+        accountId: student.studentId,
+        role: 'student',
+        mustChangePassword: false,
+      },
+    };
+  }
+
+  private async changeTeacherPassword(
+    accountId: string,
+    currentPassword: string,
+    newPassword: string,
+  ) {
+    const teacher = await this.prisma.teacher.findUnique({
+      where: {
+        teacherId: accountId,
+      },
+      select: {
+        teacherId: true,
+        passwordHash: true,
+        status: true,
+      },
+    });
+
+    if (
+      !teacher ||
+      teacher.status !== TeacherStatus.ACTIVE ||
+      !verifyPassword(currentPassword, teacher.passwordHash)
+    ) {
+      throw new UnauthorizedException('현재 비밀번호가 일치하지 않습니다.');
+    }
+
+    await this.prisma.teacher.update({
+      where: {
+        teacherId: teacher.teacherId,
+      },
+      data: {
+        passwordHash: hashPassword(newPassword),
+        mustChangePassword: false,
+      },
+    });
+
+    return {
+      ok: true,
+      user: {
+        accountId: teacher.teacherId,
+        role: 'teacher',
+        mustChangePassword: false,
+      },
+    };
   }
 }
 
@@ -90,6 +200,34 @@ function parseRequiredText(value: unknown, label: string) {
   }
 
   return text;
+}
+
+function parseRequiredPassword(value: unknown, label: string) {
+  if (typeof value !== 'string' || value.length === 0) {
+    throw new BadRequestException(`${label}를 입력해주세요.`);
+  }
+
+  return value;
+}
+
+function parseAccountRole(value: unknown) {
+  if (value === 'student' || value === 'teacher') {
+    return value;
+  }
+
+  throw new BadRequestException('계정 권한 정보가 올바르지 않습니다.');
+}
+
+function validateNewPassword(password: string) {
+  if (password.trim().length === 0) {
+    throw new BadRequestException(
+      '새 비밀번호는 공백만으로 설정할 수 없습니다.',
+    );
+  }
+
+  if (password.length < 10) {
+    throw new BadRequestException('새 비밀번호는 10자 이상이어야 합니다.');
+  }
 }
 
 function toInputText(value: unknown) {
