@@ -47,11 +47,7 @@ pnpm db:prepare
 pnpm db:down
 pnpm lint
 pnpm build
-pnpm --filter @gbsw/api test
-pnpm --filter @gbsw/api test:e2e
 ```
-
-API e2e 테스트는 루트 `.env.test` 또는 `DATABASE_URL_TEST` 환경변수로 전용 테스트 DB를 지정해야 합니다. 예시는 `.env.test.example`에 있습니다.
 
 ## Docker 이미지 빌드 예시
 

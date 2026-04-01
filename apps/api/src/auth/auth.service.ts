@@ -3,7 +3,6 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { TeacherStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { hashPassword, verifyPassword } from './password';
 
@@ -94,16 +93,11 @@ export class AuthService {
         teacherId: true,
         name: true,
         passwordHash: true,
-        status: true,
         mustChangePassword: true,
       },
     });
 
-    if (
-      teacher &&
-      teacher.status === TeacherStatus.ACTIVE &&
-      verifyPassword(password, teacher.passwordHash)
-    ) {
+    if (teacher && verifyPassword(password, teacher.passwordHash)) {
       return {
         accountId: teacher.teacherId,
         name: teacher.name,
@@ -176,7 +170,6 @@ export class AuthService {
       select: {
         teacherId: true,
         passwordHash: true,
-        status: true,
         mustChangePassword: true,
       },
     });
@@ -186,7 +179,6 @@ export class AuthService {
 
     if (
       !teacher ||
-      teacher.status !== TeacherStatus.ACTIVE ||
       (!canSkipCurrentPassword &&
         !verifyPassword(currentPassword, teacher.passwordHash))
     ) {

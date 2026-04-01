@@ -12,11 +12,6 @@ enum School {
   BYMS
 }
 
-enum TeacherStatus {
-  ACTIVE
-  LEAVE
-}
-
 model Student {
   studentId          String   @id @map("student_id")
   school             School
@@ -35,14 +30,13 @@ model Student {
 }
 
 model Teacher {
-  teacherId          String        @id @map("teacher_id")
+  teacherId          String   @id @map("teacher_id")
   name               String
   phone              String
-  passwordHash       String        @map("password_hash")
-  mustChangePassword Boolean       @default(true) @map("must_change_password")
-  status             TeacherStatus @default(ACTIVE)
-  createdAt          DateTime      @default(now()) @map("created_at")
-  updatedAt          DateTime      @updatedAt @map("updated_at")
+  passwordHash       String   @map("password_hash")
+  mustChangePassword Boolean  @default(true) @map("must_change_password")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
 
   @@map("teachers")
 }
