@@ -18,32 +18,31 @@ enum TeacherStatus {
 }
 
 model Student {
-  studentId     String   @id @map("student_id")
-  school        School
-  currentYear   Int      @map("current_year")
-  currentClass  Int      @map("current_class_number")
-  currentNumber Int      @map("current_student_number")
-  majorSubject  String?  @map("major_subject")
-  name          String
-  phone         String
-  passwordHash  String   @map("password_hash")
-  mustChangePassword Boolean @default(true) @map("must_change_password")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  studentId          String   @id @map("student_id")
+  school             School
+  currentYear        Int      @map("current_year")
+  currentClass       Int      @map("current_class_number")
+  currentNumber      Int      @map("current_student_number")
+  majorSubject       String?  @map("major_subject")
+  name               String
+  phone              String
+  passwordHash       String   @map("password_hash")
+  mustChangePassword Boolean  @default(true) @map("must_change_password")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
 
   @@map("students")
 }
 
 model Teacher {
-  id           String        @id @default(cuid())
-  teacherId    String        @unique @map("teacher_id")
-  name         String
-  phone        String
-  passwordHash String        @map("password_hash")
-  mustChangePassword Boolean @default(true) @map("must_change_password")
-  status       TeacherStatus @default(ACTIVE)
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  teacherId          String        @id @map("teacher_id")
+  name               String
+  phone              String
+  passwordHash       String        @map("password_hash")
+  mustChangePassword Boolean       @default(true) @map("must_change_password")
+  status             TeacherStatus @default(ACTIVE)
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
 
   @@map("teachers")
 }

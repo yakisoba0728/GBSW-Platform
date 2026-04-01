@@ -69,11 +69,11 @@ const TYPE_TABS: { id: AccountType; label: string }[] = [
 const headings = {
   student: {
     title: '학생 계정 생성',
-    desc: '학생 아이디 생성 정보로 아이디를 만들고, 현재 년도/반/번호와 전공과목을 저장합니다. 생성 직후에는 랜덤 임시 비밀번호가 발급됩니다.',
+    desc: '학생 아이디 생성 정보로 아이디를 만들고, 현재 년도/반/번호와 전공과목을 저장합니다. 생성 직후 임시 비밀번호는 생성된 아이디와 전화번호 뒤 4자리로 설정됩니다.',
   },
   teacher: {
     title: '교사 계정 생성',
-    desc: '새 교사 계정의 정보를 입력하세요. 교사 아이디는 직접 입력하고 임시 비밀번호는 안전한 랜덤 값으로 자동 생성됩니다.',
+    desc: '새 교사 계정의 정보를 입력하세요. 교사 아이디는 직접 입력하고 임시 비밀번호는 교사 아이디와 전화번호 뒤 4자리로 설정됩니다.',
   },
 }
 
@@ -626,7 +626,7 @@ export default function CreateTab() {
             <div className="px-6 py-5" style={{ backgroundColor: 'var(--admin-bg)' }}>
               <SectionLabel>초기 비밀번호</SectionLabel>
               <PasswordRuleBox>
-                학생 임시 비밀번호는 안전한 랜덤 문자열로 자동 생성되며, 첫 로그인 뒤 반드시 새 비밀번호로 변경해야 합니다.
+                학생 임시 비밀번호는 생성된 아이디와 전화번호 뒤 4자리로 설정되며, 첫 로그인 뒤 반드시 새 비밀번호로 변경해야 합니다.
               </PasswordRuleBox>
             </div>
           </div>
@@ -696,7 +696,7 @@ export default function CreateTab() {
             <div className="px-6 py-5" style={{ backgroundColor: 'var(--admin-bg)' }}>
               <SectionLabel>초기 비밀번호</SectionLabel>
               <PasswordRuleBox>
-                교사 임시 비밀번호는 안전한 랜덤 문자열로 자동 생성되며, 첫 로그인 뒤 반드시 새 비밀번호로 변경해야 합니다.
+                교사 임시 비밀번호는 교사 아이디와 전화번호 뒤 4자리로 설정되며, 첫 로그인 뒤 반드시 새 비밀번호로 변경해야 합니다.
               </PasswordRuleBox>
             </div>
           </div>

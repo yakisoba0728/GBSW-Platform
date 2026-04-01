@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json().catch(() => null)
   const currentPassword =
-    typeof body?.currentPassword === 'string' ? body.currentPassword : ''
+    typeof body?.currentPassword === 'string' ? body.currentPassword : undefined
   const newPassword =
     typeof body?.newPassword === 'string' ? body.newPassword : ''
 
@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
         role: session.role,
         currentPassword,
         newPassword,
+        allowMissingCurrentPassword: session.mustChangePassword,
       }),
       cache: 'no-store',
     })

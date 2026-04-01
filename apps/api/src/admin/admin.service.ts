@@ -4,7 +4,6 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Prisma, School } from '@prisma/client';
-import { randomBytes } from 'node:crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { hashPassword } from '../auth/password';
 
@@ -57,7 +56,7 @@ export class AdminService {
       classNumber,
       studentNumber,
     );
-    const temporaryPassword = buildTemporaryPassword();
+    const temporaryPassword = buildTemporaryPassword(studentId, phone);
 
     try {
       const student = await this.prisma.student.create({
@@ -100,7 +99,7 @@ export class AdminService {
     const teacherId = parseTeacherId(body.teacherId);
     const name = parseRequiredText(body.name, '이름');
     const phone = parsePhone(body.phone);
-    const temporaryPassword = buildTemporaryPassword();
+    const temporaryPassword = buildTemporaryPassword(teacherId, phone);
 
     try {
       const teacher = await this.prisma.teacher.create({
@@ -265,8 +264,8 @@ function parseBoolean(value: unknown) {
   return false;
 }
 
-function buildTemporaryPassword() {
-  return randomBytes(12).toString('base64url');
+function buildTemporaryPassword(accountId: string, phone: string) {
+  return `${accountId}${phone.slice(-4)}`;
 }
 
 function extractPhoneDigits(phone: string) {

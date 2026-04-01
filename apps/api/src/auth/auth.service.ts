@@ -38,10 +38,11 @@ export class AuthService {
   async changePassword(body: Record<string, unknown>) {
     const accountId = parseRequiredText(body.accountId, '계정 아이디');
     const role = parseAccountRole(body.role);
-    const currentPassword = parseRequiredPassword(
-      body.currentPassword,
-      '현재 비밀번호',
-    );
+    const allowMissingCurrentPassword =
+      body.allowMissingCurrentPassword === true;
+    const currentPassword = allowMissingCurrentPassword
+      ? parsePassword(body.currentPassword)
+      : parseRequiredPassword(body.currentPassword, '현재 비밀번호');
     const newPassword = parseRequiredPassword(body.newPassword, '새 비밀번호');
 
     validateNewPassword(newPassword);
@@ -51,10 +52,16 @@ export class AuthService {
         accountId,
         currentPassword,
         newPassword,
+        allowMissingCurrentPassword,
       );
     }
 
-    return this.changeTeacherPassword(accountId, currentPassword, newPassword);
+    return this.changeTeacherPassword(
+      accountId,
+      currentPassword,
+      newPassword,
+      allowMissingCurrentPassword,
+    );
   }
 
   private async findAuthenticatedUser(id: string, password: string) {
@@ -112,6 +119,7 @@ export class AuthService {
     accountId: string,
     currentPassword: string,
     newPassword: string,
+    allowMissingCurrentPassword: boolean,
   ) {
     const student = await this.prisma.student.findUnique({
       where: {
@@ -120,10 +128,18 @@ export class AuthService {
       select: {
         studentId: true,
         passwordHash: true,
+        mustChangePassword: true,
       },
     });
 
-    if (!student || !verifyPassword(currentPassword, student.passwordHash)) {
+    const canSkipCurrentPassword =
+      allowMissingCurrentPassword && student?.mustChangePassword === true;
+
+    if (
+      !student ||
+      (!canSkipCurrentPassword &&
+        !verifyPassword(currentPassword, student.passwordHash))
+    ) {
       throw new UnauthorizedException('현재 비밀번호가 일치하지 않습니다.');
     }
 
@@ -151,6 +167,7 @@ export class AuthService {
     accountId: string,
     currentPassword: string,
     newPassword: string,
+    allowMissingCurrentPassword: boolean,
   ) {
     const teacher = await this.prisma.teacher.findUnique({
       where: {
@@ -160,13 +177,18 @@ export class AuthService {
         teacherId: true,
         passwordHash: true,
         status: true,
+        mustChangePassword: true,
       },
     });
+
+    const canSkipCurrentPassword =
+      allowMissingCurrentPassword && teacher?.mustChangePassword === true;
 
     if (
       !teacher ||
       teacher.status !== TeacherStatus.ACTIVE ||
-      !verifyPassword(currentPassword, teacher.passwordHash)
+      (!canSkipCurrentPassword &&
+        !verifyPassword(currentPassword, teacher.passwordHash))
     ) {
       throw new UnauthorizedException('현재 비밀번호가 일치하지 않습니다.');
     }
@@ -203,11 +225,21 @@ function parseRequiredText(value: unknown, label: string) {
 }
 
 function parseRequiredPassword(value: unknown, label: string) {
-  if (typeof value !== 'string' || value.length === 0) {
+  const password = parsePassword(value);
+
+  if (password.length === 0) {
     throw new BadRequestException(`${label}를 입력해주세요.`);
   }
 
-  return value;
+  return password;
+}
+
+function parsePassword(value: unknown) {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  return '';
 }
 
 function parseAccountRole(value: unknown) {
