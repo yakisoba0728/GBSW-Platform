@@ -46,26 +46,9 @@ function HamburgerIcon({ open }: { open: boolean }) {
       aria-hidden="true"
       style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 18, height: 14 }}
     >
-      {/* top line */}
-      <span style={{
-        ...lineBase,
-        top: open ? '50%' : 0,
-        transform: open ? 'translateY(-50%) rotate(45deg)' : 'none',
-      }} />
-      {/* middle line */}
-      <span style={{
-        ...lineBase,
-        top: '50%',
-        transform: 'translateY(-50%)',
-        opacity: open ? 0 : 1,
-      }} />
-      {/* bottom line */}
-      <span style={{
-        ...lineBase,
-        bottom: open ? '50%' : 0,
-        top: 'auto',
-        transform: open ? 'translateY(50%) rotate(-45deg)' : 'none',
-      }} />
+      <span style={{ ...lineBase, top: open ? '50%' : 0, transform: open ? 'translateY(-50%) rotate(45deg)' : 'none' }} />
+      <span style={{ ...lineBase, top: '50%', transform: 'translateY(-50%)', opacity: open ? 0 : 1 }} />
+      <span style={{ ...lineBase, bottom: open ? '50%' : 0, top: 'auto', transform: open ? 'translateY(50%) rotate(-45deg)' : 'none' }} />
     </span>
   )
 }
@@ -86,8 +69,8 @@ export default function DashboardLayout({
   )
 
   /* ── Drawer state ── */
-  const [drawerOpen, setDrawerOpen] = useState(false)       // DOM 마운트
-  const [drawerVisible, setDrawerVisible] = useState(false) // 애니메이션
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [drawerVisible, setDrawerVisible] = useState(false)
 
   /* ── Touch swipe refs ── */
   const touchStartXRef = useRef<number | null>(null)
@@ -109,13 +92,11 @@ export default function DashboardLayout({
   /* ── Drawer open/close ── */
   const closeDrawer = useCallback(() => {
     setDrawerVisible(false)
-    // transition 완료(220ms) 후 DOM에서 언마운트
     setTimeout(() => setDrawerOpen(false), 260)
   }, [])
 
   const openDrawer = useCallback(() => {
     setDrawerOpen(true)
-    // DOM에 마운트된 뒤 transition이 트리거되도록 한 프레임 대기
     requestAnimationFrame(() => {
       requestAnimationFrame(() => setDrawerVisible(true))
     })
@@ -175,7 +156,7 @@ export default function DashboardLayout({
           {/* 섹션 레이블 */}
           {item.section && (
             <p
-              className="px-2 pt-4 pb-1.5 text-[10px] font-semibold uppercase tracking-widest select-none"
+              className="px-2 pt-5 pb-2 text-[11px] font-semibold uppercase tracking-widest select-none overflow-hidden whitespace-nowrap"
               style={{
                 fontFamily: 'var(--font-space-grotesk)',
                 color: 'var(--admin-text-muted)',
@@ -193,23 +174,27 @@ export default function DashboardLayout({
               if (hasChildren) {
                 toggleMenu(item.id)
               } else {
-                inDrawer ? handleDrawerNavClick(item.id) : setActiveTab(item.id)
+                if (inDrawer) {
+                  handleDrawerNavClick(item.id)
+                } else {
+                  setActiveTab(item.id)
+                }
               }
             }}
-            className="relative w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150 hover:bg-black/[0.035] dark:hover:bg-white/[0.04] active:scale-[0.97]"
+            className="relative w-full flex items-center gap-3 rounded-lg text-sm text-left transition-all duration-150 hover:bg-black/[0.035] dark:hover:bg-white/[0.04] active:scale-[0.97]"
             style={{
               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
               color: (isActive || isChildActive) ? 'var(--admin-accent)' : 'var(--admin-text-muted)',
               fontWeight: (isActive || isChildActive) ? 500 : 400,
               backgroundColor: isActive ? 'var(--admin-accent-bg)' : 'transparent',
+              padding: '10px 14px',
             }}
           >
             {/* 활성 인디케이터 라인 */}
             <span
               className="absolute left-0 rounded-full"
               style={{
-                top: '20%',
-                bottom: '20%',
+                top: '20%', bottom: '20%',
                 width: isActive ? 2.5 : 0,
                 backgroundColor: 'var(--admin-accent)',
                 transition: 'width 220ms cubic-bezier(0.16,1,0.3,1)',
@@ -227,33 +212,20 @@ export default function DashboardLayout({
               {item.icon}
             </span>
 
+            {/* 라벨 */}
             <span className="flex-1 truncate">{item.label}</span>
 
             {/* 서브메뉴 chevron */}
             {hasChildren && (
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                style={{
-                  flexShrink: 0,
-                  opacity: 0.45,
-                  transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-                  transition: 'transform 220ms cubic-bezier(0.16,1,0.3,1)',
-                }}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+                style={{ flexShrink: 0, opacity: 0.45, transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 220ms cubic-bezier(0.16,1,0.3,1)' }}
               >
                 <polyline points="9 18 15 12 9 6" />
               </svg>
             )}
           </button>
 
-          {/* 서브메뉴 — CSS grid trick으로 부드러운 height 애니메이션 */}
+          {/* 서브메뉴 */}
           {hasChildren && (
             <div
               style={{
@@ -264,7 +236,7 @@ export default function DashboardLayout({
               }}
             >
               <div style={{ overflow: 'hidden' }}>
-                <div className="ml-[22px] pl-3 pt-0.5 pb-1 space-y-px" style={{ borderLeft: '1px solid var(--admin-border)' }}>
+                <div className="ml-[26px] pl-3.5 pt-1 pb-1.5 space-y-0.5" style={{ borderLeft: '1px solid var(--admin-border)' }}>
                   {item.children?.map((sub, subIdx) => {
                     const isSubActive = activeTab === sub.id
                     return (
@@ -272,14 +244,12 @@ export default function DashboardLayout({
                         key={sub.id}
                         type="button"
                         tabIndex={isOpen ? 0 : -1}
-                        onClick={() =>
-                          inDrawer ? handleDrawerNavClick(sub.id) : setActiveTab(sub.id)
-                        }
-                        className="w-full flex items-center gap-2.5 rounded-lg text-left hover:bg-black/[0.035] dark:hover:bg-white/[0.04] active:scale-[0.97]"
+                        onClick={() => inDrawer ? handleDrawerNavClick(sub.id) : setActiveTab(sub.id)}
+                        className="w-full flex items-center gap-3 rounded-lg text-left hover:bg-black/[0.035] dark:hover:bg-white/[0.04] active:scale-[0.97]"
                         style={{
                           fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                          fontSize: '0.8rem',
-                          padding: '5px 8px 5px 10px',
+                          fontSize: '0.825rem',
+                          padding: '7px 10px 7px 12px',
                           color: isSubActive ? 'var(--admin-accent)' : 'var(--admin-text-muted)',
                           fontWeight: isSubActive ? 500 : 400,
                           backgroundColor: isSubActive ? 'var(--admin-accent-bg)' : 'transparent',
@@ -317,63 +287,46 @@ export default function DashboardLayout({
 
       {/* ── Sidebar (desktop only) ── */}
       <aside
-        className="hidden md:flex w-[228px] flex-shrink-0 flex-col border-r"
+        className="hidden md:flex flex-col flex-shrink-0"
         style={{
+          width: 272,
+          borderRight: '1px solid var(--admin-border)',
           backgroundColor: 'var(--admin-sidebar-bg)',
-          borderColor: 'var(--admin-border)',
         }}
       >
-        {/* 로고 */}
+        {/* 로고 헤더 */}
         <div
-          className="flex items-center gap-2.5 px-5 h-14 border-b flex-shrink-0"
+          className="flex items-center gap-3 px-5 h-16 border-b flex-shrink-0"
           style={{ borderColor: 'var(--admin-border)' }}
         >
           <Image
             src="/gbsw-logo.png"
             alt=""
-            width={22}
-            height={22}
+            width={26}
+            height={26}
             aria-hidden="true"
-            style={{ opacity: 0.65 }}
+            style={{ opacity: 0.65, flexShrink: 0 }}
           />
-          <div>
-            <p
-              className="text-xs font-semibold leading-tight"
-              style={{
-                fontFamily: 'var(--font-space-grotesk)',
-                color: 'var(--admin-text)',
-              }}
-            >
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold leading-tight" style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--admin-text)' }}>
               GBSW Platform
             </p>
-            <p
-              className="text-[11px] mt-0.5"
-              style={{
-                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                color: 'var(--admin-text-muted)',
-              }}
-            >
+            <p className="text-[12px] mt-0.5" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}>
               {roleLabel}
             </p>
           </div>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-2.5 py-3 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+        <nav className="flex-1 px-3 py-3.5 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
           {renderNavItems(false)}
         </nav>
 
         {/* Logout */}
-        <div
-          className="px-2.5 py-3 border-t"
-          style={{ borderColor: 'var(--admin-border)' }}
-        >
+        <div className="px-3 py-3 border-t flex-shrink-0" style={{ borderColor: 'var(--admin-border)' }}>
           <LogoutButton
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150 hover:bg-black/[0.035] dark:hover:bg-white/[0.04]"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              color: 'var(--admin-text-muted)',
-            }}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-left transition-all duration-150 hover:bg-black/[0.035] dark:hover:bg-white/[0.04]"
+            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ opacity: 0.55, flexShrink: 0 }}>
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -390,7 +343,7 @@ export default function DashboardLayout({
 
         {/* ── Header ── */}
         <header
-          className="flex items-center justify-between h-14 px-4 md:px-6 sticky top-0 z-20 border-b flex-shrink-0"
+          className="flex items-center justify-between h-16 px-4 md:px-6 sticky top-0 z-20 border-b flex-shrink-0"
           style={{
             backgroundColor: 'var(--admin-header-bg)',
             borderColor: 'var(--admin-border)',
@@ -412,24 +365,9 @@ export default function DashboardLayout({
           </button>
 
           {/* 모바일: 중앙 GBSW 로고 */}
-          <div
-            className="md:hidden absolute left-1/2 -translate-x-1/2 flex items-center gap-2 pointer-events-none select-none"
-          >
-            <Image
-              src="/gbsw-logo.png"
-              alt=""
-              width={18}
-              height={18}
-              aria-hidden="true"
-              style={{ opacity: 0.6 }}
-            />
-            <span
-              className="text-sm font-semibold"
-              style={{
-                fontFamily: 'var(--font-space-grotesk)',
-                color: 'var(--admin-text)',
-              }}
-            >
+          <div className="md:hidden absolute left-1/2 -translate-x-1/2 flex items-center gap-2 pointer-events-none select-none">
+            <Image src="/gbsw-logo.png" alt="" width={18} height={18} aria-hidden="true" style={{ opacity: 0.6 }} />
+            <span className="text-sm font-semibold" style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--admin-text)' }}>
               GBSW
             </span>
           </div>
@@ -437,10 +375,7 @@ export default function DashboardLayout({
           {/* 데스크탑: 현재 탭 라벨 */}
           <span
             className="hidden md:block text-sm font-semibold truncate"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              color: 'var(--admin-text)',
-            }}
+            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text)' }}
           >
             {activeLabel}
           </span>
@@ -451,35 +386,25 @@ export default function DashboardLayout({
         {/* ── Mobile Drawer + Overlay ── */}
         {drawerOpen && (
           <div className="md:hidden">
-            {/* 백드롭 오버레이 — CSS transition (keyframe 클래스 스위칭 없음) */}
             <div
               aria-hidden="true"
               onClick={closeDrawer}
               style={{
-                position: 'fixed',
-                top: 56,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                zIndex: 30,
+                position: 'fixed', top: 64, left: 0, right: 0, bottom: 0, zIndex: 30,
                 backgroundColor: 'rgba(0,0,0,0.45)',
                 opacity: drawerVisible ? 1 : 0,
                 transition: 'opacity 280ms ease',
               }}
             />
-
-            {/* 드로어 패널 — CSS transition으로 부드럽게 */}
             <aside
               id="mobile-drawer"
               role="navigation"
               aria-label="모바일 메뉴"
               className="flex flex-col"
               style={{
-                position: 'fixed',
-                top: 56,
-                left: 0,
-                height: 'calc(100% - 56px)',
-                width: 'min(280px, 85vw)',
+                position: 'fixed', top: 64, left: 0,
+                height: 'calc(100% - 64px)',
+                width: 'min(310px, 88vw)',
                 zIndex: 40,
                 backgroundColor: 'var(--admin-sidebar-bg)',
                 borderRight: '1px solid var(--admin-border)',
@@ -493,63 +418,29 @@ export default function DashboardLayout({
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
-              {/* 드로어 헤더: 로고 + 역할 */}
-              <div
-                className="flex items-center gap-2.5 px-5 py-4 border-b flex-shrink-0"
-                style={{ borderColor: 'var(--admin-border)' }}
-              >
-                <Image
-                  src="/gbsw-logo.png"
-                  alt=""
-                  width={22}
-                  height={22}
-                  aria-hidden="true"
-                  style={{ opacity: 0.65 }}
-                />
+              <div className="flex items-center gap-3 px-5 h-16 border-b flex-shrink-0" style={{ borderColor: 'var(--admin-border)' }}>
+                <Image src="/gbsw-logo.png" alt="" width={26} height={26} aria-hidden="true" style={{ opacity: 0.65 }} />
                 <div>
-                  <p
-                    className="text-xs font-semibold leading-tight"
-                    style={{
-                      fontFamily: 'var(--font-space-grotesk)',
-                      color: 'var(--admin-text)',
-                    }}
-                  >
+                  <p className="text-sm font-semibold leading-tight" style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--admin-text)' }}>
                     GBSW Platform
                   </p>
-                  <p
-                    className="text-[11px] mt-0.5"
-                    style={{
-                      fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                      color: 'var(--admin-text-muted)',
-                    }}
-                  >
+                  <p className="text-[12px] mt-0.5" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}>
                     {roleLabel}
                   </p>
                 </div>
               </div>
 
-              {/* 드로어 Nav */}
-              <nav
-                className="flex-1 px-2.5 py-3 overflow-y-auto"
-                style={{ scrollbarWidth: 'none' }}
-              >
+              <nav className="flex-1 px-3 py-3.5 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
                 {renderNavItems(true)}
               </nav>
 
-              {/* 드로어 Footer: 로그아웃 + iOS 안전 영역 */}
               <div
-                className="px-2.5 py-3 border-t flex-shrink-0"
-                style={{
-                  borderColor: 'var(--admin-border)',
-                  paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
-                }}
+                className="px-3 py-3 border-t flex-shrink-0"
+                style={{ borderColor: 'var(--admin-border)', paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
               >
                 <LogoutButton
-                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-left transition-all duration-150 hover:bg-black/[0.035] dark:hover:bg-white/[0.04]"
-                  style={{
-                    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                    color: 'var(--admin-text-muted)',
-                  }}
+                  className="w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm text-left transition-all duration-150 hover:bg-black/[0.035] dark:hover:bg-white/[0.04]"
+                  style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ opacity: 0.55, flexShrink: 0 }}>
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -565,15 +456,11 @@ export default function DashboardLayout({
 
         {/* ── Content ── */}
         <main className="flex-1 px-5 pt-4 pb-6 md:px-8 md:pt-8 md:pb-8">
-          {/* 모바일 전용 페이지 타이틀 — key로 탭 변경 시 재애니메이션 */}
           {activeLabel && (
             <h1
               key={activeLabel}
               className="md:hidden text-base font-semibold mb-5 animate-fade-in"
-              style={{
-                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                color: 'var(--admin-text)',
-              }}
+              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text)' }}
             >
               {activeLabel}
             </h1>

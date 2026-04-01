@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
 
 type DocumentWithVT = Document & {
@@ -9,16 +8,6 @@ type DocumentWithVT = Document & {
 
 export default function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
-    return <div className="w-9 h-9 rounded-lg" aria-hidden="true" />
-  }
-
   const isDark = resolvedTheme === 'dark'
 
   function handleThemeChange() {

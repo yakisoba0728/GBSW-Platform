@@ -21,7 +21,7 @@ services:
       retries: 20
 
   pgadmin:
-    image: dpage/pgadmin4:latest
+    image: dpage/pgadmin4:9.13.0
     container_name: gbsw-platform-pgadmin
     depends_on:
       db:

@@ -12,7 +12,14 @@
     "lint": "pnpm --filter @gbsw/api lint && pnpm --filter @gbsw/web lint",
     "db:up": "docker compose up -d db pgadmin",
     "db:down": "docker compose down",
-    "db:prepare": "node scripts/prepare-db.mjs"
+    "db:prepare": "node scripts/prepare-db.mjs",
+    "deploy:production": "node scripts/deploy-production.mjs"
+  },
+  "pnpm": {
+    "overrides": {
+      "effect": "3.20.0",
+      "path-to-regexp": "8.4.0"
+    }
   },
   "devDependencies": {
     "dotenv": "^17.3.1"

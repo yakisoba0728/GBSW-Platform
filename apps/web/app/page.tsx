@@ -26,6 +26,10 @@ export default async function Home() {
     )
   }
 
+  if (session.mustChangePassword) {
+    redirect('/change-password')
+  }
+
   if (session.role === 'student') {
     return <StudentDashboard />
   }

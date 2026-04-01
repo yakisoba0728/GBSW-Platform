@@ -15,6 +15,10 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
+  afterEach(async () => {
+    await app.close();
+  });
+
   it('/ (GET)', () => {
     // Supertest expects the raw Nest HTTP server instance here.
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -22,5 +26,11 @@ describe('AppController (e2e)', () => {
       .get('/')
       .expect(200)
       .expect('GBSW Platform API is running.');
+  });
+
+  it('/health (GET)', () => {
+    // Supertest expects the raw Nest HTTP server instance here.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    return request(app.getHttpServer()).get('/health').expect(200);
   });
 });

@@ -1,18 +1,12 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { timingSafeEqual } from 'node:crypto';
+import { getApiRuntimeEnv } from '../config/runtime-env';
 
-export function assertInternalSuperAdmin(
-  adminId?: string,
-  adminPassword?: string,
-) {
-  const expectedId = process.env.SUPER_ADMIN_ID ?? 'admin';
-  const expectedPassword = process.env.SUPER_ADMIN_PASSWORD ?? 'admin1234';
+export function assertInternalApiRequest(providedSecret?: string) {
+  const { INTERNAL_API_SECRET } = getApiRuntimeEnv();
 
-  if (
-    !safeEqual(adminId ?? '', expectedId) ||
-    !safeEqual(adminPassword ?? '', expectedPassword)
-  ) {
-    throw new UnauthorizedException('최고관리자 권한이 필요합니다.');
+  if (!safeEqual(providedSecret ?? '', INTERNAL_API_SECRET)) {
+    throw new UnauthorizedException('내부 API 인증에 실패했습니다.');
   }
 }
 

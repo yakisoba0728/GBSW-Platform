@@ -1,23 +1,33 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import type { NextRequest } from 'next/server'
+import {
+  getAuthSessionSecret,
+  getSuperAdminCredentials,
+} from './runtime-env'
 
 export type AuthRole = 'super-admin' | 'student' | 'teacher'
 
 export type AuthSession = {
+  version: number
   accountId: string
   role: AuthRole
+  mustChangePassword: boolean
+  iat: number
+  exp: number
+}
+
+type AuthSessionTokenInput = {
+  accountId: string
+  role: AuthRole
+  mustChangePassword: boolean
+  iat?: number
+  exp?: number
 }
 
 export const AUTH_SESSION_COOKIE = 'gbsw-auth-session'
 
 const SESSION_VERSION = 1
-
-export function getSuperAdminCredentials() {
-  return {
-    id: process.env.SUPER_ADMIN_ID ?? 'admin',
-    password: process.env.SUPER_ADMIN_PASSWORD ?? 'admin1234',
-  }
-}
+const SESSION_DURATION_SECONDS = 60 * 60 * 8
 
 export function isValidSuperAdminLogin(id: string, password: string) {
   const credentials = getSuperAdminCredentials()
@@ -28,12 +38,16 @@ export function isValidSuperAdminLogin(id: string, password: string) {
   )
 }
 
-export function createAuthSessionToken(session: AuthSession) {
+export function createAuthSessionToken(session: AuthSessionTokenInput) {
+  const issuedAt = getCurrentUnixTimestamp()
   const payload = Buffer.from(
     JSON.stringify({
+      version: SESSION_VERSION,
       accountId: session.accountId,
       role: session.role,
-      version: SESSION_VERSION,
+      mustChangePassword: session.mustChangePassword,
+      iat: session.iat ?? issuedAt,
+      exp: session.exp ?? issuedAt + SESSION_DURATION_SECONDS,
     }),
     'utf8',
   ).toString('base64url')
@@ -59,20 +73,29 @@ export function readAuthSession(token?: string) {
   try {
     const parsed = JSON.parse(
       Buffer.from(payload, 'base64url').toString('utf8'),
-    ) as Partial<AuthSession> & { version?: number }
+    ) as Partial<AuthSession>
 
     if (
       parsed.version !== SESSION_VERSION ||
       !isAuthRole(parsed.role) ||
       typeof parsed.accountId !== 'string' ||
-      parsed.accountId.trim().length === 0
+      parsed.accountId.trim().length === 0 ||
+      typeof parsed.mustChangePassword !== 'boolean' ||
+      !isValidUnixTimestamp(parsed.iat) ||
+      !isValidUnixTimestamp(parsed.exp) ||
+      parsed.exp <= parsed.iat ||
+      parsed.exp <= getCurrentUnixTimestamp()
     ) {
       return null
     }
 
     return {
+      version: SESSION_VERSION,
       accountId: parsed.accountId.trim(),
       role: parsed.role,
+      mustChangePassword: parsed.mustChangePassword,
+      iat: parsed.iat,
+      exp: parsed.exp,
     } satisfies AuthSession
   } catch {
     return null
@@ -83,7 +106,7 @@ export function isAuthRole(value: unknown): value is AuthRole {
   return value === 'super-admin' || value === 'student' || value === 'teacher'
 }
 
-export function getRedirectPathForRole(role: AuthRole) {
+export function getDefaultRedirectPathForRole(role: AuthRole) {
   switch (role) {
     case 'super-admin':
       return '/admin'
@@ -92,6 +115,20 @@ export function getRedirectPathForRole(role: AuthRole) {
     case 'teacher':
       return '/'
   }
+}
+
+export function getRedirectPathForSession(
+  session: Pick<AuthSession, 'role' | 'mustChangePassword'>,
+) {
+  if (session.role !== 'super-admin' && session.mustChangePassword) {
+    return '/change-password'
+  }
+
+  return getDefaultRedirectPathForRole(session.role)
+}
+
+export function getSessionCookieMaxAge() {
+  return SESSION_DURATION_SECONDS
 }
 
 export function shouldUseSecureCookie(request: NextRequest) {
@@ -111,21 +148,9 @@ export function shouldUseSecureCookie(request: NextRequest) {
 }
 
 function sign(payload: string) {
-  return createHmac('sha256', getSessionSigningKey())
+  return createHmac('sha256', getAuthSessionSecret())
     .update(payload)
     .digest('hex')
-}
-
-function getSessionSigningKey() {
-  const sessionSecret = process.env.AUTH_SESSION_SECRET?.trim()
-
-  if (sessionSecret) {
-    return sessionSecret
-  }
-
-  const credentials = getSuperAdminCredentials()
-
-  return `${credentials.id}:${credentials.password}`
 }
 
 function safeEqual(left: string, right: string) {
@@ -137,4 +162,12 @@ function safeEqual(left: string, right: string) {
   }
 
   return timingSafeEqual(leftBuffer, rightBuffer)
+}
+
+function getCurrentUnixTimestamp() {
+  return Math.floor(Date.now() / 1000)
+}
+
+function isValidUnixTimestamp(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value > 0
 }

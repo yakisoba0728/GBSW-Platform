@@ -1,7 +1,10 @@
 import { NestFactory } from '@nestjs/core';
+import { validateApiRuntimeEnv } from './config/runtime-env';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
+  validateApiRuntimeEnv();
+
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({

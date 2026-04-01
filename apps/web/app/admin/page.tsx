@@ -2,7 +2,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import {
   AUTH_SESSION_COOKIE,
-  getRedirectPathForRole,
+  getRedirectPathForSession,
   readAuthSession,
 } from '@/lib/auth-session'
 import AdminDashboard from './components/AdminDashboard'
@@ -16,7 +16,7 @@ export default async function AdminPage() {
   }
 
   if (session.role !== 'super-admin') {
-    redirect(getRedirectPathForRole(session.role))
+    redirect(getRedirectPathForSession(session))
   }
 
   return <AdminDashboard />

@@ -2,14 +2,33 @@ import { NextRequest, NextResponse } from 'next/server'
 import {
   AUTH_SESSION_COOKIE,
   createAuthSessionToken,
-  getRedirectPathForRole,
+  getRedirectPathForSession,
+  getSessionCookieMaxAge,
   isAuthRole,
   isValidSuperAdminLogin,
   shouldUseSecureCookie,
 } from '@/lib/auth-session'
 import { getApiBaseUrl } from '@/lib/api-base-url'
+import {
+  clearFailedLoginAttempts,
+  getClientIpFromRequestHeaders,
+  getRemainingLoginCooldownSeconds,
+  registerFailedLoginAttempt,
+} from '@/lib/login-rate-limit'
 
 export async function POST(request: NextRequest) {
+  const clientIp = getClientIpFromRequestHeaders(request.headers)
+  const cooldownSeconds = getRemainingLoginCooldownSeconds(clientIp)
+
+  if (cooldownSeconds > 0) {
+    return NextResponse.json(
+      {
+        message: `로그인 시도가 너무 많습니다. ${cooldownSeconds}초 후 다시 시도해주세요.`,
+      },
+      { status: 429 },
+    )
+  }
+
   const body = await request.json().catch(() => null)
   const id = typeof body?.id === 'string' ? body.id.trim() : ''
   const password = typeof body?.password === 'string' ? body.password : ''
@@ -23,6 +42,7 @@ export async function POST(request: NextRequest) {
 
   let accountId = id
   let role: 'super-admin' | 'student' | 'teacher' = 'super-admin'
+  let mustChangePassword = false
 
   if (!isValidSuperAdminLogin(id, password)) {
     try {
@@ -30,6 +50,7 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-forwarded-for': clientIp,
         },
         body: JSON.stringify({ id, password }),
         cache: 'no-store',
@@ -38,6 +59,10 @@ export async function POST(request: NextRequest) {
       const payload = await upstreamResponse.json().catch(() => null)
 
       if (!upstreamResponse.ok) {
+        if (upstreamResponse.status === 401) {
+          registerFailedLoginAttempt(clientIp)
+        }
+
         return NextResponse.json(
           { message: getErrorMessage(payload, '로그인에 실패했습니다.') },
           { status: upstreamResponse.status },
@@ -51,7 +76,8 @@ export async function POST(request: NextRequest) {
         !isAuthRole(user.role) ||
         user.role === 'super-admin' ||
         typeof user.accountId !== 'string' ||
-        user.accountId.trim().length === 0
+        user.accountId.trim().length === 0 ||
+        typeof user.mustChangePassword !== 'boolean'
       ) {
         return NextResponse.json(
           { message: '로그인 응답이 올바르지 않습니다.' },
@@ -61,6 +87,7 @@ export async function POST(request: NextRequest) {
 
       role = user.role
       accountId = user.accountId.trim()
+      mustChangePassword = user.mustChangePassword
     } catch {
       return NextResponse.json(
         { message: '로그인 요청을 처리하지 못했습니다.' },
@@ -69,9 +96,14 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  clearFailedLoginAttempts(clientIp)
+
   const response = NextResponse.json({
     ok: true,
-    redirectTo: getRedirectPathForRole(role),
+    redirectTo: getRedirectPathForSession({
+      role,
+      mustChangePassword,
+    }),
   })
 
   response.cookies.set({
@@ -79,12 +111,13 @@ export async function POST(request: NextRequest) {
     value: createAuthSessionToken({
       accountId,
       role,
+      mustChangePassword,
     }),
     httpOnly: true,
     sameSite: 'lax',
     secure: shouldUseSecureCookie(request),
     path: '/',
-    maxAge: 60 * 60 * 8,
+    maxAge: getSessionCookieMaxAge(),
   })
 
   return response

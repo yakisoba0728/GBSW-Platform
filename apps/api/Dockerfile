@@ -19,12 +19,13 @@ COPY . .
 WORKDIR /app/apps/api
 RUN ./node_modules/.bin/prisma generate --schema prisma/schema.prisma
 RUN ./node_modules/.bin/nest build
+RUN pnpm deploy --legacy --filter @gbsw/api --prod /prod/api
 
 FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/apps/api ./apps/api
-WORKDIR /app/apps/api
+COPY --from=builder --chown=node:node /prod/api ./
+RUN ./node_modules/.bin/prisma generate --schema prisma/schema.prisma
+USER node
 EXPOSE 3001
 CMD ["sh", "-lc", "./node_modules/.bin/prisma migrate deploy --schema prisma/schema.prisma && node dist/main"]
