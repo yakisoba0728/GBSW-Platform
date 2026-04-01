@@ -21,6 +21,12 @@
       "path-to-regexp": "8.4.0"
     }
   },
+  "pnpm": {
+    "overrides": {
+      "effect": "3.20.0",
+      "path-to-regexp": "8.4.0"
+    }
+  },
   "devDependencies": {
     "dotenv": "^17.3.1"
   }
