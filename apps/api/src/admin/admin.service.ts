@@ -1,11 +1,20 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-} from '@nestjs/common';
-import { Prisma, School } from '@prisma/client';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { hashPassword } from '../auth/password';
+import {
+  buildStudentId,
+  buildTemporaryPassword,
+  isUniqueConstraintError,
+  parseBoolean,
+  parseMajorSubject,
+  parsePhone,
+  parsePositiveInt,
+  parseRequiredText,
+  parseSchool,
+  parseTeacherId,
+  parseYear,
+  parseYearWithLabel,
+} from './admin.parsers';
 
 @Injectable()
 export class AdminService {
@@ -130,151 +139,4 @@ export class AdminService {
       throw error;
     }
   }
-}
-
-function parseSchool(value: unknown): School {
-  if (value === School.GBSW || value === School.BYMS) {
-    return value;
-  }
-
-  throw new BadRequestException('학교 정보가 올바르지 않습니다.');
-}
-
-function parseYear(value: unknown) {
-  return parseYearWithLabel(value, '입학년도');
-}
-
-function parseYearWithLabel(value: unknown, label: string) {
-  const year = parsePositiveInt(value, label, 2000, 2099);
-
-  if (`${year}`.length !== 4) {
-    throw new BadRequestException(`${label}는 4자리로 입력해주세요.`);
-  }
-
-  return year;
-}
-
-function parsePositiveInt(
-  value: unknown,
-  label: string,
-  min: number,
-  max: number,
-) {
-  const text = toInputText(value);
-  const parsed = Number.parseInt(text, 10);
-
-  if (
-    !/^\d+$/.test(text) ||
-    Number.isNaN(parsed) ||
-    parsed < min ||
-    parsed > max
-  ) {
-    throw new BadRequestException(`${label} 값이 올바르지 않습니다.`);
-  }
-
-  return parsed;
-}
-
-function parseRequiredText(value: unknown, label: string) {
-  const text = toInputText(value);
-
-  if (!text) {
-    throw new BadRequestException(`${label}을 입력해주세요.`);
-  }
-
-  return text;
-}
-
-function parsePhone(value: unknown) {
-  const phone = toInputText(value);
-  const digits = extractPhoneDigits(phone);
-
-  if (!/^010\d{8}$/.test(digits)) {
-    throw new BadRequestException(
-      '전화번호는 010-0000-0000 형식으로 입력해주세요.',
-    );
-  }
-
-  return digits;
-}
-
-function parseTeacherId(value: unknown) {
-  const teacherId = toInputText(value);
-
-  if (!teacherId) {
-    throw new BadRequestException('교사 아이디를 입력해주세요.');
-  }
-
-  if (!/^[A-Za-z0-9._-]{4,30}$/.test(teacherId)) {
-    throw new BadRequestException(
-      '교사 아이디는 4~30자의 영문, 숫자, ., _, - 만 사용할 수 있습니다.',
-    );
-  }
-
-  return teacherId;
-}
-
-function parseMajorSubject(value: unknown) {
-  const majorSubject = toInputText(value);
-
-  if (!majorSubject) {
-    throw new BadRequestException('전공과목을 입력하거나 선택해주세요.');
-  }
-
-  return majorSubject;
-}
-
-function buildStudentId(
-  school: School,
-  admissionYear: number,
-  classNumber: number,
-  studentNumber: number,
-) {
-  const prefix = school === School.GBSW ? 'GB' : 'BY';
-  const year = `${admissionYear}`.slice(-2);
-
-  return `${prefix}${year}${pad(classNumber)}${pad(studentNumber)}`;
-}
-
-function pad(value: number) {
-  return `${value}`.padStart(2, '0');
-}
-
-function toInputText(value: unknown) {
-  if (typeof value === 'string') {
-    return value.trim();
-  }
-
-  if (typeof value === 'number') {
-    return `${value}`;
-  }
-
-  return '';
-}
-
-function parseBoolean(value: unknown) {
-  if (typeof value === 'boolean') {
-    return value;
-  }
-
-  if (typeof value === 'string') {
-    return value === 'true';
-  }
-
-  return false;
-}
-
-function buildTemporaryPassword(accountId: string, phone: string) {
-  return `${accountId}${phone.slice(-4)}`;
-}
-
-function extractPhoneDigits(phone: string) {
-  return phone.replaceAll(/\D/g, '');
-}
-
-function isUniqueConstraintError(error: unknown) {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === 'P2002'
-  );
 }

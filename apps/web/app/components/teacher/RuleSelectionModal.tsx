@@ -1,0 +1,339 @@
+'use client'
+
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { ModalBase } from '../ui/modal'
+import { XIcon } from '../ui/icons'
+import type { SchoolMileageRuleSummary } from './school-mileage-types'
+import { inputStyle } from './teacher-shared'
+import { koreanIncludes } from '@/lib/korean-search'
+
+type RuleSelectionModalProps = {
+  isOpen: boolean
+  rewardRules: SchoolMileageRuleSummary[]
+  penaltyRules: SchoolMileageRuleSummary[]
+  currentRuleId: number | ''
+  onSelect: (rule: SchoolMileageRuleSummary) => void
+  onClose: () => void
+}
+
+export default function RuleSelectionModal({
+  isOpen,
+  rewardRules,
+  penaltyRules,
+  currentRuleId,
+  onSelect,
+  onClose,
+}: RuleSelectionModalProps) {
+  const [search, setSearch] = useState('')
+  const searchRef = useRef<HTMLInputElement>(null)
+
+  function handleClose() {
+    setSearch('')
+    onClose()
+  }
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    const timeoutId = window.setTimeout(() => searchRef.current?.focus(), 80)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [isOpen])
+
+  const filteredReward = useMemo(
+    () =>
+      rewardRules.filter(
+        (rule) =>
+          !search ||
+          koreanIncludes(rule.name, search) ||
+          koreanIncludes(rule.category, search),
+      ),
+    [rewardRules, search],
+  )
+
+  const filteredPenalty = useMemo(
+    () =>
+      penaltyRules.filter(
+        (rule) =>
+          !search ||
+          koreanIncludes(rule.name, search) ||
+          koreanIncludes(rule.category, search),
+      ),
+    [penaltyRules, search],
+  )
+
+  const hasResults = filteredReward.length > 0 || filteredPenalty.length > 0
+
+  return (
+    <ModalBase isOpen={isOpen} onClose={handleClose} maxWidth="max-w-lg">
+      <div
+        className="flex max-h-[80vh] flex-col overflow-hidden rounded-2xl border"
+        style={{
+          backgroundColor: 'var(--admin-sidebar-bg)',
+          borderColor: 'var(--admin-border)',
+        }}
+      >
+        <div
+          className="flex items-center justify-between px-5 py-4"
+          style={{ borderBottom: '1px solid var(--admin-border)' }}
+        >
+          <div>
+            <p
+              className="text-sm font-semibold"
+              style={{
+                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                color: 'var(--admin-text)',
+              }}
+            >
+              상벌점 항목 선택
+            </p>
+            <p
+              className="mt-0.5 text-xs"
+              style={{
+                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                color: 'var(--admin-text-muted)',
+              }}
+            >
+              항목을 선택하면 기본 점수가 자동 적용됩니다.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:opacity-70"
+            style={{ color: 'var(--admin-text-muted)' }}
+            aria-label="닫기"
+          >
+            <XIcon />
+          </button>
+        </div>
+
+        <div
+          className="px-5 py-3"
+          style={{ borderBottom: '1px solid var(--admin-border)' }}
+        >
+          <div className="relative">
+            <svg
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              style={{ color: 'var(--admin-text-muted)' }}
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              ref={searchRef}
+              type="text"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="항목명 또는 카테고리 검색"
+              className="w-full rounded-lg border py-2 pl-8 pr-3 text-sm outline-none"
+              style={inputStyle}
+            />
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-4 py-3">
+          {!hasResults ? (
+            <div className="flex flex-col items-center gap-2 py-8 text-center">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                style={{ color: 'var(--admin-text-muted)' }}
+                aria-hidden="true"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <p
+                className="text-sm"
+                style={{
+                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                  color: 'var(--admin-text-muted)',
+                }}
+              >
+                검색 결과가 없습니다.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredReward.length > 0 && (
+                <div>
+                  <div className="mb-2 flex items-center gap-1.5 px-1">
+                    <span
+                      className="inline-block h-2 w-2 rounded-full"
+                      style={{ backgroundColor: '#16a34a' }}
+                    />
+                    <p
+                      className="text-[11px] font-semibold tracking-wide"
+                      style={{
+                        color: '#16a34a',
+                        fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                      }}
+                    >
+                      상점 ({filteredReward.length})
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    {filteredReward.map((rule) => {
+                      const isSelected = currentRuleId === rule.id
+
+                      return (
+                        <button
+                          key={rule.id}
+                          type="button"
+                          onClick={() => {
+                            onSelect(rule)
+                            handleClose()
+                          }}
+                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors"
+                          style={{
+                            backgroundColor: isSelected
+                              ? 'rgba(34,197,94,0.08)'
+                              : 'transparent',
+                            borderWidth: 1,
+                            borderStyle: 'solid',
+                            borderColor: isSelected
+                              ? 'rgba(34,197,94,0.3)'
+                              : 'transparent',
+                          }}
+                        >
+                          <span
+                            className="w-[52px] flex-shrink-0 rounded-md px-2 py-0.5 text-center text-xs font-bold"
+                            style={{
+                              backgroundColor: 'rgba(34,197,94,0.15)',
+                              color: '#15803d',
+                              border: '1px solid rgba(34,197,94,0.3)',
+                              fontFamily: 'var(--font-space-grotesk)',
+                            }}
+                          >
+                            +{rule.defaultScore}점
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p
+                              className="truncate text-sm font-medium"
+                              style={{
+                                color: 'var(--admin-text)',
+                                fontFamily:
+                                  'var(--font-noto-sans-kr), sans-serif',
+                              }}
+                            >
+                              {rule.name}
+                            </p>
+                            <p
+                              className="truncate text-[11px]"
+                              style={{
+                                color: 'var(--admin-text-muted)',
+                                fontFamily:
+                                  'var(--font-noto-sans-kr), sans-serif',
+                              }}
+                            >
+                              {rule.category}
+                            </p>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {filteredPenalty.length > 0 && (
+                <div>
+                  <div className="mb-2 flex items-center gap-1.5 px-1">
+                    <span
+                      className="inline-block h-2 w-2 rounded-full"
+                      style={{ backgroundColor: '#dc2626' }}
+                    />
+                    <p
+                      className="text-[11px] font-semibold tracking-wide"
+                      style={{
+                        color: '#dc2626',
+                        fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                      }}
+                    >
+                      벌점 ({filteredPenalty.length})
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    {filteredPenalty.map((rule) => {
+                      const isSelected = currentRuleId === rule.id
+
+                      return (
+                        <button
+                          key={rule.id}
+                          type="button"
+                          onClick={() => {
+                            onSelect(rule)
+                            handleClose()
+                          }}
+                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors"
+                          style={{
+                            backgroundColor: isSelected
+                              ? 'rgba(239,68,68,0.08)'
+                              : 'transparent',
+                            borderWidth: 1,
+                            borderStyle: 'solid',
+                            borderColor: isSelected
+                              ? 'rgba(239,68,68,0.3)'
+                              : 'transparent',
+                          }}
+                        >
+                          <span
+                            className="w-[52px] flex-shrink-0 rounded-md px-2 py-0.5 text-center text-xs font-bold"
+                            style={{
+                              backgroundColor: 'rgba(239,68,68,0.15)',
+                              color: '#b91c1c',
+                              border: '1px solid rgba(239,68,68,0.3)',
+                              fontFamily: 'var(--font-space-grotesk)',
+                            }}
+                          >
+                            -{rule.defaultScore}점
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p
+                              className="truncate text-sm font-medium"
+                              style={{
+                                color: 'var(--admin-text)',
+                                fontFamily:
+                                  'var(--font-noto-sans-kr), sans-serif',
+                              }}
+                            >
+                              {rule.name}
+                            </p>
+                            <p
+                              className="truncate text-[11px]"
+                              style={{
+                                color: 'var(--admin-text-muted)',
+                                fontFamily:
+                                  'var(--font-noto-sans-kr), sans-serif',
+                              }}
+                            >
+                              {rule.category}
+                            </p>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </ModalBase>
+  )
+}

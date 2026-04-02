@@ -9,7 +9,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { assertInternalApiRequest } from '../admin/admin-auth';
+import { assertInternalApiRequest } from '../common/internal-api-auth';
 import { SchoolMileageService } from './school-mileage.service';
 
 @Controller('school-mileage')
@@ -35,6 +35,58 @@ export class SchoolMileageController {
     assertInternalApiRequest(internalApiSecret);
 
     return this.schoolMileageService.getStudents(actorTeacherId, query);
+  }
+
+  @Get('students/:studentId/summary')
+  getStudentSummary(
+    @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
+    @Headers('x-actor-teacher-id') actorTeacherId: string | undefined,
+    @Param('studentId') studentId: string,
+    @Query() query: Record<string, unknown>,
+  ) {
+    assertInternalApiRequest(internalApiSecret);
+
+    return this.schoolMileageService.getStudentSummary(
+      actorTeacherId,
+      studentId,
+      query,
+    );
+  }
+
+  @Get('analytics/overview')
+  getOverviewAnalytics(
+    @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
+    @Headers('x-actor-teacher-id') actorTeacherId: string | undefined,
+    @Query() query: Record<string, unknown>,
+  ) {
+    assertInternalApiRequest(internalApiSecret);
+
+    return this.schoolMileageService.getOverviewAnalytics(
+      actorTeacherId,
+      query,
+    );
+  }
+
+  @Get('analytics/students')
+  getStudentAnalytics(
+    @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
+    @Headers('x-actor-teacher-id') actorTeacherId: string | undefined,
+    @Query() query: Record<string, unknown>,
+  ) {
+    assertInternalApiRequest(internalApiSecret);
+
+    return this.schoolMileageService.getStudentAnalytics(actorTeacherId, query);
+  }
+
+  @Get('analytics/classes')
+  getClassAnalytics(
+    @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
+    @Headers('x-actor-teacher-id') actorTeacherId: string | undefined,
+    @Query() query: Record<string, unknown>,
+  ) {
+    assertInternalApiRequest(internalApiSecret);
+
+    return this.schoolMileageService.getClassAnalytics(actorTeacherId, query);
   }
 
   @Post('entries/batch')

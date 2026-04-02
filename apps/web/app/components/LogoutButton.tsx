@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
 
 type LogoutButtonProps = {
   children?: ReactNode
@@ -15,16 +16,23 @@ export default function LogoutButton({
   style,
 }: LogoutButtonProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const router = useRouter()
 
   async function handleLogout() {
     if (isLoggingOut) return
     setIsLoggingOut(true)
+
     try {
-      await fetch('/api/auth/logout', { method: 'POST' })
+      const response = await fetch('/api/auth/logout', { method: 'POST' })
+
+      if (!response.ok) {
+        throw new Error('logout_failed')
+      }
+
+      router.replace('/')
+      router.refresh()
     } catch {
-      // 네트워크 오류여도 '/'로 이동 (graceful degradation)
-    } finally {
-      window.location.href = '/'
+      window.location.assign('/')
     }
   }
 

@@ -109,11 +109,11 @@ export function isAuthRole(value: unknown): value is AuthRole {
 export function getDefaultRedirectPathForRole(role: AuthRole) {
   switch (role) {
     case 'super-admin':
-      return '/admin'
+      return '/admin/students/create'
     case 'student':
-      return '/'
+      return '/student'
     case 'teacher':
-      return '/'
+      return '/teacher'
   }
 }
 

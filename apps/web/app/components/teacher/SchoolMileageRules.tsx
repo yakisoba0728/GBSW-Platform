@@ -8,36 +8,12 @@ import {
   NoticeBox,
   SectionHeader,
   inputStyle,
-  koreanIncludes,
 } from './teacher-shared'
 import { AlertModal } from '../ui/modal'
 import { AnimatedTableRow, ListEmptyState, TableRowSkeleton } from '../ui/list'
+import { EditIcon, FileIcon, PlusIcon, SearchIcon, SlashIcon } from '../ui/icons'
 import type { MileageType, SchoolMileageRuleSummary } from './school-mileage-types'
-
-function PlusIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-      <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-    </svg>
-  )
-}
-
-function EditIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-    </svg>
-  )
-}
-
-function SlashIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
-    </svg>
-  )
-}
+import { koreanIncludes } from '@/lib/korean-search'
 
 export default function SchoolMileageRules({
   rules,
@@ -105,14 +81,10 @@ export default function SchoolMileageRules({
       <Card>
         <FilterRow>
           <div className="relative flex-1" style={{ minWidth: '160px' }}>
-            <svg
+            <SearchIcon
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
-              width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
               style={{ color: 'var(--admin-text-muted)' }}
-              aria-hidden="true"
-            >
-              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
+            />
             <input
               type="text"
               value={search}
@@ -194,10 +166,9 @@ export default function SchoolMileageRules({
                   <td colSpan={8}>
                     <ListEmptyState
                       icon={
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" style={{ color: 'var(--admin-accent)' }} aria-hidden="true">
-                          <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-                          <rect x="9" y="3" width="6" height="4" rx="1" />
-                        </svg>
+                        <FileIcon
+                          style={{ color: 'var(--admin-accent)' }}
+                        />
                       }
                       title="규칙이 없습니다"
                       description="검색 조건을 변경하거나 새 항목을 추가해 보세요."

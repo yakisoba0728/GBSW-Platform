@@ -33,7 +33,7 @@ try {
   startProcess('API', ['start:dev'], apiDir);
   startProcess(
     'Web',
-    ['exec', 'next', 'dev', '--port', `${config.webPort}`],
+    ['exec', 'next', 'dev', '--webpack', '--port', `${config.webPort}`],
     webDir,
   );
 

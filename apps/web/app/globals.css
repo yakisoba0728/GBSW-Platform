@@ -310,3 +310,13 @@ html.no-transitions *::after {
     font-weight: 600;
   }
 }
+
+.print-only {
+  display: none !important;
+}
+
+@media print {
+  .print-only {
+    display: block !important;
+  }
+}

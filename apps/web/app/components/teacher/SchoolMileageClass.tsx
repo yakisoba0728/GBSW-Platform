@@ -1,40 +1,41 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import {
   Card,
   FilterRow,
   NoticeBox,
-  SectionHeader,
   SCHOOL_OPTIONS,
+  SectionHeader,
   StatCard,
   inputStyle,
 } from './teacher-shared'
 import { AnimatedListItem, ListEmptyState } from '../ui/list'
+import { BuildingIcon } from '../ui/icons'
 import type {
+  ClassMileageAnalyticsResponse,
   ClassMileageSummary,
   SchoolCode,
-  SchoolMileageHistoryItem,
-  SchoolMileageStudentOption,
   StudentMileageSummary,
 } from './school-mileage-types'
-
-function BuildingIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--admin-accent)' }} aria-hidden="true">
-      <rect x="4" y="2" width="16" height="20" rx="2" />
-      <path d="M9 22V12h6v10" />
-      <path d="M8 7h.01M12 7h.01M16 7h.01M8 11h.01M16 11h.01" />
-    </svg>
-  )
-}
+import { getQueryString, useUpdateSearchParams } from '@/lib/url-state'
 
 function ChevronDownIcon({ open }: { open: boolean }) {
   return (
     <svg
-      width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
       aria-hidden="true"
-      style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 250ms ease' }}
+      style={{
+        transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+        transition: 'transform 250ms ease',
+      }}
     >
       <polyline points="6 9 12 15 18 9" />
     </svg>
@@ -51,18 +52,30 @@ function StudentRow({
   colorToken: 'green' | 'red'
 }) {
   return (
-    <div className="flex items-center gap-2 rounded-lg px-3 py-2" style={{ backgroundColor: 'var(--admin-bg)' }}>
+    <div
+      className="flex items-center gap-2 rounded-lg px-3 py-2"
+      style={{ backgroundColor: 'var(--admin-bg)' }}
+    >
       <span
         className="h-5 w-5 flex-shrink-0 rounded-full text-center text-[10px] font-bold leading-5"
         style={{
-          backgroundColor: colorToken === 'green' ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
+          backgroundColor:
+            colorToken === 'green'
+              ? 'rgba(34,197,94,0.15)'
+              : 'rgba(239,68,68,0.15)',
           color: colorToken === 'green' ? '#16a34a' : '#dc2626',
           fontFamily: 'var(--font-space-grotesk)',
         }}
       >
         {rank}
       </span>
-      <span className="min-w-0 flex-1 truncate text-xs font-medium" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text)' }}>
+      <span
+        className="min-w-0 flex-1 truncate text-xs font-medium"
+        style={{
+          fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+          color: 'var(--admin-text)',
+        }}
+      >
         {student.name}
       </span>
       <span
@@ -72,7 +85,8 @@ function StudentRow({
           color: colorToken === 'green' ? '#16a34a' : '#dc2626',
         }}
       >
-        {student.netScore >= 0 ? '+' : ''}{student.netScore}점
+        {student.netScore >= 0 ? '+' : ''}
+        {student.netScore}점
       </span>
     </div>
   )
@@ -91,17 +105,20 @@ function ClassCard({
 }) {
   return (
     <AnimatedListItem index={index}>
-      <Card className="p-0 overflow-hidden">
+      <Card className="overflow-hidden p-0">
         <button
           type="button"
           onClick={onToggle}
-          className="w-full text-left px-4 pt-4 pb-3 transition-colors hover:opacity-90"
+          className="w-full px-4 pb-3 pt-4 text-left transition-colors hover:opacity-90"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span
                 className="text-2xl font-bold"
-                style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--admin-text)' }}
+                style={{
+                  fontFamily: 'var(--font-space-grotesk)',
+                  color: 'var(--admin-text)',
+                }}
               >
                 {summary.classNumber}반
               </span>
@@ -122,16 +139,74 @@ function ClassCard({
           </div>
 
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="rounded-lg px-3 py-2" style={{ backgroundColor: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)' }}>
-              <p className="text-[10px]" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: '#16a34a' }}>상점 합계</p>
-              <p className="mt-0.5 text-lg font-semibold" style={{ fontFamily: 'var(--font-space-grotesk)', color: '#16a34a' }}>+{summary.rewardTotal}</p>
+            <div
+              className="rounded-lg px-3 py-2"
+              style={{
+                backgroundColor: 'rgba(34,197,94,0.06)',
+                border: '1px solid rgba(34,197,94,0.2)',
+              }}
+            >
+              <p
+                className="text-[10px]"
+                style={{
+                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                  color: '#16a34a',
+                }}
+              >
+                상점 합계
+              </p>
+              <p
+                className="mt-0.5 text-lg font-semibold"
+                style={{
+                  fontFamily: 'var(--font-space-grotesk)',
+                  color: '#16a34a',
+                }}
+              >
+                +{summary.rewardTotal}
+              </p>
             </div>
-            <div className="rounded-lg px-3 py-2" style={{ backgroundColor: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)' }}>
-              <p className="text-[10px]" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: '#dc2626' }}>벌점 합계</p>
-              <p className="mt-0.5 text-lg font-semibold" style={{ fontFamily: 'var(--font-space-grotesk)', color: '#dc2626' }}>-{summary.penaltyTotal}</p>
+            <div
+              className="rounded-lg px-3 py-2"
+              style={{
+                backgroundColor: 'rgba(239,68,68,0.06)',
+                border: '1px solid rgba(239,68,68,0.2)',
+              }}
+            >
+              <p
+                className="text-[10px]"
+                style={{
+                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                  color: '#dc2626',
+                }}
+              >
+                벌점 합계
+              </p>
+              <p
+                className="mt-0.5 text-lg font-semibold"
+                style={{
+                  fontFamily: 'var(--font-space-grotesk)',
+                  color: '#dc2626',
+                }}
+              >
+                -{summary.penaltyTotal}
+              </p>
             </div>
-            <div className="rounded-lg px-3 py-2" style={{ backgroundColor: 'var(--admin-bg)', border: '1px solid var(--admin-border)' }}>
-              <p className="text-[10px]" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}>순점수 합</p>
+            <div
+              className="rounded-lg px-3 py-2"
+              style={{
+                backgroundColor: 'var(--admin-bg)',
+                border: '1px solid var(--admin-border)',
+              }}
+            >
+              <p
+                className="text-[10px]"
+                style={{
+                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                  color: 'var(--admin-text-muted)',
+                }}
+              >
+                순점수 합
+              </p>
               <p
                 className="mt-0.5 text-lg font-semibold"
                 style={{
@@ -139,11 +214,26 @@ function ClassCard({
                   color: summary.netScore >= 0 ? '#16a34a' : '#dc2626',
                 }}
               >
-                {summary.netScore >= 0 ? '+' : ''}{summary.netScore}
+                {summary.netScore >= 0 ? '+' : ''}
+                {summary.netScore}
               </p>
             </div>
-            <div className="rounded-lg px-3 py-2" style={{ backgroundColor: 'var(--admin-bg)', border: '1px solid var(--admin-border)' }}>
-              <p className="text-[10px]" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}>1인 평균</p>
+            <div
+              className="rounded-lg px-3 py-2"
+              style={{
+                backgroundColor: 'var(--admin-bg)',
+                border: '1px solid var(--admin-border)',
+              }}
+            >
+              <p
+                className="text-[10px]"
+                style={{
+                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                  color: 'var(--admin-text-muted)',
+                }}
+              >
+                1인 평균
+              </p>
               <p
                 className="mt-0.5 text-lg font-semibold"
                 style={{
@@ -151,44 +241,76 @@ function ClassCard({
                   color: summary.avgNetScore >= 0 ? '#16a34a' : '#dc2626',
                 }}
               >
-                {summary.avgNetScore >= 0 ? '+' : ''}{summary.avgNetScore}
+                {summary.avgNetScore >= 0 ? '+' : ''}
+                {summary.avgNetScore}
               </p>
             </div>
           </div>
         </button>
 
-        {/* Accordion 펼침 */}
         {isExpanded && (
-          <div className="animate-slide-down px-4 pb-4 pt-1" style={{ borderTop: '1px solid var(--admin-border)' }}>
+          <div
+            className="animate-slide-down px-4 pb-4 pt-1"
+            style={{ borderTop: '1px solid var(--admin-border)' }}
+          >
             {summary.topStudents.length > 0 && (
               <div className="mt-3">
-                <p className="mb-2 text-[11px] font-semibold" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: '#16a34a' }}>
+                <p
+                  className="mb-2 text-[11px] font-semibold"
+                  style={{
+                    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                    color: '#16a34a',
+                  }}
+                >
                   상위 학생
                 </p>
                 <div className="space-y-1">
-                  {summary.topStudents.map((s, i) => (
-                    <StudentRow key={s.studentId} student={s} rank={i + 1} colorToken="green" />
+                  {summary.topStudents.map((student, index) => (
+                    <StudentRow
+                      key={student.studentId}
+                      student={student}
+                      rank={index + 1}
+                      colorToken="green"
+                    />
                   ))}
                 </div>
               </div>
             )}
             {summary.bottomStudents.length > 0 && (
               <div className="mt-3">
-                <p className="mb-2 text-[11px] font-semibold" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: '#dc2626' }}>
+                <p
+                  className="mb-2 text-[11px] font-semibold"
+                  style={{
+                    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                    color: '#dc2626',
+                  }}
+                >
                   주의 학생
                 </p>
                 <div className="space-y-1">
-                  {summary.bottomStudents.map((s, i) => (
-                    <StudentRow key={s.studentId} student={s} rank={i + 1} colorToken="red" />
+                  {summary.bottomStudents.map((student, index) => (
+                    <StudentRow
+                      key={student.studentId}
+                      student={student}
+                      rank={index + 1}
+                      colorToken="red"
+                    />
                   ))}
                 </div>
               </div>
             )}
-            {summary.topStudents.length === 0 && summary.bottomStudents.length === 0 && (
-              <p className="mt-3 text-center text-xs py-2" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}>
-                이 반에 상벌점 내역이 없습니다.
-              </p>
-            )}
+            {summary.topStudents.length === 0 &&
+              summary.bottomStudents.length === 0 && (
+                <p
+                  className="mt-3 py-2 text-center text-xs"
+                  style={{
+                    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                    color: 'var(--admin-text-muted)',
+                  }}
+                >
+                  이 반에 상벌점 내역이 없습니다.
+                </p>
+              )}
           </div>
         )}
       </Card>
@@ -196,15 +318,26 @@ function ClassCard({
   )
 }
 
-export default function SchoolMileageClass() {
-  const [filterSchool, setFilterSchool] = useState<SchoolCode | ''>('')
-  const [filterGrade, setFilterGrade] = useState('')
+const EMPTY_RESPONSE: ClassMileageAnalyticsResponse = {
+  classes: [],
+  overall: {
+    classCount: 0,
+    totalStudents: 0,
+    rewardTotal: 0,
+    penaltyTotal: 0,
+    netScore: 0,
+  },
+}
 
-  const [students, setStudents] = useState<SchoolMileageStudentOption[]>([])
-  const [entries, setEntries] = useState<SchoolMileageHistoryItem[]>([])
-  const [totalCount, setTotalCount] = useState(0)
+export default function SchoolMileageClass() {
+  const searchParams = useSearchParams()
+  const updateSearchParams = useUpdateSearchParams()
+  const filterSchool = getQueryString(searchParams, 'school') as SchoolCode | ''
+  const filterGrade = getQueryString(searchParams, 'year')
+
+  const [response, setResponse] =
+    useState<ClassMileageAnalyticsResponse>(EMPTY_RESPONSE)
   const [isLoading, setIsLoading] = useState(false)
-  const [hasQueried, setHasQueried] = useState(false)
   const [queryError, setQueryError] = useState<string | null>(null)
   const [expandedClass, setExpandedClass] = useState<number | null>(null)
 
@@ -212,7 +345,12 @@ export default function SchoolMileageClass() {
 
   const loadClassData = useCallback(async () => {
     if (!filterSchool) {
-      setQueryError('학교를 먼저 선택해주세요.')
+      abortRef.current?.abort()
+      abortRef.current = null
+      setResponse(EMPTY_RESPONSE)
+      setQueryError(null)
+      setExpandedClass(null)
+      setIsLoading(false)
       return
     }
 
@@ -225,108 +363,52 @@ export default function SchoolMileageClass() {
     setExpandedClass(null)
 
     try {
-      const studentParams = new URLSearchParams({ school: filterSchool })
-      if (filterGrade) studentParams.set('year', filterGrade)
-
-      const entryParams = new URLSearchParams({ school: filterSchool, pageSize: '500', page: '1' })
-      if (filterGrade) entryParams.set('year', filterGrade)
-
-      const [studentsRes, entriesRes] = await Promise.allSettled([
-        fetch(`/api/teacher/school-mileage/students?${studentParams.toString()}`, { signal: ctrl.signal, cache: 'no-store' }),
-        fetch(`/api/teacher/school-mileage/entries?${entryParams.toString()}`, { signal: ctrl.signal, cache: 'no-store' }),
-      ])
-
-      if (studentsRes.status === 'fulfilled' && studentsRes.value.ok) {
-        const data = await studentsRes.value.json().catch(() => null)
-        setStudents(Array.isArray(data?.students) ? data.students : [])
-      } else {
-        setStudents([])
+      const params = new URLSearchParams({ school: filterSchool })
+      if (filterGrade) {
+        params.set('year', filterGrade)
       }
 
-      if (entriesRes.status === 'fulfilled' && entriesRes.value.ok) {
-        const data = await entriesRes.value.json().catch(() => null)
-        setEntries(Array.isArray(data?.items) ? data.items : [])
-        setTotalCount(data?.totalCount ?? 0)
-      } else {
-        setEntries([])
-        setTotalCount(0)
+      const res = await fetch(
+        `/api/teacher/school-mileage/analytics/classes?${params.toString()}`,
+        {
+          signal: ctrl.signal,
+          cache: 'no-store',
+        },
+      )
+      const data = await res.json().catch(() => null)
+
+      if (!res.ok) {
+        setQueryError(data?.message ?? '학급 현황 데이터를 불러오지 못했습니다.')
+        setResponse(EMPTY_RESPONSE)
+        return
       }
-    } catch (e) {
-      if ((e as Error).name !== 'AbortError') {
+
+      setResponse({
+        classes: Array.isArray(data?.classes)
+          ? (data.classes as ClassMileageSummary[])
+          : [],
+        overall: data?.overall ?? EMPTY_RESPONSE.overall,
+      })
+    } catch (error) {
+      if ((error as Error).name !== 'AbortError') {
         setQueryError('학급 현황 조회 중 문제가 발생했습니다.')
+        setResponse(EMPTY_RESPONSE)
       }
     } finally {
-      setIsLoading(false)
-      setHasQueried(true)
+      if (abortRef.current === ctrl) {
+        abortRef.current = null
+        setIsLoading(false)
+      }
     }
-  }, [filterSchool, filterGrade])
+  }, [filterGrade, filterSchool])
 
   useEffect(() => {
-    return () => { abortRef.current?.abort() }
-  }, [])
+    void loadClassData()
 
-  const classSummaries = useMemo((): ClassMileageSummary[] => {
-    if (students.length === 0) return []
-
-    const classStudents = new Map<number, SchoolMileageStudentOption[]>()
-    for (const s of students) {
-      const arr = classStudents.get(s.classNumber) ?? []
-      arr.push(s)
-      classStudents.set(s.classNumber, arr)
+    return () => {
+      abortRef.current?.abort()
     }
-
-    const studentEntryMap = new Map<string, SchoolMileageHistoryItem[]>()
-    for (const e of entries) {
-      const arr = studentEntryMap.get(e.studentId) ?? []
-      arr.push(e)
-      studentEntryMap.set(e.studentId, arr)
-    }
-
-    return [...classStudents.entries()]
-      .map(([classNumber, classStudentList]) => {
-        const studentSummaries: StudentMileageSummary[] = classStudentList.map((s) => {
-          const ents = studentEntryMap.get(s.studentId) ?? []
-          const reward = ents.filter((e) => e.type === 'reward').reduce((acc, e) => acc + e.score, 0)
-          const penalty = ents.filter((e) => e.type === 'penalty').reduce((acc, e) => acc + e.score, 0)
-          return {
-            ...s,
-            rewardTotal: reward,
-            penaltyTotal: penalty,
-            netScore: reward - penalty,
-            entryCount: ents.length,
-          }
-        })
-
-        const rewardTotal = studentSummaries.reduce((acc, s) => acc + s.rewardTotal, 0)
-        const penaltyTotal = studentSummaries.reduce((acc, s) => acc + s.penaltyTotal, 0)
-        const netScore = rewardTotal - penaltyTotal
-        const avgNetScore =
-          studentSummaries.length > 0
-            ? Math.round((netScore / studentSummaries.length) * 10) / 10
-            : 0
-
-        const sorted = [...studentSummaries].sort((a, b) => b.netScore - a.netScore)
-
-        return {
-          classNumber,
-          studentCount: classStudentList.length,
-          rewardTotal,
-          penaltyTotal,
-          netScore,
-          avgNetScore,
-          topStudents: sorted.slice(0, 3),
-          bottomStudents: sorted.length > 3 ? sorted.slice(-3).reverse() : [],
-        }
-      })
-      .sort((a, b) => a.classNumber - b.classNumber)
-  }, [students, entries])
-
-  const overallSummary = useMemo(() => {
-    const rewardTotal = classSummaries.reduce((acc, c) => acc + c.rewardTotal, 0)
-    const penaltyTotal = classSummaries.reduce((acc, c) => acc + c.penaltyTotal, 0)
-    const totalStudents = classSummaries.reduce((acc, c) => acc + c.studentCount, 0)
-    return { rewardTotal, penaltyTotal, netScore: rewardTotal - penaltyTotal, totalStudents, classCount: classSummaries.length }
-  }, [classSummaries])
+  }, [loadClassData])
 
   return (
     <div className="space-y-4">
@@ -339,19 +421,25 @@ export default function SchoolMileageClass() {
           <FilterRow>
             <select
               value={filterSchool}
-              onChange={(e) => setFilterSchool(e.target.value as SchoolCode | '')}
+              onChange={(event) =>
+                updateSearchParams({ school: event.target.value, year: filterGrade })
+              }
               className="rounded-lg border px-3 py-2 text-xs outline-none"
               style={inputStyle}
             >
               <option value="">학교 선택</option>
-              {SCHOOL_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
+              {SCHOOL_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
               ))}
             </select>
 
             <select
               value={filterGrade}
-              onChange={(e) => setFilterGrade(e.target.value)}
+              onChange={(event) =>
+                updateSearchParams({ year: event.target.value })
+              }
               className="rounded-lg border px-3 py-2 text-xs outline-none"
               style={inputStyle}
             >
@@ -363,7 +451,9 @@ export default function SchoolMileageClass() {
 
             <button
               type="button"
-              onClick={() => { void loadClassData() }}
+              onClick={() => {
+                void loadClassData()
+              }}
               disabled={isLoading || !filterSchool}
               className="rounded-lg px-4 py-2 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
               style={{
@@ -372,7 +462,7 @@ export default function SchoolMileageClass() {
                 color: '#fff',
               }}
             >
-              {isLoading ? '조회 중...' : '조회'}
+              {isLoading ? '조회 중...' : '새로고침'}
             </button>
           </FilterRow>
         </div>
@@ -380,59 +470,94 @@ export default function SchoolMileageClass() {
 
       {queryError && <NoticeBox type="error" message={queryError} />}
 
-      {!hasQueried && !isLoading && (
+      {!filterSchool && !isLoading && (
         <Card>
           <ListEmptyState
-            icon={<BuildingIcon />}
-            title="학교를 선택하고 조회하세요"
-            description="학교·학년 조건을 설정하고 조회 버튼을 클릭하세요."
+            icon={<BuildingIcon style={{ color: 'var(--admin-accent)' }} />}
+            title="학교를 선택하세요"
+            description="학교·학년 조건을 설정하면 학급별 현황이 표시됩니다."
           />
         </Card>
       )}
 
-      {isLoading && (
+      {isLoading && filterSchool && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="overflow-hidden rounded-xl border h-40 relative" style={{ borderColor: 'var(--admin-border)', backgroundColor: 'var(--admin-sidebar-bg)' }}>
-              <div className="absolute inset-0 animate-shimmer" style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)' }} />
+          {[0, 1, 2, 3, 4, 5].map((index) => (
+            <div
+              key={index}
+              className="relative h-40 overflow-hidden rounded-xl border"
+              style={{
+                borderColor: 'var(--admin-border)',
+                backgroundColor: 'var(--admin-sidebar-bg)',
+              }}
+            >
+              <div
+                className="absolute inset-0 animate-shimmer"
+                style={{
+                  background:
+                    'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)',
+                }}
+              />
             </div>
           ))}
         </div>
       )}
 
-      {hasQueried && !isLoading && classSummaries.length === 0 && !queryError && (
-        <Card>
-          <ListEmptyState
-            icon={<BuildingIcon />}
-            title="학급 데이터가 없습니다"
-            description="다른 조건으로 다시 조회해 보세요."
-          />
-        </Card>
-      )}
+      {filterSchool &&
+        !isLoading &&
+        response.classes.length === 0 &&
+        !queryError && (
+          <Card>
+            <ListEmptyState
+              icon={<BuildingIcon style={{ color: 'var(--admin-accent)' }} />}
+              title="학급 데이터가 없습니다"
+              description="다른 조건으로 다시 조회해 보세요."
+            />
+          </Card>
+        )}
 
-      {hasQueried && !isLoading && classSummaries.length > 0 && (
+      {response.classes.length > 0 && (
         <>
-          {totalCount > 500 && (
-            <NoticeBox type="error" message={`전체 ${totalCount}건 중 최근 500건만 기준으로 집계됩니다.`} />
-          )}
-
-          {/* 전체 요약 */}
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            <StatCard label="총 학급 수" value={`${overallSummary.classCount}개`} />
-            <StatCard label="총 학생 수" value={`${overallSummary.totalStudents}명`} />
-            <StatCard label="전체 상점 합계" value={`+${overallSummary.rewardTotal}점`} colorToken="green" />
-            <StatCard label="전체 벌점 합계" value={`-${overallSummary.penaltyTotal}점`} colorToken="red" />
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+            <StatCard
+              label="총 학급 수"
+              value={`${response.overall.classCount}개`}
+            />
+            <StatCard
+              label="총 학생 수"
+              value={`${response.overall.totalStudents}명`}
+            />
+            <StatCard
+              label="전체 상점 합계"
+              value={`+${response.overall.rewardTotal}점`}
+              colorToken="green"
+            />
+            <StatCard
+              label="전체 벌점 합계"
+              value={`-${response.overall.penaltyTotal}점`}
+              colorToken="red"
+            />
+            <StatCard
+              label="전체 순점수"
+              value={`${response.overall.netScore >= 0 ? '+' : ''}${response.overall.netScore}점`}
+              colorToken={response.overall.netScore >= 0 ? 'green' : 'red'}
+            />
           </div>
 
-          {/* 학급 카드 그리드 */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {classSummaries.map((cls, i) => (
+            {response.classes.map((classSummary, index) => (
               <ClassCard
-                key={cls.classNumber}
-                summary={cls}
-                index={i}
-                isExpanded={expandedClass === cls.classNumber}
-                onToggle={() => setExpandedClass(expandedClass === cls.classNumber ? null : cls.classNumber)}
+                key={classSummary.classNumber}
+                summary={classSummary}
+                index={index}
+                isExpanded={expandedClass === classSummary.classNumber}
+                onToggle={() =>
+                  setExpandedClass(
+                    expandedClass === classSummary.classNumber
+                      ? null
+                      : classSummary.classNumber,
+                  )
+                }
               />
             ))}
           </div>

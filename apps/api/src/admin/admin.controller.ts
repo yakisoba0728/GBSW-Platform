@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Headers, Post } from '@nestjs/common';
-import { assertInternalApiRequest } from './admin-auth';
+import { assertInternalApiRequest } from '../common/internal-api-auth';
 import { AdminService } from './admin.service';
 
 @Controller('admin')

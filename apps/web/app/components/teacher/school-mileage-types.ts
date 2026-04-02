@@ -95,3 +95,49 @@ export type CategoryStat = {
   count: number
   totalScore: number
 }
+
+export type TopRuleStat = {
+  ruleId: number
+  ruleName: string
+  category: string
+  type: MileageType
+  count: number
+  totalScore: number
+}
+
+export type SchoolMileageOverviewSummary = {
+  rewardCount: number
+  penaltyCount: number
+  rewardSum: number
+  penaltySum: number
+  uniqueStudents: number
+  totalCount: number
+}
+
+export type SchoolMileageOverviewResponse = {
+  summary: SchoolMileageOverviewSummary
+  categoryStats: CategoryStat[]
+  topRules: TopRuleStat[]
+}
+
+export type StudentMileageAnalyticsResponse = {
+  students: StudentMileageSummary[]
+  totalCount: number
+}
+
+export type ClassMileageAnalyticsOverall = {
+  classCount: number
+  totalStudents: number
+  rewardTotal: number
+  penaltyTotal: number
+  netScore: number
+}
+
+export type ClassMileageAnalyticsResponse = {
+  classes: ClassMileageSummary[]
+  overall: ClassMileageAnalyticsOverall
+}
+
+export type StudentMileageSummaryResponse = {
+  summary: StudentMileageSummary
+}
