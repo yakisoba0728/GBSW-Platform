@@ -164,6 +164,12 @@
   50%       { opacity: 0.45; }
 }
 
+/* [10-1] shimmer — 스켈레톤 슬라이드 광택 효과: animate-shimmer */
+@keyframes shimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
 /* ─── Mobile Drawer Animations ──────────────────────────────── */
 
 /* [11] drawerEnter — 모바일 드로어 슬라이드인: animate-drawer-enter */
@@ -212,6 +218,7 @@
   .animate-slide-in-right { animation: slideInRight  220ms cubic-bezier(0.16,1,0.3,1) both; }
   .animate-bounce-subtle  { animation: bounceSubtle  600ms ease infinite; }
   .animate-pulse-soft     { animation: pulseSoft     1.8s ease-in-out infinite; }
+  .animate-shimmer        { animation: shimmer       1.6s ease-in-out infinite; }
 
   /* Mobile drawer */
   .animate-drawer-enter  { animation: drawerEnter  280ms cubic-bezier(0.32,0.72,0,1) both; }
@@ -240,6 +247,12 @@
   to   { opacity: 1; }
 }
 
+/* [15] progressShrink — AlertModal 자동 닫힘 진행 바 */
+@keyframes progressShrink {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+
 /* View Transition 진행 중 element-level 트랜지션 억제
    — 스냅샷 캡처 시 transition 중간 상태가 찍혀 경계선이 보이는 문제 방지 */
 html.no-transitions *,
@@ -247,4 +260,53 @@ html.no-transitions *::before,
 html.no-transitions *::after {
   transition: none !important;
   animation-duration: 0ms !important;
+}
+
+/* ─── Print styles ──────────────────────────────────────────── */
+@media print {
+  nav,
+  aside,
+  header,
+  .no-print {
+    display: none !important;
+  }
+
+  .print-area {
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  @page {
+    margin: 20mm;
+  }
+
+  body {
+    color: #000 !important;
+    background: #fff !important;
+  }
+
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    font-size: 12px;
+    color: #000;
+    background: #fff;
+  }
+
+  th {
+    background: #f5f5f5 !important;
+    font-weight: 600;
+  }
 }
