@@ -2,6 +2,11 @@
 
 import { motion } from 'framer-motion'
 import { Card, SectionTitle } from '@/app/components/mileage/shared'
+import {
+  CHART_LANE_OFFSET,
+  getChartRevealTransition,
+  useMotionPreference,
+} from '@/app/components/ui/motion'
 
 export function CategoryBarChart({
   title,
@@ -12,6 +17,8 @@ export function CategoryBarChart({
   data: Array<{ category: string; total: number }>
   colorVar: string
 }) {
+  const prefersReducedMotion = useMotionPreference()
+
   if (data.length === 0) {
     return (
       <Card>
@@ -59,10 +66,11 @@ export function CategoryBarChart({
               </span>
               <div className="flex-1" style={{ minWidth: 0 }}>
                 <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${pct}%` }}
-                  transition={{ duration: 0.6, ease: 'easeOut', delay: index * 0.05 }}
+                  initial={prefersReducedMotion ? { opacity: 0 } : { width: 0 }}
+                  animate={prefersReducedMotion ? { opacity: 1 } : { width: `${pct}%` }}
+                  transition={getChartRevealTransition(prefersReducedMotion, index)}
                   style={{
+                    width: prefersReducedMotion ? `${pct}%` : undefined,
                     height: 20,
                     borderRadius: 4,
                     backgroundColor: colorVar,
@@ -101,6 +109,8 @@ export function MonthlyTrendChart({
 }: {
   data: Array<{ key: string; label: string; reward: number; penalty: number }>
 }) {
+  const prefersReducedMotion = useMotionPreference()
+
   if (data.length === 0) {
     return (
       <Card>
@@ -210,10 +220,11 @@ export function MonthlyTrendChart({
                     <div className="flex w-full flex-col">
                       {month.penalty > 0 && (
                         <motion.div
-                          initial={{ height: 0 }}
-                          animate={{ height: `${penaltyPct}%` }}
-                          transition={{ duration: 0.6, ease: 'easeOut', delay: index * 0.08 }}
+                          initial={prefersReducedMotion ? { opacity: 0 } : { height: 0 }}
+                          animate={prefersReducedMotion ? { opacity: 1 } : { height: `${penaltyPct}%` }}
+                          transition={getChartRevealTransition(prefersReducedMotion, index)}
                           style={{
+                            height: prefersReducedMotion ? `${penaltyPct}%` : undefined,
                             width: '100%',
                             maxWidth: 40,
                             backgroundColor: 'var(--penalty)',
@@ -224,10 +235,11 @@ export function MonthlyTrendChart({
                       )}
                       {month.reward > 0 && (
                         <motion.div
-                          initial={{ height: 0 }}
-                          animate={{ height: `${rewardPct}%` }}
-                          transition={{ duration: 0.6, ease: 'easeOut', delay: index * 0.08 + 0.1 }}
+                          initial={prefersReducedMotion ? { opacity: 0 } : { height: 0 }}
+                          animate={prefersReducedMotion ? { opacity: 1 } : { height: `${rewardPct}%` }}
+                          transition={getChartRevealTransition(prefersReducedMotion, index, CHART_LANE_OFFSET)}
                           style={{
+                            height: prefersReducedMotion ? `${rewardPct}%` : undefined,
                             width: '100%',
                             maxWidth: 40,
                             backgroundColor: 'var(--reward)',

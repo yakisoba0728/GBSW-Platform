@@ -11,6 +11,10 @@ import type {
 import { formatAwardedAt, formatSignedScore } from '../mileage/shared'
 import { EmptyStatePane, ListSkeleton } from '../ui/list'
 import { SearchIcon } from '../ui/icons'
+import {
+  getMicroInteractionTransition,
+  useMotionPreference,
+} from '../ui/motion'
 import { RefetchWrapper } from '../ui/primitives'
 
 const DETAIL_FETCH_PAGE_SIZE = 100
@@ -459,6 +463,9 @@ function StudentRow({
   startDate: string
   endDate: string
 }) {
+  const prefersReducedMotion = useMotionPreference()
+  const transition = getMicroInteractionTransition(prefersReducedMotion)
+
   return (
     <>
       <tr
@@ -484,7 +491,7 @@ function StudentRow({
         <td className="px-3 py-2.5" style={{ width: '32px' }}>
           <motion.span
             animate={{ rotate: isExpanded ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
+            transition={transition}
             style={{
               display: 'inline-flex',
               color: 'var(--fg-muted)',
@@ -566,7 +573,7 @@ function StudentRow({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            transition={transition}
             className="print-expanded-row"
           >
             <td colSpan={8} style={{ padding: 0 }}>

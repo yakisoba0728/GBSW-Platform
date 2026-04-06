@@ -4,7 +4,11 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Card, StatCard, ScoreSummaryBar, formatAwardedAtParts } from '@/app/components/mileage/shared'
 import { MileageBadge } from '@/app/components/ui/primitives'
-import { getSectionMotion, useMotionPreference } from '@/app/components/ui/motion'
+import {
+  getSectionMotion,
+  getStaggerDelay,
+  useMotionPreference,
+} from '@/app/components/ui/motion'
 import type { SchoolMileageHistoryItem } from '@/app/components/student/student-mileage-types'
 
 function ClipboardIcon() {
@@ -52,16 +56,16 @@ function QuickLinkCard({
   icon,
   title,
   description,
-  delay,
+  step,
 }: {
   href: string
   icon: React.ReactNode
   title: string
   description: string
-  delay: number
+  step: number
 }) {
   const prefersReducedMotion = useMotionPreference()
-  const motionProps = getSectionMotion(prefersReducedMotion, delay)
+  const motionProps = getSectionMotion(prefersReducedMotion, getStaggerDelay(step))
 
   return (
     <Link href={href} style={{ textDecoration: 'none' }}>
@@ -180,30 +184,30 @@ export function StudentHomeStatsSection({
 
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-      {[0.06, 0.1, 0.14].map((delay, index) => {
-        const motionProps = getSectionMotion(prefersReducedMotion, delay)
-        const cards = [
-          {
-            label: '총 상점',
-            value: `+${rewardTotal}`,
-            subValue: '상점 합계',
-            colorToken: 'green' as const,
-          },
-          {
-            label: '총 벌점',
-            value: `-${penaltyTotal}`,
-            subValue: '벌점 합계',
-            colorToken: 'red' as const,
-          },
-          {
-            label: '순점수',
-            value: netScore,
-            subValue: '상점 - 벌점',
-            colorToken: 'default' as const,
-          },
-        ]
-
-        const card = cards[index]
+      {[
+        {
+          label: '총 상점',
+          value: `+${rewardTotal}`,
+          subValue: '상점 합계',
+          colorToken: 'green' as const,
+        },
+        {
+          label: '총 벌점',
+          value: `-${penaltyTotal}`,
+          subValue: '벌점 합계',
+          colorToken: 'red' as const,
+        },
+        {
+          label: '순점수',
+          value: netScore,
+          subValue: '상점 - 벌점',
+          colorToken: 'default' as const,
+        },
+      ].map((card, index) => {
+        const motionProps = getSectionMotion(
+          prefersReducedMotion,
+          getStaggerDelay(index + 1),
+        )
 
         return (
           <motion.div
@@ -228,7 +232,7 @@ export function StudentHomeSummarySection({
   penaltyTotal: number
 }) {
   const prefersReducedMotion = useMotionPreference()
-  const motionProps = getSectionMotion(prefersReducedMotion, 0.18)
+  const motionProps = getSectionMotion(prefersReducedMotion, getStaggerDelay(4))
 
   if (rewardTotal <= 0 && penaltyTotal <= 0) {
     return null
@@ -257,7 +261,7 @@ export function StudentHomeRecentEntriesSection({
   entries: SchoolMileageHistoryItem[]
 }) {
   const prefersReducedMotion = useMotionPreference()
-  const motionProps = getSectionMotion(prefersReducedMotion, 0.22)
+  const motionProps = getSectionMotion(prefersReducedMotion, getStaggerDelay(5))
 
   return (
     <motion.div
@@ -446,21 +450,21 @@ export function StudentHomeQuickLinksSection() {
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
       <QuickLinkCard
-        delay={0.26}
+        step={1}
         href="/student/mileage/history"
         icon={<ClipboardIcon />}
         title="상벌점 내역"
         description="부여받은 상점과 벌점 내역을 날짜별로 확인할 수 있습니다."
       />
       <QuickLinkCard
-        delay={0.3}
+        step={2}
         href="/student/mileage/rules"
         icon={<FileTextIcon />}
         title="규정 항목"
         description="학교에 등록된 상벌점 규정 항목과 기준 점수를 확인할 수 있습니다."
       />
       <QuickLinkCard
-        delay={0.34}
+        step={3}
         href="/student/mileage/stats"
         icon={<ChartIcon />}
         title="내 통계"

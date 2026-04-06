@@ -1,6 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import {
+  getMicroInteractionTransition,
+  useMotionPreference,
+} from './motion'
 
 interface AnimatedCheckboxProps {
   checked: boolean
@@ -20,12 +24,15 @@ export default function AnimatedCheckbox({
   disabled = false,
   size = 20,
 }: AnimatedCheckboxProps) {
+  const prefersReducedMotion = useMotionPreference()
+  const transition = getMicroInteractionTransition(prefersReducedMotion)
+
   return (
     <motion.button
       type="button"
       onClick={() => !disabled && onChange(!checked)}
       disabled={disabled}
-      whileTap={disabled ? undefined : { scale: 0.85 }}
+      whileTap={disabled || prefersReducedMotion ? undefined : { scale: 0.9 }}
       style={{
         width: size,
         height: size,
@@ -42,10 +49,12 @@ export default function AnimatedCheckbox({
         transition: 'background-color 0.15s ease, border-color 0.15s ease',
       }}
       animate={{
-        scale: checked ? [1, 1.15, 1] : 1,
+        ...(prefersReducedMotion
+          ? {}
+          : { scale: checked ? [1, 1.12, 1] : 1 }),
         backgroundColor: checked ? 'var(--accent)' : 'transparent',
       }}
-      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      transition={transition}
       aria-checked={checked}
       role="checkbox"
     >
@@ -65,7 +74,7 @@ export default function AnimatedCheckbox({
           variants={checkVariants}
           initial={false}
           animate={checked ? 'checked' : 'unchecked'}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
+          transition={transition}
         />
       </svg>
     </motion.button>

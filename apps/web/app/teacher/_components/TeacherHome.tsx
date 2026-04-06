@@ -4,29 +4,33 @@ import { motion } from 'framer-motion'
 import { NoticeBox } from '@/app/components/mileage/shared'
 import { useRulesContext } from '@/app/components/mileage/rules-context'
 import { StatsGridSkeleton } from '@/app/components/ui/page-skeletons'
-import { getSectionMotion, useMotionPreference } from '@/app/components/ui/motion'
-
-const stagger = {
-  container: { transition: { staggerChildren: 0.06 } },
-  item: { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.25, ease: 'easeOut' } },
-}
+import {
+  getSectionMotion,
+  getStaggerDelay,
+  useMotionPreference,
+} from '@/app/components/ui/motion'
 
 function StatCard({
   label,
   value,
   color,
   isLoading,
+  step,
 }: {
   label: string
   value: number | string
   color?: string
   isLoading: boolean
+  step: number
 }) {
+  const prefersReducedMotion = useMotionPreference()
+  const motionProps = getSectionMotion(prefersReducedMotion, getStaggerDelay(step))
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      initial={motionProps.initial}
+      animate={motionProps.animate}
+      transition={motionProps.transition}
       style={{
         borderRadius: 12,
         border: '1px solid var(--border)',
@@ -115,16 +119,34 @@ export default function TeacherHome() {
           {isRulesLoading ? (
             <StatsGridSkeleton count={3} />
           ) : (
-            <motion.div
-              {...stagger.container}
-              animate="animate"
-              initial="initial"
-              style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+                gap: 12,
+              }}
             >
-              <StatCard label="활성 규칙 수" value={rules.length} isLoading={false} />
-              <StatCard label="상점 규칙" value={rewardRules} color="var(--reward)" isLoading={false} />
-              <StatCard label="벌점 규칙" value={penaltyRules} color="var(--penalty)" isLoading={false} />
-            </motion.div>
+              <StatCard
+                label="활성 규칙 수"
+                value={rules.length}
+                isLoading={false}
+                step={1}
+              />
+              <StatCard
+                label="상점 규칙"
+                value={rewardRules}
+                color="var(--reward)"
+                isLoading={false}
+                step={2}
+              />
+              <StatCard
+                label="벌점 규칙"
+                value={penaltyRules}
+                color="var(--penalty)"
+                isLoading={false}
+                step={3}
+              />
+            </div>
           )}
         </>
       )}

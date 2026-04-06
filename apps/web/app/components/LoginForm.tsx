@@ -6,7 +6,12 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from './ui/button'
-import { getSectionMotion, useMotionPreference } from './ui/motion'
+import {
+  getInlineMessageMotion,
+  getSectionMotion,
+  getStaggerDelay,
+  useMotionPreference,
+} from './ui/motion'
 
 const ThemeToggle = dynamic(() => import('./ThemeToggle'), {
   ssr: false,
@@ -26,7 +31,7 @@ function InputField({
   autoComplete,
   icon,
   rightAction,
-  delay,
+  step,
 }: {
   id: string
   label: string
@@ -38,11 +43,11 @@ function InputField({
   autoComplete: string
   icon: React.ReactNode
   rightAction?: React.ReactNode
-  delay: number
+  step: number
 }) {
   const [focused, setFocused] = useState(false)
   const prefersReducedMotion = useMotionPreference()
-  const motionProps = getSectionMotion(prefersReducedMotion, delay)
+  const motionProps = getSectionMotion(prefersReducedMotion, getStaggerDelay(step))
 
   return (
     <motion.div
@@ -99,8 +104,9 @@ export default function LoginForm() {
   const router = useRouter()
   const prefersReducedMotion = useMotionPreference()
   const headingMotion = getSectionMotion(prefersReducedMotion)
-  const buttonMotion = getSectionMotion(prefersReducedMotion, 0.15)
-  const footerMotion = getSectionMotion(prefersReducedMotion, 0.25)
+  const buttonMotion = getSectionMotion(prefersReducedMotion, getStaggerDelay(3))
+  const footerMotion = getSectionMotion(prefersReducedMotion, getStaggerDelay(4))
+  const errorMotion = getInlineMessageMotion(prefersReducedMotion)
   const [showPw, setShowPw] = useState(false)
   const [id, setId] = useState('')
   const [pw, setPw] = useState('')
@@ -185,7 +191,7 @@ export default function LoginForm() {
               onChange={setId}
               disabled={isSubmitting}
               autoComplete="username"
-              delay={0.05}
+              step={1}
               icon={
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -204,7 +210,7 @@ export default function LoginForm() {
               onChange={setPw}
               disabled={isSubmitting}
               autoComplete="current-password"
-              delay={0.1}
+              step={2}
               icon={
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -239,10 +245,10 @@ export default function LoginForm() {
               {errorMessage && (
                 <motion.p
                   key="error"
-                  initial={{ opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.2 }}
+                  initial={errorMotion.initial}
+                  animate={errorMotion.animate}
+                  exit={errorMotion.exit}
+                  transition={errorMotion.transition}
                   style={{ fontSize: 13, color: 'var(--penalty)', marginTop: -4 }}
                 >
                   {errorMessage}

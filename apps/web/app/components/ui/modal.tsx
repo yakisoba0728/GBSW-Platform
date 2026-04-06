@@ -4,7 +4,12 @@ import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, Trash2, Info, CircleCheck, CircleX, AlertTriangle } from 'lucide-react'
-import { getModalMotion, getOverlayMotion, useMotionPreference } from './motion'
+import {
+  MODAL_BASE_EXIT_DURATION_MS,
+  getModalMotion,
+  getOverlayMotion,
+  useMotionPreference,
+} from './motion'
 import { acquireBodyScrollLock } from './scroll-lock'
 
 // ─── Modal ────────────────────────────────────────────────────────────────────
@@ -191,8 +196,6 @@ export function ModalFooter({
 import { useRef, useState } from 'react'
 
 type AnimPhase = 'idle' | 'enter' | 'exit'
-
-const MODAL_BASE_EXIT_DURATION_MS = 280
 
 export function ModalBase({
   isOpen,

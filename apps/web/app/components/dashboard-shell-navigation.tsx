@@ -6,6 +6,11 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import type { DashboardNavItem, DashboardNavMatch } from './dashboard-nav'
 import { ChevronRightIcon } from './ui/icons'
+import {
+  getAccordionTransitionCss,
+  getMicroInteractionTransition,
+  useMotionPreference,
+} from './ui/motion'
 
 export function matchesPath(
   pathname: string,
@@ -58,6 +63,9 @@ export function getInitialOpenMenus(
 }
 
 export function HamburgerIcon({ open }: { open: boolean }) {
+  const prefersReducedMotion = useMotionPreference()
+  const transition = getMicroInteractionTransition(prefersReducedMotion)
+
   return (
     <motion.span
       aria-hidden="true"
@@ -91,7 +99,7 @@ export function HamburgerIcon({ open }: { open: boolean }) {
                   ? { opacity: 1 }
                   : { bottom: 0, rotate: 0, translateY: 0, top: 'auto' }
           }
-          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          transition={transition}
           style={{
             display: 'block',
             position: 'absolute',
@@ -132,6 +140,10 @@ export function NavSidebar({
   closeDrawer: () => void
   footer: ReactNode
 }) {
+  const prefersReducedMotion = useMotionPreference()
+  const microTransition = getMicroInteractionTransition(prefersReducedMotion)
+  const accordionTransition = getAccordionTransitionCss(prefersReducedMotion)
+
   return (
     <div
       style={{
@@ -259,7 +271,7 @@ export function NavSidebar({
                   </span>
                   <motion.span
                     animate={{ rotate: isOpen ? 90 : 0 }}
-                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                    transition={microTransition}
                     style={{ flexShrink: 0, opacity: 0.35 }}
                   >
                     <ChevronRightIcon style={{ width: 13, height: 13 }} />
@@ -323,8 +335,7 @@ export function NavSidebar({
                     display: 'grid',
                     gridTemplateRows: isOpen ? '1fr' : '0fr',
                     marginBottom: isOpen ? 2 : 0,
-                    transition:
-                      'grid-template-rows 240ms cubic-bezier(0.16,1,0.3,1), margin-bottom 240ms ease',
+                    transition: accordionTransition,
                   }}
                 >
                   <div style={{ overflow: 'hidden' }}>

@@ -7,7 +7,11 @@ import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import LogoutButton from './LogoutButton'
 import { Button } from './ui/button'
-import { getSectionMotion, useMotionPreference } from './ui/motion'
+import {
+  getInlineMessageMotion,
+  getSectionMotion,
+  useMotionPreference,
+} from './ui/motion'
 
 const ThemeToggle = dynamic(() => import('./ThemeToggle'), {
   ssr: false,
@@ -26,6 +30,7 @@ export default function ChangePasswordForm({
   const router = useRouter()
   const prefersReducedMotion = useMotionPreference()
   const panelMotion = getSectionMotion(prefersReducedMotion)
+  const errorMotion = getInlineMessageMotion(prefersReducedMotion)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showNewPassword, setShowNewPassword] = useState(false)
@@ -152,10 +157,10 @@ export default function ChangePasswordForm({
               {errorMessage && (
                 <motion.p
                   key="error"
-                  initial={{ opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.2 }}
+                  initial={errorMotion.initial}
+                  animate={errorMotion.animate}
+                  exit={errorMotion.exit}
+                  transition={errorMotion.transition}
                   style={{
                     padding: '10px 14px',
                     borderRadius: 8,

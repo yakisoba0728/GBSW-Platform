@@ -4,7 +4,13 @@ import { useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import { getModalMotion, getOverlayMotion, useMotionPreference } from './motion'
+import {
+  getModalMotion,
+  getOverlayMotion,
+  getSectionMotion,
+  getStaggerDelay,
+  useMotionPreference,
+} from './motion'
 import { acquireBodyScrollLock } from './scroll-lock'
 
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false })
@@ -69,6 +75,7 @@ function SuccessModalContent({
   const prefersReducedMotion = useMotionPreference()
   const overlayMotion = getOverlayMotion(prefersReducedMotion)
   const modalMotion = getModalMotion(prefersReducedMotion)
+  const textMotion = getSectionMotion(prefersReducedMotion, getStaggerDelay(1))
   const [animationData, setAnimationData] = useState<object | null>(
     () => preloadLottie(type),
   )
@@ -212,9 +219,9 @@ function SuccessModalContent({
 
             {/* 텍스트 — 모달과 동시에 즉시 표시 (Lottie 완료 대기 없음) */}
             <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
+              initial={textMotion.initial}
+              animate={textMotion.animate}
+              transition={textMotion.transition}
             >
               <p
                 style={{

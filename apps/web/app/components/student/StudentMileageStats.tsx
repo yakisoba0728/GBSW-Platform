@@ -9,7 +9,11 @@ import {
   PageHeaderSkeleton,
   SummaryBarSkeleton,
 } from '@/app/components/ui/page-skeletons'
-import { getSectionMotion, useMotionPreference } from '@/app/components/ui/motion'
+import {
+  getSectionMotion,
+  getStaggerDelay,
+  useMotionPreference,
+} from '@/app/components/ui/motion'
 import type {
   SchoolMileageHistoryItem,
   StudentMileageSummary,
@@ -20,7 +24,11 @@ const ENTRY_PAGE_SIZE = 100
 
 export default function StudentMileageStats() {
   const prefersReducedMotion = useMotionPreference()
-  const getMotion = (delay = 0) => getSectionMotion(prefersReducedMotion, delay)
+  const getMotion = (step = 0) =>
+    getSectionMotion(
+      prefersReducedMotion,
+      step === 0 ? 0 : getStaggerDelay(step),
+    )
   const [summary, setSummary] = useState<StudentMileageSummary | null>(null)
   const [entries, setEntries] = useState<SchoolMileageHistoryItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -243,9 +251,9 @@ export default function StudentMileageStats() {
       <div className="flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           <motion.div
-            initial={getMotion(0.06).initial}
-            animate={getMotion(0.06).animate}
-            transition={getMotion(0.06).transition}
+            initial={getMotion(1).initial}
+            animate={getMotion(1).animate}
+            transition={getMotion(1).transition}
           >
             <StatCard
               label="총 상점"
@@ -255,9 +263,9 @@ export default function StudentMileageStats() {
             />
           </motion.div>
           <motion.div
-            initial={getMotion(0.1).initial}
-            animate={getMotion(0.1).animate}
-            transition={getMotion(0.1).transition}
+            initial={getMotion(2).initial}
+            animate={getMotion(2).animate}
+            transition={getMotion(2).transition}
           >
             <StatCard
               label="총 벌점"
@@ -267,9 +275,9 @@ export default function StudentMileageStats() {
             />
           </motion.div>
           <motion.div
-            initial={getMotion(0.14).initial}
-            animate={getMotion(0.14).animate}
-            transition={getMotion(0.14).transition}
+            initial={getMotion(3).initial}
+            animate={getMotion(3).animate}
+            transition={getMotion(3).transition}
           >
             <StatCard
               label="순점수"
@@ -279,9 +287,9 @@ export default function StudentMileageStats() {
             />
           </motion.div>
           <motion.div
-            initial={getMotion(0.18).initial}
-            animate={getMotion(0.18).animate}
-            transition={getMotion(0.18).transition}
+            initial={getMotion(4).initial}
+            animate={getMotion(4).animate}
+            transition={getMotion(4).transition}
           >
             <StatCard
               label="총 건수"
@@ -294,9 +302,9 @@ export default function StudentMileageStats() {
 
         {(rewardTotal > 0 || penaltyTotal > 0) && (
           <motion.div
-            initial={getMotion(0.22).initial}
-            animate={getMotion(0.22).animate}
-            transition={getMotion(0.22).transition}
+            initial={getMotion(5).initial}
+            animate={getMotion(5).animate}
+            transition={getMotion(5).transition}
           >
             <Card>
               <ScoreSummaryBar reward={rewardTotal} penalty={penaltyTotal} />
@@ -305,9 +313,9 @@ export default function StudentMileageStats() {
         )}
 
         <motion.div
-          initial={getMotion(0.26).initial}
-          animate={getMotion(0.26).animate}
-          transition={getMotion(0.26).transition}
+          initial={getMotion(6).initial}
+          animate={getMotion(6).animate}
+          transition={getMotion(6).transition}
         >
           <CategoryBarChart
             title="카테고리별 상점 분포"
@@ -317,9 +325,9 @@ export default function StudentMileageStats() {
         </motion.div>
 
         <motion.div
-          initial={getMotion(0.3).initial}
-          animate={getMotion(0.3).animate}
-          transition={getMotion(0.3).transition}
+          initial={getMotion(7).initial}
+          animate={getMotion(7).animate}
+          transition={getMotion(7).transition}
         >
           <CategoryBarChart
             title="카테고리별 벌점 분포"
@@ -329,9 +337,9 @@ export default function StudentMileageStats() {
         </motion.div>
 
         <motion.div
-          initial={getMotion(0.34).initial}
-          animate={getMotion(0.34).animate}
-          transition={getMotion(0.34).transition}
+          initial={getMotion(8).initial}
+          animate={getMotion(8).animate}
+          transition={getMotion(8).transition}
         >
           <MonthlyTrendChart data={monthlyStats} />
         </motion.div>

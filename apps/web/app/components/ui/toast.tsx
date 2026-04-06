@@ -10,6 +10,7 @@ import {
 import type { ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CircleCheck, CircleX, Info, X } from 'lucide-react'
+import { getToastMotion, useMotionPreference } from './motion'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -47,12 +48,16 @@ function ToastItemComponent({
   toast: ToastItem
   onClose: () => void
 }) {
+  const prefersReducedMotion = useMotionPreference()
+  const motionProps = getToastMotion(prefersReducedMotion)
+
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, x: 60, scale: 0.95 }}
-      animate={{ opacity: 1, x: 0, scale: 1, transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] } }}
-      exit={{ opacity: 0, x: 60, scale: 0.95, transition: { duration: 0.15 } }}
+      initial={motionProps.initial}
+      animate={motionProps.animate}
+      exit={motionProps.exit}
+      transition={motionProps.transition}
       style={{
         minWidth: 280,
         maxWidth: 380,

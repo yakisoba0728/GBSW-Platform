@@ -16,6 +16,10 @@ import SuccessModal from '../ui/success-modal'
 import { Button } from '../ui/button'
 import { AnimatedListItem, ListEmptyState } from '../ui/list'
 import { BuildingIcon } from '../ui/icons'
+import {
+  getMicroInteractionTransition,
+  useMotionPreference,
+} from '../ui/motion'
 import type {
   ClassMileageAnalyticsResponse,
   ClassMileageSummary,
@@ -91,6 +95,9 @@ function ClassCard({
   onToggle: () => void
   index: number
 }) {
+  const prefersReducedMotion = useMotionPreference()
+  const expandTransition = getMicroInteractionTransition(prefersReducedMotion)
+
   return (
     <AnimatedListItem index={index}>
       <Card className="overflow-hidden p-0">
@@ -157,7 +164,7 @@ function ClassCard({
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.22, ease: 'easeOut' }}
+              transition={expandTransition}
               style={{ overflow: 'hidden', borderTop: '1px solid var(--border)' }}
             >
               <div className="px-4 pb-4 pt-1">

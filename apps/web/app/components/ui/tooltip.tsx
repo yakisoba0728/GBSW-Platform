@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import { getTooltipMotion, useMotionPreference } from './motion'
 
 interface TooltipProps {
   content: ReactNode
@@ -22,6 +23,8 @@ export default function Tooltip({
   position = 'top',
   disabled = false,
 }: TooltipProps) {
+  const prefersReducedMotion = useMotionPreference()
+  const motionProps = getTooltipMotion(prefersReducedMotion)
   const [visible, setVisible] = useState(false)
   const [coords, setCoords] = useState<{ x: number; y: number; placement: 'top' | 'bottom' }>({
     x: 0,
@@ -102,10 +105,10 @@ export default function Tooltip({
           <AnimatePresence>
             {visible && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.15 }}
+                initial={motionProps.initial}
+                animate={motionProps.animate}
+                exit={motionProps.exit}
+                transition={motionProps.transition}
                 style={{
                   position: 'fixed',
                   left: coords.x,
