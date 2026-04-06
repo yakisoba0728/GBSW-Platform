@@ -34,9 +34,9 @@ export default function StudentEntriesTable({
   onPageChange,
 }: Props) {
   return (
-    <Card className="overflow-hidden p-0">
+    <Card className="overflow-hidden p-0 flex flex-col flex-1 min-h-0">
       <div
-        className="px-4 py-3"
+        className="flex-shrink-0 px-4 py-3"
         style={{ borderBottom: '1px solid var(--admin-border)' }}
       >
         <SectionTitle>
@@ -54,7 +54,7 @@ export default function StudentEntriesTable({
           )}
         </SectionTitle>
       </div>
-      <div className="overflow-x-auto">
+      <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto">
         <table className="w-full text-xs">
           <thead>
             <tr
@@ -170,7 +170,7 @@ export default function StudentEntriesTable({
       </div>
 
       {!isLoading && totalEntryCount > 0 && (
-        <div className="flex items-center justify-between gap-3 px-4 py-3">
+        <div className="flex flex-shrink-0 items-center justify-between gap-3 px-4 py-3">
           <p
             className="text-xs"
             style={{

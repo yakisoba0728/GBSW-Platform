@@ -37,8 +37,7 @@ export default function HistoryTable({
   return (
     <>
       <div
-        className="relative hidden overflow-x-auto overflow-y-auto md:block"
-        style={{ height: 'calc(100dvh - 310px)', minHeight: '200px' }}
+        className="relative hidden flex-1 min-h-0 overflow-x-auto overflow-y-auto md:block"
       >
         {isFetching && !isLoading && (
           <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center animate-fade-in">
@@ -91,7 +90,7 @@ export default function HistoryTable({
               <TableRowSkeleton columns={7} count={6} />
             ) : items.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ height: 'calc(100dvh - 370px)', minHeight: '160px', verticalAlign: 'middle' }}>
+                <td colSpan={7} style={{ verticalAlign: 'middle', height: '200px' }}>
                   <ListEmptyState
                     icon={
                       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--admin-accent)' }} aria-hidden="true">
@@ -211,7 +210,7 @@ export default function HistoryTable({
       </div>
 
       {!isLoading && (
-        <div className="mt-4 flex items-center justify-between gap-3">
+        <div className="mt-4 flex flex-shrink-0 items-center justify-between gap-3">
           <p className="text-xs" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}>
             총 <span style={{ color: 'var(--admin-text)', fontWeight: 600 }}>{totalCount.toLocaleString()}</span>건
           </p>

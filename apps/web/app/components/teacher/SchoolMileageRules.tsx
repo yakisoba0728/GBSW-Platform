@@ -50,7 +50,7 @@ export default function SchoolMileageRules({
   }, [rules, typeFilter, categoryFilter, search])
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col h-full gap-4">
       <Card>
         <SectionHeader
           title="상벌점 항목 관리"
@@ -142,8 +142,8 @@ export default function SchoolMileageRules({
         </FilterRow>
       </Card>
 
-      <Card className="overflow-hidden p-0">
-        <div className="overflow-x-auto">
+      <Card className="overflow-hidden p-0 flex flex-col flex-1 min-h-0">
+        <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto">
           <table className="w-full text-xs">
             <thead>
               <tr style={{ borderBottom: '1px solid var(--admin-border)', backgroundColor: 'var(--admin-bg)' }}>

@@ -273,7 +273,7 @@ export default function SchoolMileageReport() {
   }, [allEntriesCurrentPage, allEntriesReport.items, pageSize])
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col h-full gap-4">
       <ReportFilters
         reportType={reportType}
         filterSchool={filterSchool}
@@ -316,7 +316,7 @@ export default function SchoolMileageReport() {
 
       {previewError && <NoticeBox type="error" message={previewError} />}
 
-      <div className="print-area">
+      <div className="print-area flex flex-col flex-1 min-h-0">
         {isLoading && (
           <Card>
             <LoadingSpinner />
@@ -334,9 +334,9 @@ export default function SchoolMileageReport() {
         )}
 
         {!isLoading && hasPreview && (
-          <Card className="overflow-hidden p-0">
+          <Card className="overflow-hidden p-0 flex flex-col flex-1 min-h-0">
             <div
-              className="flex items-start justify-between px-5 py-4"
+              className="flex-shrink-0 flex items-start justify-between px-5 py-4"
               style={{ borderBottom: '1px solid var(--admin-border)' }}
             >
               <div>
@@ -370,7 +370,7 @@ export default function SchoolMileageReport() {
               </button>
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto">
               {reportType === 'student' && (
                 <StudentReportTable students={studentReport.students} />
               )}
@@ -390,7 +390,7 @@ export default function SchoolMileageReport() {
             </div>
 
             {reportType === 'all' && allEntriesReport.totalCount > pageSize && (
-              <div className="no-print flex items-center justify-end gap-2 px-5 py-4">
+              <div className="no-print flex flex-shrink-0 items-center justify-end gap-2 px-5 py-4">
                 <button
                   type="button"
                   onClick={() =>

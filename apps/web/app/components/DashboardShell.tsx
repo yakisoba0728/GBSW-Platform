@@ -393,7 +393,7 @@ export default function DashboardShell({
   }
 
   return (
-    <div className="flex min-h-screen" style={{ backgroundColor: 'var(--admin-bg)' }}>
+    <div className="flex h-dvh overflow-hidden" style={{ backgroundColor: 'var(--admin-bg)' }}>
       <aside
         className="hidden flex-shrink-0 flex-col md:flex"
         style={{
@@ -460,7 +460,7 @@ export default function DashboardShell({
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <header
           className="sticky top-0 z-20 flex h-16 flex-shrink-0 items-center justify-between border-b px-4 md:px-6"
           style={{
@@ -620,11 +620,11 @@ export default function DashboardShell({
           </div>
         )}
 
-        <main className="flex-1 px-5 pb-6 pt-4 md:px-8 md:pb-8 md:pt-8">
+        <main className="flex-1 min-h-0 flex flex-col overflow-hidden px-5 pt-4 md:px-8 md:pt-8">
           {activeLabel && (
             <h1
               key={activeLabel}
-              className="mb-5 animate-fade-in text-base font-semibold md:hidden"
+              className="mb-5 flex-shrink-0 animate-fade-in text-base font-semibold md:hidden"
               style={{
                 fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                 color: 'var(--admin-text)',
@@ -633,7 +633,9 @@ export default function DashboardShell({
               {activeLabel}
             </h1>
           )}
-          {children}
+          <div className="flex-1 min-h-0 overflow-hidden pb-6 md:pb-8">
+            {children}
+          </div>
         </main>
       </div>
     </div>

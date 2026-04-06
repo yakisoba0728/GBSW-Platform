@@ -197,8 +197,8 @@ export default function SchoolMileageGrant({
         onClose={() => setRuleModalRowId(null)}
       />
 
-      <div className="space-y-4">
-        <div className="flex flex-wrap items-center justify-end gap-2">
+      <div className="flex flex-col h-full gap-4">
+        <div className="flex flex-shrink-0 flex-wrap items-center justify-end gap-2">
           {rows.length >= 2 && (
             <button
               type="button"
@@ -255,7 +255,7 @@ export default function SchoolMileageGrant({
         )}
         {rulesError && <NoticeBox type="error" message={rulesError} />}
 
-        <Card>
+        <Card className="flex flex-col flex-1 min-h-0 overflow-hidden">
           {isRulesLoading ? (
             <ListSkeleton count={3} rowHeight="h-14" />
           ) : rows.length === 0 ? (
@@ -317,7 +317,7 @@ export default function SchoolMileageGrant({
                 <span style={{ width: 32 }} />
               </div>
 
-              <div className="space-y-2">
+              <div className="flex-1 min-h-0 overflow-y-auto space-y-2">
                 {rows.map((row, index) => (
                   <GrantRowCard
                     key={row.localId}

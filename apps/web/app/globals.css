@@ -77,10 +77,12 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    height: 100%;
   }
 
   body {
-    min-height: 100svh;
+    height: 100svh;
+    overflow: hidden;
     background-color: var(--bg);
     color: var(--fg);
     font-family: var(--font-space-grotesk), var(--font-noto-sans-kr), 'Apple SD Gothic Neo', sans-serif;

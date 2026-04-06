@@ -235,7 +235,7 @@ export default function SchoolMileageStudentView() {
   const pageCount = Math.max(1, Math.ceil(totalEntryCount / pageSize))
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col h-full gap-4">
       <StudentSearchPanel
         filterSchool={filterSchool}
         filterGrade={filterGrade}
@@ -287,8 +287,8 @@ export default function SchoolMileageStudentView() {
       {studentsError && <NoticeBox type="error" message={studentsError} />}
       {detailError && <NoticeBox type="error" message={detailError} />}
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[300px_1fr]">
-        <Card className="overflow-hidden p-0">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[300px_1fr] flex-1 min-h-0">
+        <Card className="overflow-hidden p-0 flex flex-col min-h-0">
           <div
             className="px-4 py-3"
             style={{ borderBottom: '1px solid var(--admin-border)' }}
@@ -311,7 +311,7 @@ export default function SchoolMileageStudentView() {
               )}
             </p>
           </div>
-          <div className="max-h-[600px] overflow-y-auto p-3">
+          <div className="flex-1 min-h-0 overflow-y-auto p-3">
             {!filterSchool ? (
               <ListEmptyState
                 icon={<UserIcon style={{ color: 'var(--admin-accent)' }} />}
@@ -408,7 +408,7 @@ export default function SchoolMileageStudentView() {
             />
           </Card>
         ) : (
-          <div className="animate-fade-in space-y-4">
+          <div className="animate-fade-in flex flex-col min-h-0 gap-4 overflow-hidden">
             <StudentSummaryCards summary={summary} isLoading={isSummaryLoading} />
 
             <StudentEntriesTable

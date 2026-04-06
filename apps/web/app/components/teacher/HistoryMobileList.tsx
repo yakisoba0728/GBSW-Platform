@@ -24,11 +24,7 @@ export default function HistoryMobileList({
 }) {
   return (
     <div
-      className="relative overflow-y-auto pr-0.5 md:hidden"
-      style={{
-        height: 'calc(100dvh - 420px)',
-        minHeight: '200px',
-      }}
+      className="relative flex-1 min-h-0 overflow-y-auto pr-0.5 md:hidden"
     >
       {isFetching && !isLoading && (
         <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center animate-fade-in">

@@ -196,7 +196,7 @@ export default function SchoolMileageHistory({
         }}
       />
 
-      <div className="space-y-3">
+      <div className="flex flex-col h-full gap-3">
         {notice && (
           <NoticeBox
             type={notice.type}
@@ -214,30 +214,28 @@ export default function SchoolMileageHistory({
         />
 
         {/* ── 데이터 카드 ── */}
-        <Card className="pb-3">
-          <>
-            <HistoryMobileList
-              items={response.items}
-              isLoading={isLoading}
-              isFetching={isFetching}
-              onEdit={setEditingItem}
-              onDelete={requestDeleteEntry}
-            />
+        <Card className="pb-3 flex flex-col flex-1 min-h-0 overflow-hidden">
+          <HistoryMobileList
+            items={response.items}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            onEdit={setEditingItem}
+            onDelete={requestDeleteEntry}
+          />
 
-            <HistoryTable
-              items={response.items}
-              isLoading={isLoading}
-              isFetching={isFetching}
-              page={page}
-              pageCount={pageCount}
-              totalCount={response.totalCount}
-              onEdit={setEditingItem}
-              onDelete={requestDeleteEntry}
-              onPageChange={(nextPage) =>
-                updateSearchParams({ page: nextPage, pageSize })
-              }
-            />
-          </>
+          <HistoryTable
+            items={response.items}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            page={page}
+            pageCount={pageCount}
+            totalCount={response.totalCount}
+            onEdit={setEditingItem}
+            onDelete={requestDeleteEntry}
+            onPageChange={(nextPage) =>
+              updateSearchParams({ page: nextPage, pageSize })
+            }
+          />
         </Card>
       </div>
     </>

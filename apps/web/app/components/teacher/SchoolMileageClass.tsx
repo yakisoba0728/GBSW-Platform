@@ -411,7 +411,7 @@ export default function SchoolMileageClass() {
   }, [loadClassData])
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col h-full gap-4">
       <Card>
         <SectionHeader
           title="학급별 현황"
@@ -469,6 +469,8 @@ export default function SchoolMileageClass() {
       </Card>
 
       {queryError && <NoticeBox type="error" message={queryError} />}
+
+      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4">
 
       {!filterSchool && !isLoading && (
         <Card>
@@ -563,6 +565,8 @@ export default function SchoolMileageClass() {
           </div>
         </>
       )}
+
+      </div>
     </div>
   )
 }
