@@ -192,6 +192,8 @@ import { useRef, useState } from 'react'
 
 type AnimPhase = 'idle' | 'enter' | 'exit'
 
+const MODAL_BASE_EXIT_DURATION_MS = 280
+
 export function ModalBase({
   isOpen,
   onClose,
@@ -239,7 +241,7 @@ export function ModalBase({
         setVisible(false)
         setAnimPhase('idle')
         exitTimerRef.current = null
-      }, 220)
+      }, MODAL_BASE_EXIT_DURATION_MS)
     }
 
     return () => {
