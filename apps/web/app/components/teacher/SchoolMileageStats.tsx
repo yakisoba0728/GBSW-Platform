@@ -13,6 +13,7 @@ import {
   StatCard,
   inputStyle,
 } from './teacher-shared'
+import { Button } from '../ui/button'
 import { AnimatedListItem, ListEmptyState, ListSkeleton } from '../ui/list'
 import type {
   CategoryStat,
@@ -218,7 +219,7 @@ export default function SchoolMileageStats() {
   )
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col h-full gap-4">
       <Card>
         <SectionHeader
           title="통계 보기"
@@ -276,25 +277,12 @@ export default function SchoolMileageStats() {
               style={inputStyle}
             />
 
-            <button
-              type="button"
-              onClick={() => {
-                void loadStats()
-              }}
-              disabled={isLoading}
-              className="h-8 rounded-lg px-3 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
-              style={{
-                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                backgroundColor: 'var(--accent)',
-                color: '#fff',
-              }}
-            >
-              {isLoading ? '조회 중...' : '새로고침'}
-            </button>
+            <Button variant="primary" size="sm" loading={isLoading} disabled={isLoading} onClick={() => { void loadStats() }}>새로고침</Button>
           </FilterRow>
         </div>
       </Card>
 
+      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4">
       {queryError && <NoticeBox type="error" message={queryError} />}
 
       {isLoading && response.summary.totalCount === 0 && (
@@ -304,8 +292,9 @@ export default function SchoolMileageStats() {
       )}
 
       {!isLoading && response.summary.totalCount === 0 && !queryError && (
-        <Card>
+        <Card className="flex flex-1 flex-col">
           <ListEmptyState
+            fill
             icon={<BarChartIcon />}
             title="조회 결과가 없습니다"
             description="다른 조건으로 다시 조회해 보세요."
@@ -346,15 +335,17 @@ export default function SchoolMileageStats() {
             <Card>
               <SectionTitle>카테고리별 집계 — 상점</SectionTitle>
               {rewardCategoryStats.length === 0 ? (
-                <p
-                  className="py-4 text-center text-xs"
-                  style={{
-                    color: 'var(--admin-text-muted)',
-                    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                  }}
-                >
-                  해당 기간에 상점 내역이 없습니다.
-                </p>
+                <div className="flex min-h-[140px] items-center justify-center">
+                  <p
+                    className="text-center text-xs"
+                    style={{
+                      color: 'var(--admin-text-muted)',
+                      fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                    }}
+                  >
+                    해당 기간에 상점 내역이 없습니다.
+                  </p>
+                </div>
               ) : (
                 <div className="mt-2 space-y-1">
                   {rewardCategoryStats.map((stat) => (
@@ -375,15 +366,17 @@ export default function SchoolMileageStats() {
             <Card>
               <SectionTitle>카테고리별 집계 — 벌점</SectionTitle>
               {penaltyCategoryStats.length === 0 ? (
-                <p
-                  className="py-4 text-center text-xs"
-                  style={{
-                    color: 'var(--admin-text-muted)',
-                    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                  }}
-                >
-                  해당 기간에 벌점 내역이 없습니다.
-                </p>
+                <div className="flex min-h-[140px] items-center justify-center">
+                  <p
+                    className="text-center text-xs"
+                    style={{
+                      color: 'var(--admin-text-muted)',
+                      fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                    }}
+                  >
+                    해당 기간에 벌점 내역이 없습니다.
+                  </p>
+                </div>
               ) : (
                 <div className="mt-2 space-y-1">
                   {penaltyCategoryStats.map((stat) => (
@@ -459,6 +452,7 @@ export default function SchoolMileageStats() {
           )}
         </>
       )}
+      </div>
     </div>
   )
 }

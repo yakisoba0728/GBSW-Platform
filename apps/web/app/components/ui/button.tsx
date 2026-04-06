@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { useState, type ReactNode } from 'react'
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'accent'
 type ButtonSize = 'sm' | 'md' | 'lg'
 
 interface ButtonProps {
@@ -15,6 +15,8 @@ interface ButtonProps {
   children?: ReactNode
   type?: 'button' | 'submit' | 'reset'
   className?: string
+  icon?: ReactNode
+  fullWidth?: boolean
 }
 
 const sizeStyles: Record<ButtonSize, React.CSSProperties> = {
@@ -50,6 +52,12 @@ function getVariantStyle(variant: ButtonVariant, hovered: boolean): React.CSSPro
         border: '1px solid var(--penalty-border)',
         color: 'var(--penalty)',
       }
+    case 'accent':
+      return {
+        background: hovered ? 'var(--accent)' : 'var(--accent-subtle)',
+        border: '1px solid var(--accent)',
+        color: hovered ? '#ffffff' : 'var(--accent)',
+      }
   }
 }
 
@@ -82,6 +90,8 @@ export function Button({
   children,
   type = 'button',
   className = '',
+  icon,
+  fullWidth = false,
 }: ButtonProps) {
   const [hovered, setHovered] = useState(false)
   const isInert = disabled || loading
@@ -92,6 +102,7 @@ export function Button({
     justifyContent: 'center',
     gap: '6px',
     borderRadius: '8px',
+    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
     fontWeight: 500,
     lineHeight: 1,
     cursor: isInert ? 'not-allowed' : 'pointer',
@@ -100,9 +111,16 @@ export function Button({
     userSelect: 'none',
     whiteSpace: 'nowrap',
     outline: 'none',
+    ...(fullWidth ? { width: '100%' } : {}),
     ...sizeStyles[size],
     ...getVariantStyle(variant, hovered && !isInert),
   }
+
+  const iconEl = icon ? (
+    <span style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}>
+      {icon}
+    </span>
+  ) : null
 
   if (isInert) {
     return (
@@ -114,6 +132,7 @@ export function Button({
         aria-busy={loading}
       >
         {loading && <LoadingSpinner />}
+        {!loading && iconEl}
         {!loading && children}
       </button>
     )
@@ -130,6 +149,7 @@ export function Button({
       onHoverEnd={() => setHovered(false)}
     >
       {loading && <LoadingSpinner />}
+      {!loading && iconEl}
       {children}
     </motion.button>
   )

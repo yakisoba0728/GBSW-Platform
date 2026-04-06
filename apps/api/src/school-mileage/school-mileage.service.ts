@@ -13,23 +13,26 @@ export class SchoolMileageService {
     private readonly analyticsService: SchoolMileageAnalyticsService,
   ) {}
 
-  getRules(actorTeacherId: string | undefined) {
-    return this.rulesService.getRules(actorTeacherId);
+  getRules(
+    actorTeacherId: string | undefined,
+    actorSuperAdminId?: string,
+  ) {
+    return this.rulesService.getRules(actorTeacherId, actorSuperAdminId);
   }
 
   createRule(
-    actorTeacherId: string | undefined,
+    actorSuperAdminId: string | undefined,
     body: Record<string, unknown>,
   ) {
-    return this.rulesService.createRule(actorTeacherId, body);
+    return this.rulesService.createRule(actorSuperAdminId, body);
   }
 
   updateRule(
-    actorTeacherId: string | undefined,
+    actorSuperAdminId: string | undefined,
     id: string,
     body: Record<string, unknown>,
   ) {
-    return this.rulesService.updateRule(actorTeacherId, id, body);
+    return this.rulesService.updateRule(actorSuperAdminId, id, body);
   }
 
   getStudents(

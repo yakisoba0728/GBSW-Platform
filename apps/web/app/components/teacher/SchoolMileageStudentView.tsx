@@ -313,19 +313,25 @@ export default function SchoolMileageStudentView() {
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto p-3">
             {!filterSchool ? (
-              <ListEmptyState
-                icon={<UserIcon style={{ color: 'var(--accent)' }} />}
-                title="학교를 선택하세요"
-                description="학교를 선택하면 학생 목록을 바로 불러옵니다."
-              />
+              <div className="flex h-full items-center justify-center">
+                <ListEmptyState
+                  fill
+                  icon={<UserIcon style={{ color: 'var(--accent)' }} />}
+                  title="학교를 선택하세요"
+                  description="학교를 선택하면 학생 목록을 바로 불러옵니다."
+                />
+              </div>
             ) : isStudentsLoading ? (
               <ListSkeleton count={8} rowHeight="h-14" />
             ) : students.length === 0 ? (
-              <ListEmptyState
-                icon={<UserIcon style={{ color: 'var(--accent)' }} />}
-                title="학생이 없습니다"
-                description="검색 조건을 변경해 보세요."
-              />
+              <div className="flex h-full items-center justify-center">
+                <ListEmptyState
+                  fill
+                  icon={<UserIcon style={{ color: 'var(--accent)' }} />}
+                  title="학생이 없습니다"
+                  description="검색 조건을 변경해 보세요."
+                />
+              </div>
             ) : (
               <div className="space-y-1.5">
                 {students.map((student, index) => {
@@ -400,8 +406,9 @@ export default function SchoolMileageStudentView() {
         </Card>
 
         {!selectedStudentId ? (
-          <Card>
+          <Card className="flex flex-col flex-1 min-h-0">
             <ListEmptyState
+              fill
               icon={<UserIcon style={{ color: 'var(--accent)' }} />}
               title="학생을 선택하세요"
               description="좌측 목록에서 학생을 클릭하면 누적 점수와 처리 내역이 표시됩니다."

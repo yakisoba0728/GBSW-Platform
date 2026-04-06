@@ -374,4 +374,19 @@ html.no-transitions *::after {
   .print-only {
     display: block !important;
   }
+
+  /* Expand all student detail panels when printing */
+  .print-expanded-row {
+    display: table-row !important;
+    opacity: 1 !important;
+    height: auto !important;
+  }
+
+  .print-expanded-row td {
+    padding: 0 !important;
+  }
+
+  .print-expand-trigger {
+    cursor: default !important;
+  }
 }

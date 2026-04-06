@@ -2,6 +2,7 @@
 
 import { AnimatedListItem } from '../ui/list'
 import { XIcon } from '../ui/icons'
+import AnimatedCheckbox from '../ui/animated-checkbox'
 import Tooltip from '../ui/tooltip'
 import { getSchoolLabel, inputStyle } from './teacher-shared'
 import type {
@@ -22,6 +23,8 @@ type GrantRowCardProps = {
   row: GrantRow
   selectedRule: SchoolMileageRuleSummary | null
   disabled?: boolean
+  checked: boolean
+  onCheckedChange: (checked: boolean) => void
   onOpenRuleModal: () => void
   onReasonChange: (reason: string) => void
   onRemove: () => void
@@ -32,6 +35,8 @@ export default function GrantRowCard({
   row,
   selectedRule,
   disabled = false,
+  checked,
+  onCheckedChange,
   onOpenRuleModal,
   onReasonChange,
   onRemove,
@@ -130,6 +135,12 @@ export default function GrantRowCard({
     >
       <div className="sm:hidden">
         <div className="mb-2.5 flex items-start justify-between gap-2">
+          <AnimatedCheckbox
+            checked={checked}
+            onChange={onCheckedChange}
+            disabled={disabled}
+            size={18}
+          />
           <div>
             <div className="flex items-baseline gap-1.5">
               <span
@@ -186,6 +197,12 @@ export default function GrantRowCard({
       </div>
 
       <div className="hidden items-center gap-3 sm:flex">
+        <AnimatedCheckbox
+          checked={checked}
+          onChange={onCheckedChange}
+          disabled={disabled}
+          size={18}
+        />
         <div className="w-[160px] flex-shrink-0 overflow-hidden">
           <div className="flex min-w-0 items-baseline gap-1">
             <span

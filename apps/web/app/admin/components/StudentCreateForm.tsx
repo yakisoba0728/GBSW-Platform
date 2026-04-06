@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Button } from '@/app/components/ui/button'
 import {
   buildStudentId,
   Divider,
@@ -497,20 +498,14 @@ export default function StudentCreateForm() {
                 className={inputBase}
                 style={{ ...inputBaseStyle, fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
               />
-              <button
-                type="button"
+              <Button
+                variant="secondary"
+                size="md"
                 onClick={addMajorSubjectOption}
                 disabled={isSubmitting}
-                className="rounded-xl border px-4 py-2.5 text-sm transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60"
-                style={{
-                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                  color: 'var(--fg)',
-                  borderColor: 'var(--border)',
-                  backgroundColor: 'var(--bg-subtle)',
-                }}
               >
                 추가하기
-              </button>
+              </Button>
             </div>
           </div>
 

@@ -1,9 +1,9 @@
 'use client'
 
 import SchoolMileageRules from '@/app/components/teacher/SchoolMileageRules'
-import { useRulesContext } from '../../_components/RulesContext'
+import { useRulesContext } from '@/app/teacher/_components/RulesContext'
 
-export default function TeacherMileageRulesPage() {
+export default function AdminMileageRulesPage() {
   const { rules, isRulesLoading, rulesError, loadRules } = useRulesContext()
 
   return (
@@ -12,7 +12,7 @@ export default function TeacherMileageRulesPage() {
       isRulesLoading={isRulesLoading}
       rulesError={rulesError}
       loadRules={loadRules}
-      readOnly={true}
+      apiPath="/api/admin/school-mileage/rules"
     />
   )
 }

@@ -12,7 +12,7 @@ type RulesContextValue = {
 
 const RulesContext = createContext<RulesContextValue | null>(null)
 
-export function RulesProvider({ children }: { children: React.ReactNode }) {
+export function RulesProvider({ children, apiPath = '/api/teacher/school-mileage/rules' }: { children: React.ReactNode; apiPath?: string }) {
   const [rules, setRules] = useState<SchoolMileageRuleSummary[]>([])
   const [isRulesLoading, setIsRulesLoading] = useState(true)
   const [rulesError, setRulesError] = useState<string | null>(null)
@@ -22,7 +22,7 @@ export function RulesProvider({ children }: { children: React.ReactNode }) {
     setRulesError(null)
 
     try {
-      const response = await fetch('/api/teacher/school-mileage/rules', {
+      const response = await fetch(apiPath, {
         cache: 'no-store',
       })
       const result = await response.json().catch(() => null)
@@ -44,7 +44,7 @@ export function RulesProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsRulesLoading(false)
     }
-  }, [])
+  }, [apiPath])
 
   useEffect(() => {
     void loadRules()

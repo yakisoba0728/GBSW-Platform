@@ -7,6 +7,7 @@ import {
   SectionHeader,
   inputStyle,
 } from './teacher-shared'
+import { Button } from '../ui/button'
 import type { SchoolCode } from './school-mileage-types'
 
 type Props = {
@@ -91,19 +92,15 @@ export default function StudentSearchPanel({
             style={{ ...inputStyle, minWidth: '120px' }}
           />
 
-          <button
-            type="button"
-            onClick={onReload}
+          <Button
+            variant="primary"
+            size="sm"
+            loading={isLoading}
             disabled={!filterSchool || isLoading}
-            className="rounded-lg px-4 py-2 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              backgroundColor: 'var(--admin-accent)',
-              color: '#fff',
-            }}
+            onClick={onReload}
           >
-            {isLoading ? '조회 중...' : '새로고침'}
-          </button>
+            새로고침
+          </Button>
         </FilterRow>
       </div>
     </Card>

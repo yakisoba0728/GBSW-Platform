@@ -24,6 +24,16 @@ const LOTTIE_SRC: Record<SuccessModalType, string> = {
   warning: '/lottie/error.json',
 }
 
+// 모듈 레벨 캐시 — 같은 세션에서 두 번째 열림부터 즉시 재생
+const lottieCache = new Map<string, object>()
+
+function preloadLottie(type: SuccessModalType): object | null {
+  const src = LOTTIE_SRC[type]
+  const cached = lottieCache.get(src)
+  if (cached) return cached
+  return null
+}
+
 export default function SuccessModal({
   open,
   onClose,
@@ -54,37 +64,36 @@ function SuccessModalContent({
   description,
   autoCloseMs = 3000,
 }: Omit<SuccessModalProps, 'open'>) {
-  const [animationData, setAnimationData] = useState<object | null>(null)
-  const [textVisible, setTextVisible] = useState(false)
+  const [animationData, setAnimationData] = useState<object | null>(
+    () => preloadLottie(type),
+  )
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // Lottie JSON 로드 (캐시 우선)
   useEffect(() => {
-    let isMounted = true
+    if (animationData) return
 
-    fetch(LOTTIE_SRC[type])
+    let isMounted = true
+    const src = LOTTIE_SRC[type]
+
+    fetch(src)
       .then((res) => res.json())
       .then((data) => {
-        if (isMounted) {
-          setAnimationData(data)
-        }
+        lottieCache.set(src, data)
+        if (isMounted) setAnimationData(data)
       })
       .catch(() => {
-        if (isMounted) {
-          setTextVisible(true)
-        }
+        // Lottie 로드 실패 시 무시 — 텍스트는 이미 보임
       })
 
     return () => {
       isMounted = false
-      if (timerRef.current) {
-        clearTimeout(timerRef.current)
-        timerRef.current = null
-      }
     }
-  }, [type])
+  }, [animationData, type])
 
+  // auto-close 타이머 — 모달 마운트 즉시 시작
   useEffect(() => {
-    if (!textVisible || autoCloseMs <= 0) return
+    if (autoCloseMs <= 0) return
 
     timerRef.current = setTimeout(onClose, autoCloseMs)
 
@@ -94,15 +103,12 @@ function SuccessModalContent({
         timerRef.current = null
       }
     }
-  }, [textVisible, autoCloseMs, onClose])
+  }, [autoCloseMs, onClose])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-      }
+      if (e.key === 'Escape') onClose()
     }
-
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
@@ -185,30 +191,28 @@ function SuccessModalContent({
           </button>
 
           <div style={{ padding: '32px 24px 28px' }}>
-            {animationData && (
-              <div
-                style={{
-                  width: 100,
-                  height: 100,
-                  margin: '0 auto 16px',
-                }}
-              >
+            {/* Lottie 컨테이너 — 고정 크기로 레이아웃 시프트 방지 */}
+            <div
+              style={{
+                width: 100,
+                height: 100,
+                margin: '0 auto 16px',
+              }}
+            >
+              {animationData && (
                 <Lottie
                   animationData={animationData}
                   loop={false}
-                  onComplete={() => setTextVisible(true)}
                   style={{ width: '100%', height: '100%' }}
                 />
-              </div>
-            )}
+              )}
+            </div>
 
+            {/* 텍스트 — 모달과 동시에 즉시 표시 (Lottie 완료 대기 없음) */}
             <motion.div
-              initial={false}
-              animate={{
-                opacity: textVisible || !animationData ? 1 : 0,
-                y: textVisible || !animationData ? 0 : 8,
-              }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
             >
               <p
                 style={{

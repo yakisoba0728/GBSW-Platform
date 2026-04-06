@@ -1,28 +1,29 @@
 import { NextRequest } from 'next/server'
 import { proxyApiRequest } from './api-proxy'
 
-type TeacherPath =
+type TeacherGetPath =
   | '/school-mileage/rules'
-  | `/school-mileage/rules/${string}`
   | '/school-mileage/students'
   | `/school-mileage/students/${string}/summary`
   | '/school-mileage/entries'
-  | '/school-mileage/entries/batch'
   | '/school-mileage/analytics/overview'
   | '/school-mileage/analytics/students'
   | '/school-mileage/analytics/classes'
+
+type TeacherWritePath =
+  | '/school-mileage/entries/batch'
   | `/school-mileage/entries/${string}`
 
 export async function proxyTeacherGetRequest(
   request: NextRequest,
-  pathname: TeacherPath,
+  pathname: TeacherGetPath,
 ) {
   return proxyTeacherRequest(request, pathname, 'GET')
 }
 
 export async function proxyTeacherWriteRequest(
   request: NextRequest,
-  pathname: TeacherPath,
+  pathname: TeacherWritePath,
   method: 'POST' | 'PATCH' | 'DELETE',
 ) {
   return proxyTeacherRequest(request, pathname, method)
@@ -30,7 +31,7 @@ export async function proxyTeacherWriteRequest(
 
 async function proxyTeacherRequest(
   request: NextRequest,
-  pathname: TeacherPath,
+  pathname: TeacherGetPath | TeacherWritePath,
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
 ) {
   return proxyApiRequest(request, {

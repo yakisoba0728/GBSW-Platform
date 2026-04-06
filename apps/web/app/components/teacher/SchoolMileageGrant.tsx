@@ -1,10 +1,10 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
-import { Loader2 } from 'lucide-react'
-import { ListSkeleton } from '../ui/list'
+import { ListEmptyState, ListSkeleton } from '../ui/list'
+import { Button } from '../ui/button'
 import SuccessModal from '../ui/success-modal'
+import AnimatedCheckbox from '../ui/animated-checkbox'
 import { UserPlusIcon } from '../ui/icons'
 import RuleSelectionModal from './RuleSelectionModal'
 import StudentSelectionModal from './StudentSelectionModal'
@@ -34,6 +34,7 @@ export default function SchoolMileageGrant({
     message: string
   }>({ open: false, message: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [checkedRows, setCheckedRows] = useState<Set<number>>(new Set())
   const nextRowIdRef = useRef(1)
 
   const rulesById = useMemo(
@@ -53,7 +54,11 @@ export default function SchoolMileageGrant({
     [rows],
   )
 
-  const canApplyFirstRow = rows.length >= 2 && rows[0]?.ruleId !== ''
+  const canApplyFirstRow = useMemo(() => {
+    const firstRow = rows[0]
+    if (!firstRow || firstRow.ruleId === '') return false
+    return [...checkedRows].some((rowId) => rowId !== firstRow.localId)
+  }, [checkedRows, rows])
   const canSubmit =
     rows.length > 0 && !isRulesLoading && rows.every((row) => row.ruleId !== '')
 
@@ -104,25 +109,36 @@ export default function SchoolMileageGrant({
 
   function removeRow(localId: number) {
     setRows((prev) => prev.filter((row) => row.localId !== localId))
+    setCheckedRows((prev) => {
+      const next = new Set(prev)
+      next.delete(localId)
+      return next
+    })
   }
 
-  function applyFirstRowToAll() {
+  function toggleRow(localId: number) {
+    setCheckedRows((prev) => {
+      const next = new Set(prev)
+      if (next.has(localId)) next.delete(localId)
+      else next.add(localId)
+      return next
+    })
+  }
+
+  function toggleAll() {
+    setCheckedRows((prev) =>
+      prev.size === rows.length ? new Set() : new Set(rows.map((r) => r.localId)),
+    )
+  }
+
+  function applyFirstRowToSelected() {
     const firstRow = rows[0]
-
-    if (!firstRow || !canApplyFirstRow) {
-      return
-    }
-
+    if (!firstRow || firstRow.ruleId === '' || checkedRows.size === 0) return
     setRows((prev) =>
-      prev.map((row, index) =>
-        index === 0
+      prev.map((row) =>
+        row.localId === firstRow.localId || !checkedRows.has(row.localId)
           ? row
-          : {
-              ...row,
-              ruleId: firstRow.ruleId,
-              score: firstRow.score,
-              reason: firstRow.reason,
-            },
+          : { ...row, ruleId: firstRow.ruleId, score: firstRow.score, reason: firstRow.reason },
       ),
     )
   }
@@ -158,6 +174,7 @@ export default function SchoolMileageGrant({
       }
 
       setRows([])
+      setCheckedRows(new Set())
       setSuccessModal({
         open: true,
         message: result?.message ?? '상벌점이 부여되었습니다.',
@@ -207,31 +224,22 @@ export default function SchoolMileageGrant({
       <div className="flex flex-col h-full gap-4">
         <div className="flex flex-shrink-0 flex-wrap items-center justify-end gap-2">
           {rows.length >= 2 && (
-            <button
-              type="button"
-              onClick={applyFirstRowToAll}
-              disabled={!canApplyFirstRow || isSubmitting}
-              className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
-              style={{
-                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                color: 'var(--accent)',
-                borderColor: 'var(--accent)',
-                backgroundColor: 'var(--accent-subtle)',
-              }}
-            >
-              첫 행 설정 모두 적용
-            </button>
+            <div className="flex items-center gap-2">
+              <AnimatedCheckbox
+                checked={checkedRows.size === rows.length && rows.length > 0}
+                onChange={toggleAll}
+                disabled={isSubmitting}
+                size={18}
+              />
+              <span className="text-xs" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg-muted)' }}>
+                전체 선택
+              </span>
+            </div>
           )}
-          <button
-            type="button"
-            onClick={() => setIsStudentModalOpen(true)}
-            disabled={isSubmitting}
-            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', backgroundColor: 'var(--accent)' }}
-          >
-            <UserPlusIcon size={13} strokeWidth={2.5} />
-            학생 추가
-          </button>
+          {rows.length >= 2 && (
+            <Button variant="accent" size="sm" onClick={applyFirstRowToSelected} disabled={!canApplyFirstRow || isSubmitting}>선택 항목에 적용</Button>
+          )}
+          <Button variant="primary" size="sm" icon={<UserPlusIcon size={13} strokeWidth={2.5} />} onClick={() => setIsStudentModalOpen(true)} disabled={isSubmitting}>학생 추가</Button>
         </div>
 
         {error && (
@@ -247,36 +255,12 @@ export default function SchoolMileageGrant({
           {isRulesLoading ? (
             <ListSkeleton count={3} rowHeight="h-14" />
           ) : rows.length === 0 ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
-              <div
-                className="flex h-12 w-12 items-center justify-center rounded-lg"
-                style={{ backgroundColor: 'var(--accent-subtle)' }}
-              >
-                <UserPlusIcon size={24} strokeWidth={1.7} style={{ color: 'var(--accent)' }} />
-              </div>
-              <div>
-                <p
-                  className="text-sm font-semibold"
-                  style={{
-                    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                    color: 'var(--fg)',
-                  }}
-                >
-                  선택된 학생이 없습니다
-                </p>
-                <p
-                  className="mt-1 text-xs leading-relaxed"
-                  style={{
-                    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                    color: 'var(--fg-muted)',
-                  }}
-                >
-                  상단 버튼으로 학생을 추가한 뒤
-                  <br />
-                  규칙과 점수를 입력하세요.
-                </p>
-              </div>
-            </div>
+            <ListEmptyState
+              fill
+              icon={<div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: 'var(--accent-subtle)' }}><UserPlusIcon size={24} strokeWidth={1.7} style={{ color: 'var(--accent)' }} /></div>}
+              title="선택된 학생이 없습니다"
+              description="상단 버튼으로 학생을 추가한 뒤 규칙과 점수를 입력하세요."
+            />
           ) : (
             <>
               <div
@@ -299,6 +283,8 @@ export default function SchoolMileageGrant({
                       row.ruleId === '' ? null : (rulesById.get(row.ruleId) ?? null)
                     }
                     disabled={isSubmitting}
+                    checked={checkedRows.has(row.localId)}
+                    onCheckedChange={() => toggleRow(row.localId)}
                     onOpenRuleModal={() => setRuleModalRowId(row.localId)}
                     onReasonChange={(reason) =>
                       updateRow(row.localId, { reason })
@@ -308,23 +294,11 @@ export default function SchoolMileageGrant({
                 ))}
               </div>
 
-              <motion.button
-                type="button"
-                onClick={submitEntries}
-                disabled={!canSubmit || isSubmitting}
-                whileTap={!canSubmit || isSubmitting ? undefined : { scale: 0.97 }}
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
-                style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', backgroundColor: 'var(--accent)' }}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" color="white" aria-hidden="true" />
-                    부여 중...
-                  </>
-                ) : (
-                  `전체 부여하기 (${rows.length}명)`
-                )}
-              </motion.button>
+              <div className="mt-4">
+                <Button variant="primary" size="md" fullWidth loading={isSubmitting} disabled={!canSubmit || isSubmitting} onClick={submitEntries}>
+                  {isSubmitting ? '부여 중...' : `전체 부여하기 (${rows.length}명)`}
+                </Button>
+              </div>
             </>
           )}
         </Card>

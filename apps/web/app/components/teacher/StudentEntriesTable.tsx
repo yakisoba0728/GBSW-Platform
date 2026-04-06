@@ -1,7 +1,11 @@
 'use client'
 
 import { Badge, Card, SectionTitle, formatAwardedAtParts, formatSignedScore } from './teacher-shared'
-import { AnimatedTableRow, ListEmptyState, TableRowSkeleton } from '../ui/list'
+import {
+  AnimatedTableRow,
+  EmptyStatePane,
+  TableRowSkeleton,
+} from '../ui/list'
 import { Pagination } from '../ui/primitives'
 import type { SchoolMileageHistoryItem } from './school-mileage-types'
 
@@ -43,28 +47,25 @@ export default function StudentEntriesTable({
 
       {/* 테이블 */}
       <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto">
-        <table className="w-full text-xs">
-          <thead className="table-header">
-            <tr>
-              {['유형', '카테고리', '항목', '점수', '사유', '일시'].map((h) => (
-                <th key={h} className="px-3">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              <TableRowSkeleton columns={6} count={5} />
-            ) : entries.length === 0 ? (
+        {isLoading ? (
+          <TableRowSkeleton columns={6} count={5} />
+        ) : entries.length === 0 ? (
+          <EmptyStatePane
+            className="h-full"
+            title="처리 내역이 없습니다"
+            description="이 학생에게 아직 부여된 상벌점이 없습니다."
+          />
+        ) : (
+          <table className="w-full text-xs">
+            <thead className="table-header">
               <tr>
-                <td colSpan={6}>
-                  <ListEmptyState
-                    title="처리 내역이 없습니다"
-                    description="이 학생에게 아직 부여된 상벌점이 없습니다."
-                  />
-                </td>
+                {['유형', '카테고리', '항목', '점수', '사유', '일시'].map((h) => (
+                  <th key={h} className="px-3">{h}</th>
+                ))}
               </tr>
-            ) : (
-              entries.map((entry, index) => {
+            </thead>
+            <tbody>
+              {entries.map((entry, index) => {
                 const { date, time } = formatAwardedAtParts(entry.awardedAt)
                 return (
                   <AnimatedTableRow
@@ -99,10 +100,10 @@ export default function StudentEntriesTable({
                     </td>
                   </AnimatedTableRow>
                 )
-              })
-            )}
-          </tbody>
-        </table>
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* 페이지네이션 */}

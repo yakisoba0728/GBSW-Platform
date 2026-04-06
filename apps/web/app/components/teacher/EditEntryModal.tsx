@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
 import { ModalBase } from '../ui/modal'
 import { XIcon } from '../ui/icons'
+import { Button } from '../ui/button'
+import { IconButton } from '../ui/primitives'
 import { NoticeBox } from './teacher-shared'
 import {
   formatAwardedAt,
@@ -89,15 +90,7 @@ export default function EditEntryModal({
               </p>
             )}
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:opacity-70"
-            style={{ color: 'var(--fg-muted)' }}
-            aria-label="닫기"
-          >
-            <XIcon />
-          </button>
+          <IconButton icon={<XIcon />} label="닫기" onClick={onClose} />
         </div>
 
         {item && (
@@ -166,35 +159,18 @@ export default function EditEntryModal({
         )}
 
         <div className="flex items-center justify-end gap-2 px-5 py-4" style={{ borderTop: '1px solid var(--admin-border)' }}>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
-            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--admin-border)', color: 'var(--fg-muted)' }}
-          >
+          <Button variant="secondary" size="sm" onClick={onClose} disabled={isSubmitting}>
             취소
-          </button>
-          <button
-            type="button"
-            onClick={() => void handleSubmit()}
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            loading={isSubmitting}
             disabled={isSubmitting || !item}
-            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
-            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', backgroundColor: 'var(--accent)' }}
+            onClick={() => void handleSubmit()}
           >
-            {isSubmitting ? (
-              <>
-                <motion.svg
-                  width="13" height="13" viewBox="0 0 16 16" fill="none"
-                  animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 0.7, ease: 'linear' }}
-                  aria-hidden="true"
-                >
-                  <circle cx="8" cy="8" r="6" stroke="white" strokeWidth="2" strokeDasharray="28 8" fill="none" />
-                </motion.svg>
-                저장 중...
-              </>
-            ) : '저장'}
-          </button>
+            저장
+          </Button>
         </div>
       </div>
     </ModalBase>

@@ -19,7 +19,7 @@ export const TEACHER_NAV_ITEMS: DashboardNavItem[] = [
       { href: '/teacher/mileage/students', label: '학생별 조회' },
       { href: '/teacher/mileage/stats', label: '통계 보기' },
       { href: '/teacher/mileage/classes', label: '학급별 현황' },
-      { href: '/teacher/mileage/rules', label: '상벌점 항목 관리' },
+      { href: '/teacher/mileage/rules', label: '상벌점 항목' },
       { href: '/teacher/mileage/report', label: '보고서 출력' },
     ],
   },

@@ -1,6 +1,7 @@
 'use client'
 
 import { Filter } from 'lucide-react'
+import { Button } from '../ui/button'
 import { Card, SCHOOL_OPTIONS, inputStyle } from './teacher-shared'
 
 type HistoryFilters = {
@@ -135,18 +136,9 @@ export default function HistoryFilters({
         />
 
         {hasActiveFilters && (
-          <button
-            type="button"
-            onClick={onReset}
-            className="ml-auto rounded-md border px-2 py-1 text-[11px] font-medium transition-opacity hover:opacity-70"
-            style={{
-              borderColor: 'var(--accent)',
-              color: 'var(--accent)',
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            }}
-          >
-            초기화
-          </button>
+          <div className="ml-auto">
+            <Button variant="accent" size="sm" onClick={onReset}>초기화</Button>
+          </div>
         )}
       </div>
     </Card>

@@ -1,6 +1,8 @@
 'use client'
 
 import { RefreshCw, Printer, Download } from 'lucide-react'
+import { Button } from '../ui/button'
+import { UsersIcon } from '../ui/icons'
 import { Card, FilterRow, SectionHeader, inputStyle } from './teacher-shared'
 import type { SchoolCode } from './school-mileage-types'
 
@@ -18,11 +20,14 @@ export default function ReportFilters({
   filterGrade,
   startDate,
   endDate,
+  selectedStudentIds,
   onReportTypeChange,
   onSchoolChange,
   onGradeChange,
   onStartDateChange,
   onEndDateChange,
+  onStudentIdsChange,
+  onOpenStudentModal,
   onReload,
   onPrint,
   onExport,
@@ -36,11 +41,14 @@ export default function ReportFilters({
   filterGrade: string
   startDate: string
   endDate: string
+  selectedStudentIds: string[]
   onReportTypeChange: (value: ReportType) => void
   onSchoolChange: (value: string) => void
   onGradeChange: (value: string) => void
   onStartDateChange: (value: string) => void
   onEndDateChange: (value: string) => void
+  onStudentIdsChange: (ids: string[]) => void
+  onOpenStudentModal: () => void
   onReload: () => void
   onPrint: () => void
   onExport: () => void
@@ -156,54 +164,41 @@ export default function ReportFilters({
               className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               style={inputStyle}
             />
+
+            {reportType === 'student' && (
+              <Button
+                variant="accent"
+                size="sm"
+                icon={<UsersIcon size={12} />}
+                onClick={onOpenStudentModal}
+              >
+                {selectedStudentIds.length > 0
+                  ? `학생 ${selectedStudentIds.length}명 선택됨`
+                  : '학생 선택'}
+              </Button>
+            )}
+            {reportType === 'student' && selectedStudentIds.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onStudentIdsChange([])}
+              >
+                선택 초기화
+              </Button>
+            )}
           </FilterRow>
         </div>
 
         <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={onReload}
-            disabled={isLoading}
-            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              backgroundColor: 'var(--accent)',
-              color: '#fff',
-            }}
-          >
-            <RefreshCw size={12} aria-hidden="true" />
+          <Button variant="primary" size="sm" loading={isLoading} disabled={isLoading} icon={<RefreshCw size={12} aria-hidden="true" />} onClick={onReload}>
             {isLoading ? '불러오는 중...' : '새로고침'}
-          </button>
-          <button
-            type="button"
-            onClick={onPrint}
-            disabled={!canPrint}
-            className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              borderColor: 'var(--border)',
-              color: 'var(--fg)',
-              backgroundColor: 'var(--bg-subtle)',
-            }}
-          >
-            <Printer size={12} aria-hidden="true" />
+          </Button>
+          <Button variant="secondary" size="sm" disabled={!canPrint} icon={<Printer size={12} aria-hidden="true" />} onClick={onPrint}>
             인쇄
-          </button>
-          <button
-            type="button"
-            onClick={onExport}
-            disabled={!canExport}
-            className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              borderColor: 'var(--border)',
-              color: 'var(--fg)',
-              backgroundColor: 'var(--bg-subtle)',
-            }}
-          >
-            <Download size={12} aria-hidden="true" />
+          </Button>
+          <Button variant="secondary" size="sm" disabled={!canExport} icon={<Download size={12} aria-hidden="true" />} onClick={onExport}>
             엑셀 내보내기
-          </button>
+          </Button>
         </div>
       </div>
     </Card>

@@ -440,7 +440,7 @@ export default function StudentMileageStats() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col h-full gap-4">
         {/* Header skeleton */}
         <div
           style={{
@@ -498,7 +498,7 @@ export default function StudentMileageStats() {
 
   if (error) {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col h-full gap-4">
         <div
           className="rounded-xl border px-5 py-4 text-xs"
           style={{
@@ -522,7 +522,7 @@ export default function StudentMileageStats() {
   const entryCount = summary?.entryCount ?? 0
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col h-full gap-4">
       {/* ── 1. Header ──────────────────────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
@@ -573,6 +573,7 @@ export default function StudentMileageStats() {
         </p>
       </motion.div>
 
+      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4">
       {/* ── 2. Four stat cards ─────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <motion.div
@@ -672,6 +673,7 @@ export default function StudentMileageStats() {
       >
         <MonthlyTrendChart data={monthlyStats} />
       </motion.div>
+      </div>
     </div>
   )
 }

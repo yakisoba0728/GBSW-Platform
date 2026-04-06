@@ -12,6 +12,7 @@ import {
   StatCard,
   inputStyle,
 } from './teacher-shared'
+import { Button } from '../ui/button'
 import { AnimatedListItem, ListEmptyState } from '../ui/list'
 import { BuildingIcon } from '../ui/icons'
 import type {
@@ -318,15 +319,7 @@ export default function SchoolMileageClass() {
               <option value="3">3학년</option>
             </select>
 
-            <button
-              type="button"
-              onClick={() => void loadClassData()}
-              disabled={isLoading || !filterSchool}
-              className="h-8 rounded-md px-3 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
-              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', backgroundColor: 'var(--accent)', color: '#fff' }}
-            >
-              {isLoading ? '조회 중...' : '새로고침'}
-            </button>
+            <Button variant="primary" size="sm" loading={isLoading} disabled={isLoading || !filterSchool} onClick={() => void loadClassData()}>새로고침</Button>
           </FilterRow>
         </div>
       </Card>
@@ -336,8 +329,9 @@ export default function SchoolMileageClass() {
       <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4">
 
       {!filterSchool && !isLoading && (
-        <Card>
+        <Card className="flex flex-1 flex-col">
           <ListEmptyState
+            fill
             icon={<BuildingIcon style={{ color: 'var(--accent)' }} />}
             title="학교를 선택하세요"
             description="학교·학년 조건을 설정하면 학급별 현황이 표시됩니다."
@@ -372,8 +366,9 @@ export default function SchoolMileageClass() {
         !isLoading &&
         response.classes.length === 0 &&
         !queryError && (
-          <Card>
+          <Card className="flex flex-1 flex-col">
             <ListEmptyState
+              fill
               icon={<BuildingIcon style={{ color: 'var(--accent)' }} />}
               title="학급 데이터가 없습니다"
               description="다른 조건으로 다시 조회해 보세요."

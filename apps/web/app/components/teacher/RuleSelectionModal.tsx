@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ModalBase } from '../ui/modal'
 import { SearchIcon, XIcon } from '../ui/icons'
+import { EmptyStatePane } from '../ui/list'
 import type { SchoolMileageRuleSummary } from './school-mileage-types'
 import { inputStyle } from './teacher-shared'
 import { koreanIncludes } from '@/lib/korean-search'
@@ -131,18 +132,18 @@ export default function RuleSelectionModal({
 
         <div className="flex-1 overflow-y-auto px-4 py-3">
           {!hasResults ? (
-            <div className="flex flex-col items-center gap-2 py-8 text-center">
-              <SearchIcon size={24} strokeWidth={1.5} style={{ color: 'var(--admin-text-muted)' }} />
-              <p
-                className="text-sm"
-                style={{
-                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                  color: 'var(--admin-text-muted)',
-                }}
-              >
-                검색 결과가 없습니다.
-              </p>
-            </div>
+            <EmptyStatePane
+              icon={
+                <SearchIcon
+                  size={24}
+                  strokeWidth={1.5}
+                  style={{ color: 'var(--admin-text-muted)' }}
+                />
+              }
+              title="검색 결과가 없습니다."
+              description="항목명이나 카테고리로 다시 검색해 보세요."
+              className="min-h-[220px]"
+            />
           ) : (
             <div className="space-y-4">
               {filteredReward.length > 0 && (

@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { ListSkeleton } from '../ui/list'
+import { Button } from '../ui/button'
+import { EmptyStatePane, ListSkeleton } from '../ui/list'
 import { ModalBase } from '../ui/modal'
 import { UsersIcon, XIcon } from '../ui/icons'
 import type { SchoolMileageStudentOption } from './school-mileage-types'
@@ -234,18 +235,9 @@ export default function StudentSelectionModal({
           className="flex items-center justify-between px-5 py-2.5"
           style={{ borderBottom: '1px solid var(--admin-border)' }}
         >
-          <button
-            type="button"
-            onClick={toggleAll}
-            className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              borderColor: 'var(--admin-border)',
-              color: 'var(--admin-text-muted)',
-            }}
-          >
+          <Button variant="secondary" size="sm" onClick={toggleAll}>
             {allSelected ? '전체 선택 해제' : '전체 선택'}
-          </button>
+          </Button>
           <span
             className="text-xs"
             style={{
@@ -269,18 +261,18 @@ export default function StudentSelectionModal({
           {isLoading ? (
             <ListSkeleton count={5} rowHeight="h-14" />
           ) : visibleStudents.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 py-8 text-center">
-              <UsersIcon size={28} strokeWidth={1.5} style={{ color: 'var(--admin-text-muted)' }} />
-              <p
-                className="text-sm"
-                style={{
-                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                  color: 'var(--admin-text-muted)',
-                }}
-              >
-                조건에 맞는 학생이 없습니다.
-              </p>
-            </div>
+            <EmptyStatePane
+              icon={
+                <UsersIcon
+                  size={28}
+                  strokeWidth={1.5}
+                  style={{ color: 'var(--admin-text-muted)' }}
+                />
+              }
+              title="조건에 맞는 학생이 없습니다."
+              description="학교와 학년 조건을 바꿔 다시 찾아보세요."
+              className="min-h-[220px]"
+            />
           ) : (
             <div className="space-y-1.5">
               {visibleStudents.map((student) => {
@@ -375,30 +367,17 @@ export default function StudentSelectionModal({
           className="flex items-center justify-end gap-2 px-5 py-4"
           style={{ borderTop: '1px solid var(--admin-border)' }}
         >
-          <button
-            type="button"
-            onClick={handleClose}
-            className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              borderColor: 'var(--admin-border)',
-              color: 'var(--admin-text-muted)',
-            }}
-          >
+          <Button variant="secondary" size="sm" onClick={handleClose}>
             취소
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
             onClick={() => onConfirm(Array.from(selectedStudents.values()))}
             disabled={selectedStudents.size === 0}
-            className="rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              backgroundColor: 'var(--admin-accent)',
-            }}
           >
             추가하기 ({selectedStudents.size}명)
-          </button>
+          </Button>
         </div>
       </div>
     </ModalBase>

@@ -1,5 +1,6 @@
 import type { DashboardNavItem } from '@/app/components/dashboard-nav'
 import {
+  ShieldCheckIcon,
   UserCheckIcon,
   UserPlusIcon,
   UsersIcon,
@@ -27,5 +28,14 @@ export const ADMIN_NAV_ITEMS: DashboardNavItem[] = [
     label: '교사 관리',
     href: '/admin/teachers',
     icon: <UserCheckIcon />,
+  },
+  {
+    id: 'admin-mileage',
+    label: '그린 마일리지',
+    section: '마일리지 관리',
+    icon: <ShieldCheckIcon />,
+    children: [
+      { href: '/admin/mileage/rules', label: '상벌점 항목' },
+    ],
   },
 ]

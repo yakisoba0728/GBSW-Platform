@@ -1,3 +1,5 @@
+import { Button } from '@/app/components/ui/button'
+
 export const inputBase = `
   w-full rounded-lg border px-3.5 py-2 text-sm outline-none transition-all duration-150
   disabled:cursor-not-allowed disabled:opacity-60
@@ -293,46 +295,41 @@ export function FormActions({
 }) {
   return (
     <div className="flex items-center gap-3 pt-5">
-      <button
+      <Button
         type="submit"
+        variant="primary"
+        size="md"
+        loading={isSubmitting}
         disabled={isSubmitting}
-        className="flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium text-white transition-all duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
-        style={{
-          fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-          backgroundColor: 'var(--accent)',
-        }}
+        icon={
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <line x1="19" y1="8" x2="19" y2="14" />
+            <line x1="22" y1="11" x2="16" y2="11" />
+          </svg>
+        }
       >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <line x1="19" y1="8" x2="19" y2="14" />
-          <line x1="22" y1="11" x2="16" y2="11" />
-        </svg>
-        {isSubmitting ? '생성 중...' : submitLabel}
-      </button>
-      <button
-        type="button"
+        {submitLabel}
+      </Button>
+      <Button
+        variant="ghost"
+        size="md"
         onClick={onReset}
         disabled={isSubmitting}
-        className="rounded-md border px-4 py-2.5 text-sm transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60"
-        style={{
-          fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-          color: 'var(--fg-muted)',
-          borderColor: 'var(--border)',
-        }}
       >
         초기화
-      </button>
+      </Button>
     </div>
   )
 }

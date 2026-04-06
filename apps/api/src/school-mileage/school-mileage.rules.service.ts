@@ -6,8 +6,9 @@ import {
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
+  assertSuperAdmin,
   assertStudentExists,
-  assertTeacherExists,
+  assertTeacherOrSuperAdmin,
 } from './school-mileage.access';
 import {
   toApiMileageType,
@@ -23,8 +24,15 @@ import {
 export class SchoolMileageRulesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getRules(actorTeacherId: string | undefined) {
-    await assertTeacherExists(this.prisma, actorTeacherId);
+  async getRules(
+    actorTeacherId: string | undefined,
+    actorSuperAdminId?: string,
+  ) {
+    await assertTeacherOrSuperAdmin(
+      this.prisma,
+      actorTeacherId,
+      actorSuperAdminId,
+    );
 
     const rules = await this.prisma.schoolMileageRule.findMany({
       where: { isActive: true },
@@ -50,10 +58,10 @@ export class SchoolMileageRulesService {
   }
 
   async createRule(
-    actorTeacherId: string | undefined,
+    actorSuperAdminId: string | undefined,
     body: Record<string, unknown>,
   ) {
-    await assertTeacherExists(this.prisma, actorTeacherId);
+    assertSuperAdmin(actorSuperAdminId);
     const input = parseCreateRuleInput(body);
 
     await this.assertRuleNameAvailable(input.type, input.category, input.name);
@@ -87,11 +95,11 @@ export class SchoolMileageRulesService {
   }
 
   async updateRule(
-    actorTeacherId: string | undefined,
+    actorSuperAdminId: string | undefined,
     id: string,
     body: Record<string, unknown>,
   ) {
-    await assertTeacherExists(this.prisma, actorTeacherId);
+    assertSuperAdmin(actorSuperAdminId);
     const ruleId = parseRuleId(id);
     const input = parseUpdateRuleInput(body);
 

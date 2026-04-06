@@ -11,6 +11,7 @@ import {
 } from './teacher-shared'
 import SuccessModal from '../ui/success-modal'
 import { AnimatedTableRow, ListEmptyState, TableRowSkeleton } from '../ui/list'
+import { Button } from '../ui/button'
 import { EditIcon, FileIcon, PlusIcon, SearchIcon } from '../ui/icons'
 import RuleFormModal from './RuleFormModal'
 import type { MileageType, SchoolMileageRuleSummary } from './school-mileage-types'
@@ -21,11 +22,15 @@ export default function SchoolMileageRules({
   isRulesLoading,
   rulesError,
   loadRules,
+  readOnly = false,
+  apiPath = '/api/teacher/school-mileage/rules',
 }: {
   rules: SchoolMileageRuleSummary[]
   isRulesLoading: boolean
   rulesError: string | null
   loadRules: () => Promise<void>
+  readOnly?: boolean
+  apiPath?: string
 }) {
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<'' | MileageType>('')
@@ -96,6 +101,7 @@ export default function SchoolMileageRules({
         categories={categories}
         existingRules={rules}
         onSuccess={handleFormSuccess}
+        apiPath={apiPath}
       />
 
       <SuccessModal
@@ -108,23 +114,12 @@ export default function SchoolMileageRules({
 
       <Card>
         <SectionHeader
-          title="상벌점 항목 관리"
-          subtitle="현재 등록된 상벌점 규칙을 관리합니다."
+          title="상벌점 항목"
+          subtitle={readOnly ? '현재 등록된 상벌점 규칙 목록입니다.' : '현재 등록된 상벌점 규칙을 관리합니다.'}
           action={
-            <button
-              type="button"
-              onClick={handleCreate}
-              className="flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-opacity hover:opacity-70"
-              style={{
-                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                backgroundColor: 'var(--accent-subtle)',
-                borderColor: 'var(--accent)',
-                color: 'var(--accent)',
-              }}
-            >
-              <PlusIcon />
-              항목 추가
-            </button>
+            readOnly ? undefined : (
+              <Button variant="accent" size="sm" icon={<PlusIcon />} onClick={handleCreate}>항목 추가</Button>
+            )
           }
         />
       </Card>
@@ -174,14 +169,7 @@ export default function SchoolMileageRules({
           </select>
 
           {(search || typeFilter || categoryFilter) && (
-            <button
-              type="button"
-              onClick={() => { setSearch(''); setTypeFilter(''); setCategoryFilter('') }}
-              className="h-8 rounded-md border px-2.5 text-xs transition-opacity hover:opacity-70"
-              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--border)', color: 'var(--fg-muted)' }}
-            >
-              초기화
-            </button>
+            <Button variant="ghost" size="sm" onClick={() => { setSearch(''); setTypeFilter(''); setCategoryFilter('') }}>초기화</Button>
           )}
           <span className="ml-auto text-xs" style={{ color: 'var(--fg-muted)', fontFamily: 'var(--font-space-grotesk)' }}>
             {filteredRules.length}건
@@ -194,26 +182,29 @@ export default function SchoolMileageRules({
           <table className="w-full text-xs">
             <thead className="table-header">
               <tr>
-                {['ID', '유형', '카테고리', '항목명', '기본점수', '순서', ''].map((h) => (
+                {['ID', '유형', '카테고리', '항목명', '기본점수', '순서', ...(readOnly ? [] : [''])].map((h) => (
                   <th key={h} className="px-3">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {isRulesLoading ? (
-                <TableRowSkeleton columns={7} count={6} />
+                <TableRowSkeleton columns={readOnly ? 6 : 7} count={6} />
               ) : filteredRules.length === 0 ? (
                 <tr>
-                  <td colSpan={7}>
-                    <ListEmptyState
-                      icon={
-                        <FileIcon
-                          style={{ color: 'var(--accent)' }}
-                        />
-                      }
-                      title="규칙이 없습니다"
-                      description="검색 조건을 변경하거나 새 항목을 추가해 보세요."
-                    />
+                  <td colSpan={readOnly ? 6 : 7} className="p-0">
+                    <div className="flex min-h-[320px]">
+                      <ListEmptyState
+                        fill
+                        icon={
+                          <FileIcon
+                            style={{ color: 'var(--accent)' }}
+                          />
+                        }
+                        title="규칙이 없습니다"
+                        description="검색 조건을 변경하거나 새 항목을 추가해 보세요."
+                      />
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -250,21 +241,23 @@ export default function SchoolMileageRules({
                     <td className="px-3 py-2" style={{ color: 'var(--fg-muted)', fontFamily: 'var(--font-space-grotesk)' }}>
                       {rule.displayOrder}
                     </td>
-                    <td className="px-3 py-2">
-                      <div
-                        className="flex items-center gap-1.5 transition-opacity"
-                        style={{ opacity: hoveredRowId === rule.id ? 1 : 0 }}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => handleEdit(rule)}
-                          className="flex items-center gap-1 rounded border px-2 py-1 text-[11px] transition-opacity hover:opacity-70"
-                          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--border)', color: 'var(--fg-muted)' }}
+                    {!readOnly && (
+                      <td className="px-3 py-2">
+                        <div
+                          className="flex items-center gap-1.5 transition-opacity"
+                          style={{ opacity: hoveredRowId === rule.id ? 1 : 0 }}
                         >
-                          <EditIcon />수정
-                        </button>
-                      </div>
-                    </td>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            icon={<EditIcon />}
+                            onClick={() => handleEdit(rule)}
+                          >
+                            수정
+                          </Button>
+                        </div>
+                      </td>
+                    )}
                   </AnimatedTableRow>
                 ))
               )}

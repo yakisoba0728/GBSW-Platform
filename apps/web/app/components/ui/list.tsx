@@ -224,13 +224,23 @@ export function ListEmptyState({
   icon,
   title,
   description,
+  fill = false,
+  className = '',
 }: {
   icon?: ReactNode
   title: string
   description?: string
+  fill?: boolean
+  className?: string
 }) {
+  const baseClassName = fill
+    ? 'flex h-full min-h-full w-full flex-1 flex-col items-center justify-center gap-3 py-6 text-center'
+    : 'flex min-h-[220px] w-full flex-col items-center justify-center gap-3 py-10 text-center'
+
   return (
-    <div className="flex flex-col items-center gap-3 py-14 text-center">
+    <div
+      className={`${baseClassName} ${className}`.trim()}
+    >
       {icon && (
         <div
           className="flex h-13 w-13 items-center justify-center rounded-2xl"
@@ -255,6 +265,22 @@ export function ListEmptyState({
           </p>
         )}
       </div>
+    </div>
+  )
+}
+
+export function EmptyStatePane({
+  className = '',
+  ...props
+}: {
+  icon?: ReactNode
+  title: string
+  description?: string
+  className?: string
+}) {
+  return (
+    <div className={`flex min-h-[240px] flex-1 ${className}`.trim()}>
+      <ListEmptyState fill {...props} />
     </div>
   )
 }

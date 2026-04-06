@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { Modal, ModalFooter } from '../ui/modal'
+import { Button } from '../ui/button'
 import type { MileageType, SchoolMileageRuleSummary } from './school-mileage-types'
 
 interface RuleFormModalProps {
@@ -13,6 +14,7 @@ interface RuleFormModalProps {
   categories: string[]
   existingRules: SchoolMileageRuleSummary[]
   onSuccess: () => Promise<void> | void
+  apiPath?: string
 }
 
 export default function RuleFormModal({
@@ -23,6 +25,7 @@ export default function RuleFormModal({
   categories,
   existingRules,
   onSuccess,
+  apiPath = '/api/teacher/school-mileage/rules',
 }: RuleFormModalProps) {
   const [type, setType] = useState<MileageType>('reward')
   const [category, setCategory] = useState('')
@@ -115,8 +118,8 @@ export default function RuleFormModal({
     try {
       const url =
         mode === 'create'
-          ? '/api/teacher/school-mileage/rules'
-          : `/api/teacher/school-mileage/rules/${rule?.id}`
+          ? apiPath
+          : `${apiPath}/${rule?.id}`
       const method = mode === 'create' ? 'POST' : 'PATCH'
 
       const response = await fetch(url, {
@@ -147,6 +150,7 @@ export default function RuleFormModal({
     name,
     onClose,
     onSuccess,
+    apiPath,
     rule,
     type,
   ])
@@ -310,32 +314,23 @@ export default function RuleFormModal({
       </div>
 
       <ModalFooter>
-        <button
-          type="button"
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={onClose}
           disabled={isSubmitting}
-          className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
-          style={{
-            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            borderColor: 'var(--border)',
-            color: 'var(--fg-muted)',
-          }}
         >
           취소
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          variant="primary"
+          size="sm"
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-          style={{
-            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            backgroundColor: 'var(--accent)',
-          }}
         >
           {isSubmitting && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}
           {mode === 'create' ? '추가' : '저장'}
-        </button>
+        </Button>
       </ModalFooter>
     </Modal>
   )

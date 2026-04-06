@@ -62,6 +62,41 @@ export function FetchingOverlay({ visible }: { visible: boolean }) {
   )
 }
 
+// ─── RefetchWrapper ──────────────────────────────────────────────────────────
+// 데이터 리페치 시 기존 콘텐츠 위에 오버레이를 표시하는 래퍼.
+// isInitialLoad=true 이면 children을 렌더링하지 않음 (호출자가 스켈레톤 처리).
+
+export function RefetchWrapper({
+  isFetching,
+  isInitialLoad,
+  children,
+  className = '',
+  contentClassName = '',
+}: {
+  isFetching: boolean
+  isInitialLoad: boolean
+  children: ReactNode
+  className?: string
+  contentClassName?: string
+}) {
+  if (isInitialLoad) return null
+
+  return (
+    <div className={`relative ${className}`.trim()}>
+      <div
+        className={contentClassName}
+        style={{
+          opacity: isFetching ? 0.35 : 1,
+          transition: 'opacity 200ms ease',
+        }}
+      >
+        {children}
+      </div>
+      <FetchingOverlay visible={isFetching} />
+    </div>
+  )
+}
+
 // ─── IconButton ───────────────────────────────────────────────────────────────
 
 export function IconButton({

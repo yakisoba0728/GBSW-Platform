@@ -20,33 +20,34 @@ export class SchoolMileageController {
   getRules(
     @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
     @Headers('x-actor-teacher-id') actorTeacherId: string | undefined,
+    @Headers('x-actor-super-admin-id') actorSuperAdminId: string | undefined,
   ) {
     assertInternalApiRequest(internalApiSecret);
 
-    return this.schoolMileageService.getRules(actorTeacherId);
+    return this.schoolMileageService.getRules(actorTeacherId, actorSuperAdminId);
   }
 
   @Post('rules')
   createRule(
     @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
-    @Headers('x-actor-teacher-id') actorTeacherId: string | undefined,
+    @Headers('x-actor-super-admin-id') actorSuperAdminId: string | undefined,
     @Body() body: Record<string, unknown>,
   ) {
     assertInternalApiRequest(internalApiSecret);
 
-    return this.schoolMileageService.createRule(actorTeacherId, body);
+    return this.schoolMileageService.createRule(actorSuperAdminId, body);
   }
 
   @Patch('rules/:id')
   updateRule(
     @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
-    @Headers('x-actor-teacher-id') actorTeacherId: string | undefined,
+    @Headers('x-actor-super-admin-id') actorSuperAdminId: string | undefined,
     @Param('id') id: string,
     @Body() body: Record<string, unknown>,
   ) {
     assertInternalApiRequest(internalApiSecret);
 
-    return this.schoolMileageService.updateRule(actorTeacherId, id, body);
+    return this.schoolMileageService.updateRule(actorSuperAdminId, id, body);
   }
 
   @Get('students')

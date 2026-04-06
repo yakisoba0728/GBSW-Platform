@@ -175,6 +175,7 @@ export default function StudentMileageRules() {
             </div>
           ) : grouped.length === 0 ? (
             <ListEmptyState
+              fill
               icon={
                 <SearchIcon
                   size={20}
