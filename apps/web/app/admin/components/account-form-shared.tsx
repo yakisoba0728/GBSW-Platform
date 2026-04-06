@@ -13,8 +13,6 @@ export const inputBaseStyle = {
 
 export type School = 'GBSW' | 'BYMS'
 
-export type Notice = { type: 'error' | 'success'; text: string } | null
-
 export type StudentFormState = {
   school: School
   admissionYear: string
@@ -334,20 +332,3 @@ export function FormActions({
   )
 }
 
-export function FormNotice({ notice }: { notice: Notice }) {
-  if (!notice) {
-    return null
-  }
-
-  return (
-    <p
-      className="mt-4 whitespace-pre-line text-sm"
-      style={{
-        fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-        color: notice.type === 'success' ? 'var(--reward)' : 'var(--penalty)',
-      }}
-    >
-      {notice.text}
-    </p>
-  )
-}

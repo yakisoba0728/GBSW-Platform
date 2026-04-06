@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Card, NoticeBox } from './teacher-shared'
+import SuccessModal from '../ui/success-modal'
 import {
   AnimatedListItem,
   ListEmptyState,
@@ -56,6 +57,9 @@ export default function SchoolMileageStudentView() {
   const [isEntriesLoading, setIsEntriesLoading] = useState(false)
   const [detailError, setDetailError] = useState<string | null>(null)
 
+  const combinedError = studentsError || detailError
+  const [showErrorModal, setShowErrorModal] = useState(false)
+
   const abortStudentsRef = useRef<AbortController | null>(null)
   const abortSummaryRef = useRef<AbortController | null>(null)
   const abortEntriesRef = useRef<AbortController | null>(null)
@@ -91,6 +95,7 @@ export default function SchoolMileageStudentView() {
 
       if (!res.ok) {
         setStudentsError(data?.message ?? '학생 목록을 불러오지 못했습니다.')
+        setShowErrorModal(true)
         setStudents([])
         return
       }
@@ -99,6 +104,7 @@ export default function SchoolMileageStudentView() {
     } catch (error) {
       if ((error as Error).name !== 'AbortError') {
         setStudentsError('학생 목록 조회 중 문제가 발생했습니다.')
+        setShowErrorModal(true)
         setStudents([])
       }
     } finally {
@@ -137,6 +143,7 @@ export default function SchoolMileageStudentView() {
           (data as { message?: string } | null)?.message ??
             '학생 요약을 불러오지 못했습니다.',
         )
+        setShowErrorModal(true)
         setSummary(null)
         return
       }
@@ -145,6 +152,7 @@ export default function SchoolMileageStudentView() {
     } catch (error) {
       if ((error as Error).name !== 'AbortError') {
         setDetailError('학생 요약 조회 중 문제가 발생했습니다.')
+        setShowErrorModal(true)
         setSummary(null)
       }
     } finally {
@@ -185,6 +193,7 @@ export default function SchoolMileageStudentView() {
 
       if (!res.ok) {
         setDetailError('학생 처리 내역을 불러오지 못했습니다.')
+        setShowErrorModal(true)
         setStudentEntries([])
         setTotalEntryCount(0)
         return
@@ -195,6 +204,7 @@ export default function SchoolMileageStudentView() {
     } catch (error) {
       if ((error as Error).name !== 'AbortError') {
         setDetailError('학생 처리 내역 조회 중 문제가 발생했습니다.')
+        setShowErrorModal(true)
         setStudentEntries([])
         setTotalEntryCount(0)
       }
@@ -284,6 +294,13 @@ export default function SchoolMileageStudentView() {
         isLoading={isStudentsLoading}
       />
 
+      <SuccessModal
+        open={showErrorModal && !!combinedError}
+        onClose={() => setShowErrorModal(false)}
+        type="error"
+        title="데이터 조회 실패"
+        description={combinedError ?? ''}
+      />
       {studentsError && <NoticeBox type="error" message={studentsError} />}
       {detailError && <NoticeBox type="error" message={detailError} />}
 
@@ -323,6 +340,15 @@ export default function SchoolMileageStudentView() {
               </div>
             ) : isStudentsLoading ? (
               <ListSkeleton count={8} rowHeight="h-14" />
+            ) : studentsError ? (
+              <div className="flex h-full items-center justify-center">
+                <ListEmptyState
+                  fill
+                  icon={<UserIcon style={{ color: 'var(--accent)' }} />}
+                  title="학생 목록을 불러오지 못했습니다"
+                  description={studentsError}
+                />
+              </div>
             ) : students.length === 0 ? (
               <div className="flex h-full items-center justify-center">
                 <ListEmptyState
@@ -412,6 +438,15 @@ export default function SchoolMileageStudentView() {
               icon={<UserIcon style={{ color: 'var(--accent)' }} />}
               title="학생을 선택하세요"
               description="좌측 목록에서 학생을 클릭하면 누적 점수와 처리 내역이 표시됩니다."
+            />
+          </Card>
+        ) : detailError && !summary && studentEntries.length === 0 && !isSummaryLoading && !isEntriesLoading ? (
+          <Card className="flex flex-col flex-1 min-h-0">
+            <ListEmptyState
+              fill
+              icon={<UserIcon style={{ color: 'var(--accent)' }} />}
+              title="학생 정보를 불러오지 못했습니다"
+              description={detailError}
             />
           </Card>
         ) : (

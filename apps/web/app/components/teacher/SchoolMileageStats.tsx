@@ -13,8 +13,9 @@ import {
   StatCard,
   inputStyle,
 } from './teacher-shared'
+import SuccessModal from '../ui/success-modal'
 import { Button } from '../ui/button'
-import { AnimatedListItem, ListEmptyState, ListSkeleton } from '../ui/list'
+import { AnimatedListItem, ListEmptyState, ListSkeleton, StatCardSkeleton } from '../ui/list'
 import type {
   CategoryStat,
   MileageType,
@@ -127,6 +128,7 @@ export default function SchoolMileageStats() {
     useState<SchoolMileageOverviewResponse>(EMPTY_RESPONSE)
   const [isLoading, setIsLoading] = useState(false)
   const [queryError, setQueryError] = useState<string | null>(null)
+  const [showQueryErrorModal, setShowQueryErrorModal] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   const abortRef = useRef<AbortController | null>(null)
@@ -138,6 +140,7 @@ export default function SchoolMileageStats() {
 
     setIsLoading(true)
     setQueryError(null)
+    setShowQueryErrorModal(false)
     setMounted(false)
 
     try {
@@ -158,6 +161,7 @@ export default function SchoolMileageStats() {
 
       if (!res.ok) {
         setQueryError(data?.message ?? '통계 데이터를 불러오지 못했습니다.')
+        setShowQueryErrorModal(true)
         setResponse(EMPTY_RESPONSE)
         return
       }
@@ -174,6 +178,7 @@ export default function SchoolMileageStats() {
     } catch (error) {
       if ((error as Error).name !== 'AbortError') {
         setQueryError('통계 조회 중 문제가 발생했습니다.')
+        setShowQueryErrorModal(true)
         setResponse(EMPTY_RESPONSE)
       }
     } finally {
@@ -283,11 +288,31 @@ export default function SchoolMileageStats() {
       </Card>
 
       <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4">
-      {queryError && <NoticeBox type="error" message={queryError} />}
+      <SuccessModal
+        open={showQueryErrorModal && !!queryError}
+        onClose={() => setShowQueryErrorModal(false)}
+        type="error"
+        title="통계 조회 실패"
+        description={queryError ?? ''}
+      />
+
+      {queryError && (
+        <NoticeBox
+          type="error"
+          message={queryError}
+        />
+      )}
 
       {isLoading && response.summary.totalCount === 0 && (
         <div className="space-y-4">
-          <ListSkeleton count={5} rowHeight="h-20" />
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </div>
+          <ListSkeleton count={3} rowHeight="h-16" />
         </div>
       )}
 

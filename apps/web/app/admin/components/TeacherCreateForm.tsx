@@ -5,25 +5,26 @@ import {
   Divider,
   FieldBlock,
   FormActions,
-  FormNotice,
   inputBase,
   inputBaseStyle,
   PasswordRuleBox,
-  type Notice,
   type TeacherFormState,
   SectionLabel,
   formatPhoneNumberInput,
   TEACHER_INITIAL,
 } from './account-form-shared'
+import SuccessModal from '@/app/components/ui/success-modal'
 
 export default function TeacherCreateForm() {
   const [teacher, setTeacher] = useState<TeacherFormState>(TEACHER_INITIAL)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [notice, setNotice] = useState<Notice>(null)
+  const [modal, setModal] = useState<{
+    open: boolean; type: 'success' | 'error'; title: string; description: string
+  }>({ open: false, type: 'success', title: '', description: '' })
 
   function setTeacherField<K extends keyof TeacherFormState>(key: K) {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
-      setNotice(null)
+      setModal((prev) => ({ ...prev, open: false }))
 
       const nextValue =
         key === 'phone'
@@ -36,7 +37,7 @@ export default function TeacherCreateForm() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setNotice(null)
+    setModal((prev) => ({ ...prev, open: false }))
     setIsSubmitting(true)
 
     try {
@@ -55,9 +56,11 @@ export default function TeacherCreateForm() {
       const payload = await response.json().catch(() => null)
 
       if (!response.ok) {
-        setNotice({
+        setModal({
+          open: true,
           type: 'error',
-          text: payload?.message ?? '교사 계정을 생성하지 못했습니다.',
+          title: '생성 실패',
+          description: payload?.message ?? '교사 계정을 생성하지 못했습니다.',
         })
         return
       }
@@ -66,9 +69,11 @@ export default function TeacherCreateForm() {
         payload?.teacher?.teacherId ?? teacher.teacherId.trim()
 
       setTeacher(TEACHER_INITIAL)
-      setNotice({
+      setModal({
+        open: true,
         type: 'success',
-        text: [
+        title: '교사 계정 생성 완료',
+        description: [
           payload?.message ?? '교사 계정이 생성되었습니다.',
           `아이디: ${createdTeacherId}`,
           `임시 비밀번호: ${
@@ -79,9 +84,11 @@ export default function TeacherCreateForm() {
         ].join('\n'),
       })
     } catch {
-      setNotice({
+      setModal({
+        open: true,
         type: 'error',
-        text: '교사 계정 생성 요청 중 문제가 발생했습니다.',
+        title: '생성 실패',
+        description: '교사 계정 생성 요청 중 문제가 발생했습니다.',
       })
     } finally {
       setIsSubmitting(false)
@@ -178,14 +185,21 @@ export default function TeacherCreateForm() {
         <FormActions
           onReset={() => {
             setTeacher(TEACHER_INITIAL)
-            setNotice(null)
+            setModal((prev) => ({ ...prev, open: false }))
           }}
           isSubmitting={isSubmitting}
           submitLabel="교사 계정 생성"
         />
       </form>
 
-      <FormNotice notice={notice} />
+      <SuccessModal
+        open={modal.open}
+        onClose={() => setModal((prev) => ({ ...prev, open: false }))}
+        type={modal.type}
+        title={modal.title}
+        description={modal.description}
+        autoCloseMs={modal.type === 'success' ? 0 : 3000}
+      />
     </div>
   )
 }

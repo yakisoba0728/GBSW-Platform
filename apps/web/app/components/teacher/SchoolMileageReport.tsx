@@ -12,6 +12,7 @@ import {
   formatSignedScore,
   getSchoolLabel,
 } from './teacher-shared'
+import SuccessModal from '../ui/success-modal'
 import { Button } from '../ui/button'
 import { EmptyStatePane, ListSkeleton } from '../ui/list'
 import { FileIcon } from '../ui/icons'
@@ -93,6 +94,7 @@ export default function SchoolMileageReport() {
     })
   const [isLoading, setIsLoading] = useState(false)
   const [previewError, setPreviewError] = useState<string | null>(null)
+  const [showPreviewErrorModal, setShowPreviewErrorModal] = useState(false)
 
   const hasPreviewData =
     studentReport.students.length > 0 ||
@@ -128,6 +130,7 @@ export default function SchoolMileageReport() {
 
     setIsLoading(true)
     setPreviewError(null)
+    setShowPreviewErrorModal(false)
 
     try {
       const params = new URLSearchParams()
@@ -161,6 +164,7 @@ export default function SchoolMileageReport() {
 
           if (!res.ok) {
             setPreviewError(data?.message ?? '데이터를 불러오지 못했습니다.')
+            setShowPreviewErrorModal(true)
             if (!hasPreviewData) {
               resetReports()
             }
@@ -204,6 +208,7 @@ export default function SchoolMileageReport() {
 
       if (!res.ok) {
         setPreviewError(data?.message ?? '데이터를 불러오지 못했습니다.')
+        setShowPreviewErrorModal(true)
         if (!hasPreviewData) {
           resetReports()
         }
@@ -232,6 +237,7 @@ export default function SchoolMileageReport() {
     } catch (error) {
       if ((error as Error).name !== 'AbortError') {
         setPreviewError('미리보기 조회 중 문제가 발생했습니다.')
+        setShowPreviewErrorModal(true)
         if (!hasPreviewData) {
           resetReports()
         }
@@ -388,7 +394,8 @@ export default function SchoolMileageReport() {
 
   const showInitialLoading = isLoading && !hasPreviewData
   const showRefetchOverlay = isLoading && hasPreviewData
-  const showErrorBanner = !!previewError && hasPreviewData
+  const showErrorBanner =
+    showPreviewErrorModal && !!previewError && hasPreviewData
 
   return (
     <div className="flex flex-col h-full gap-4">
@@ -438,7 +445,16 @@ export default function SchoolMileageReport() {
         schoolOptions={SCHOOL_OPTIONS}
       />
 
-      {showErrorBanner && <NoticeBox type="error" message={previewError} />}
+      <SuccessModal
+        open={showErrorBanner}
+        onClose={() => setShowPreviewErrorModal(false)}
+        type="error"
+        title="리포트 조회 실패"
+        description={previewError ?? ''}
+      />
+      {previewError && hasPreviewData && (
+        <NoticeBox type="error" message={previewError} />
+      )}
 
       <div className="print-area flex flex-col flex-1 min-h-0">
         {showInitialLoading ? (

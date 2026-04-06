@@ -233,6 +233,7 @@ function SuccessModalContent({
                     fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                     marginTop: 6,
                     lineHeight: 1.5,
+                    whiteSpace: 'pre-line',
                   }}
                 >
                   {description}

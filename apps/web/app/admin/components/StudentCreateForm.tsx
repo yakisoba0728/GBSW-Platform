@@ -7,13 +7,11 @@ import {
   Divider,
   FieldBlock,
   FormActions,
-  FormNotice,
   IdPreview,
   InfoBox,
   inputBase,
   inputBaseStyle,
   PasswordRuleBox,
-  type Notice,
   type StudentFormState,
   SCHOOLS,
   SectionLabel,
@@ -21,11 +19,14 @@ import {
   formatPhoneNumberInput,
   STUDENT_INITIAL,
 } from './account-form-shared'
+import SuccessModal from '@/app/components/ui/success-modal'
 
 export default function StudentCreateForm() {
   const [student, setStudent] = useState<StudentFormState>(STUDENT_INITIAL)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [notice, setNotice] = useState<Notice>(null)
+  const [modal, setModal] = useState<{
+    open: boolean; type: 'success' | 'error'; title: string; description: string
+  }>({ open: false, type: 'success', title: '', description: '' })
   const [majorSubjectOptions, setMajorSubjectOptions] = useState<string[]>([])
   const [majorSubjectDraft, setMajorSubjectDraft] = useState('')
 
@@ -66,7 +67,7 @@ export default function StudentCreateForm() {
 
   function setStudentField<K extends keyof StudentFormState>(key: K) {
     return (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      setNotice(null)
+      setModal((prev) => ({ ...prev, open: false }))
 
       let nextValue = event.target.value
 
@@ -79,12 +80,12 @@ export default function StudentCreateForm() {
   }
 
   function setStudentSchool(school: StudentFormState['school']) {
-    setNotice(null)
+    setModal((prev) => ({ ...prev, open: false }))
     setStudent((prev) => ({ ...prev, school }))
   }
 
   function setFirstEnrollment(checked: boolean) {
-    setNotice(null)
+    setModal((prev) => ({ ...prev, open: false }))
     setStudent((prev) => ({
       ...prev,
       isFirstEnrollment: checked,
@@ -98,10 +99,7 @@ export default function StudentCreateForm() {
     const normalized = majorSubjectDraft.trim()
 
     if (!normalized) {
-      setNotice({
-        type: 'error',
-        text: '추가할 전공과목 이름을 입력해주세요.',
-      })
+      setModal({ open: true, type: 'error', title: '입력 오류', description: '추가할 전공과목 이름을 입력해주세요.' })
       return
     }
 
@@ -109,26 +107,30 @@ export default function StudentCreateForm() {
 
     setMajorSubjectOptions(nextOptions)
     setMajorSubjectDraft('')
-    setNotice(null)
+    setModal((prev) => ({ ...prev, open: false }))
     setStudent((prev) => ({ ...prev, majorSubject: normalized }))
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setNotice(null)
+    setModal((prev) => ({ ...prev, open: false }))
 
     if (!studentId) {
-      setNotice({
+      setModal({
+        open: true,
         type: 'error',
-        text: '학생 아이디를 만들 수 있도록 최초 입학 년도, 반, 번호를 입력해주세요.',
+        title: '입력 오류',
+        description: '학생 아이디를 만들 수 있도록 최초 입학 년도, 반, 번호를 입력해주세요.',
       })
       return
     }
 
     if (!student.majorSubject.trim()) {
-      setNotice({
+      setModal({
+        open: true,
         type: 'error',
-        text: '전공과목을 선택하거나 직접 추가해주세요.',
+        title: '입력 오류',
+        description: '전공과목을 선택하거나 직접 추가해주세요.',
       })
       return
     }
@@ -159,9 +161,11 @@ export default function StudentCreateForm() {
       const payload = await response.json().catch(() => null)
 
       if (!response.ok) {
-        setNotice({
+        setModal({
+          open: true,
           type: 'error',
-          text: payload?.message ?? '학생 계정을 생성하지 못했습니다.',
+          title: '생성 실패',
+          description: payload?.message ?? '학생 계정을 생성하지 못했습니다.',
         })
         return
       }
@@ -173,9 +177,11 @@ export default function StudentCreateForm() {
           payload?.student?.majorSubject ?? student.majorSubject,
         ]),
       )
-      setNotice({
+      setModal({
+        open: true,
         type: 'success',
-        text: [
+        title: '학생 계정 생성 완료',
+        description: [
           payload?.message ?? '학생 계정이 생성되었습니다.',
           `아이디: ${payload?.student?.studentId ?? studentId}`,
           `임시 비밀번호: ${
@@ -186,9 +192,11 @@ export default function StudentCreateForm() {
         ].join('\n'),
       })
     } catch {
-      setNotice({
+      setModal({
+        open: true,
         type: 'error',
-        text: '학생 계정 생성 요청 중 문제가 발생했습니다.',
+        title: '생성 실패',
+        description: '학생 계정 생성 요청 중 문제가 발생했습니다.',
       })
     } finally {
       setIsSubmitting(false)
@@ -524,14 +532,21 @@ export default function StudentCreateForm() {
           onReset={() => {
             setStudent(STUDENT_INITIAL)
             setMajorSubjectDraft('')
-            setNotice(null)
+            setModal((prev) => ({ ...prev, open: false }))
           }}
           isSubmitting={isSubmitting}
           submitLabel="학생 계정 생성"
         />
       </form>
 
-      <FormNotice notice={notice} />
+      <SuccessModal
+        open={modal.open}
+        onClose={() => setModal((prev) => ({ ...prev, open: false }))}
+        type={modal.type}
+        title={modal.title}
+        description={modal.description}
+        autoCloseMs={modal.type === 'success' ? 0 : 3000}
+      />
     </div>
   )
 }

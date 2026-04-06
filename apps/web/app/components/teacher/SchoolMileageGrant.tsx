@@ -28,7 +28,7 @@ export default function SchoolMileageGrant({
   const [rows, setRows] = useState<GrantRow[]>([])
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false)
   const [ruleModalRowId, setRuleModalRowId] = useState<number | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [errorModal, setErrorModal] = useState<{ open: boolean; message: string }>({ open: false, message: '' })
   const [successModal, setSuccessModal] = useState<{
     open: boolean
     message: string
@@ -80,7 +80,7 @@ export default function SchoolMileageGrant({
         })),
       ]
     })
-    setError(null)
+    setErrorModal({ open: false, message: '' })
     setIsStudentModalOpen(false)
   }
 
@@ -149,7 +149,7 @@ export default function SchoolMileageGrant({
     }
 
     setIsSubmitting(true)
-    setError(null)
+    setErrorModal({ open: false, message: '' })
 
     const payload: CreateSchoolMileageEntriesPayload = {
       entries: rows.map((row) => ({
@@ -169,7 +169,7 @@ export default function SchoolMileageGrant({
       const result = await response.json().catch(() => null)
 
       if (!response.ok) {
-        setError(result?.message ?? '상벌점 부여에 실패했습니다.')
+        setErrorModal({ open: true, message: result?.message ?? '상벌점 부여에 실패했습니다.' })
         return
       }
 
@@ -180,7 +180,7 @@ export default function SchoolMileageGrant({
         message: result?.message ?? '상벌점이 부여되었습니다.',
       })
     } catch {
-      setError('상벌점 부여 요청 중 문제가 발생했습니다.')
+      setErrorModal({ open: true, message: '상벌점 부여 요청 중 문제가 발생했습니다.' })
     } finally {
       setIsSubmitting(false)
     }
@@ -221,7 +221,17 @@ export default function SchoolMileageGrant({
         description={successModal.message}
       />
 
+      <SuccessModal
+        open={errorModal.open}
+        onClose={() => setErrorModal({ open: false, message: '' })}
+        type="error"
+        title="부여 실패"
+        description={errorModal.message}
+      />
+
       <div className="flex flex-col h-full gap-4">
+        {rulesError && <NoticeBox type="error" message={rulesError} />}
+
         <div className="flex flex-shrink-0 flex-wrap items-center justify-end gap-2">
           {rows.length >= 2 && (
             <div className="flex items-center gap-2">
@@ -241,15 +251,6 @@ export default function SchoolMileageGrant({
           )}
           <Button variant="primary" size="sm" icon={<UserPlusIcon size={13} strokeWidth={2.5} />} onClick={() => setIsStudentModalOpen(true)} disabled={isSubmitting}>학생 추가</Button>
         </div>
-
-        {error && (
-          <NoticeBox
-            type="error"
-            message={error}
-            onDismiss={() => setError(null)}
-          />
-        )}
-        {rulesError && <NoticeBox type="error" message={rulesError} />}
 
         <Card className="flex flex-col flex-1 min-h-0 overflow-hidden">
           {isRulesLoading ? (

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { StatCard, ScoreSummaryBar, Card, formatAwardedAtParts } from '@/app/components/teacher/teacher-shared'
 import { MileageBadge } from '@/app/components/ui/primitives'
-import { ListSkeleton } from '@/app/components/ui/list'
+import { ListSkeleton, StatCardSkeleton } from '@/app/components/ui/list'
 import type { StudentMileageSummary, SchoolMileageHistoryItem } from '@/app/components/student/student-mileage-types'
 
 // ─── Icons (inline SVGs) ─────────────────────────────────────────────────────
@@ -102,45 +102,6 @@ function QuickLinkCard({
         </p>
       </motion.div>
     </Link>
-  )
-}
-
-// ─── Skeleton for Stat Cards ─────────────────────────────────────────────────
-
-function StatCardSkeleton() {
-  return (
-    <div
-      className="rounded-xl border p-4"
-      style={{ backgroundColor: 'var(--bg-subtle)', borderColor: 'var(--border)' }}
-    >
-      <div
-        className="relative overflow-hidden rounded-md"
-        style={{ height: 12, width: '40%', backgroundColor: 'var(--border)' }}
-      >
-        <div
-          className="absolute inset-0 animate-shimmer"
-          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)' }}
-        />
-      </div>
-      <div
-        className="relative mt-3 overflow-hidden rounded-md"
-        style={{ height: 24, width: '50%', backgroundColor: 'var(--border)' }}
-      >
-        <div
-          className="absolute inset-0 animate-shimmer"
-          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)' }}
-        />
-      </div>
-      <div
-        className="relative mt-2 overflow-hidden rounded-md"
-        style={{ height: 12, width: '60%', backgroundColor: 'var(--border)' }}
-      >
-        <div
-          className="absolute inset-0 animate-shimmer"
-          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)' }}
-        />
-      </div>
-    </div>
   )
 }
 
@@ -262,7 +223,7 @@ export default function StudentHome() {
         >
           <div
             className="relative overflow-hidden rounded-md"
-            style={{ height: 10, width: '30%', backgroundColor: 'var(--border)', marginBottom: 10 }}
+            style={{ height: 14, width: '30%', backgroundColor: 'var(--border)', marginBottom: 10 }}
           >
             <div
               className="absolute inset-0 animate-shimmer"
@@ -271,7 +232,7 @@ export default function StudentHome() {
           </div>
           <div
             className="relative overflow-hidden rounded-md"
-            style={{ height: 20, width: '50%', backgroundColor: 'var(--border)', marginBottom: 8 }}
+            style={{ height: 26, width: '50%', backgroundColor: 'var(--border)', marginBottom: 8 }}
           >
             <div
               className="absolute inset-0 animate-shimmer"
@@ -280,7 +241,7 @@ export default function StudentHome() {
           </div>
           <div
             className="relative overflow-hidden rounded-md"
-            style={{ height: 12, width: '65%', backgroundColor: 'var(--border)' }}
+            style={{ height: 14, width: '65%', backgroundColor: 'var(--border)' }}
           >
             <div
               className="absolute inset-0 animate-shimmer"

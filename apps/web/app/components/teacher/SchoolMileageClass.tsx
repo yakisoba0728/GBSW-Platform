@@ -12,6 +12,7 @@ import {
   StatCard,
   inputStyle,
 } from './teacher-shared'
+import SuccessModal from '../ui/success-modal'
 import { Button } from '../ui/button'
 import { AnimatedListItem, ListEmptyState } from '../ui/list'
 import { BuildingIcon } from '../ui/icons'
@@ -215,6 +216,7 @@ export default function SchoolMileageClass() {
     useState<ClassMileageAnalyticsResponse>(EMPTY_RESPONSE)
   const [isLoading, setIsLoading] = useState(false)
   const [queryError, setQueryError] = useState<string | null>(null)
+  const [showQueryErrorModal, setShowQueryErrorModal] = useState(false)
   const [expandedClass, setExpandedClass] = useState<number | null>(null)
 
   const abortRef = useRef<AbortController | null>(null)
@@ -225,6 +227,7 @@ export default function SchoolMileageClass() {
       abortRef.current = null
       setResponse(EMPTY_RESPONSE)
       setQueryError(null)
+      setShowQueryErrorModal(false)
       setExpandedClass(null)
       setIsLoading(false)
       return
@@ -236,6 +239,7 @@ export default function SchoolMileageClass() {
 
     setIsLoading(true)
     setQueryError(null)
+    setShowQueryErrorModal(false)
     setExpandedClass(null)
 
     try {
@@ -255,6 +259,7 @@ export default function SchoolMileageClass() {
 
       if (!res.ok) {
         setQueryError(data?.message ?? '학급 현황 데이터를 불러오지 못했습니다.')
+        setShowQueryErrorModal(true)
         setResponse(EMPTY_RESPONSE)
         return
       }
@@ -268,6 +273,7 @@ export default function SchoolMileageClass() {
     } catch (error) {
       if ((error as Error).name !== 'AbortError') {
         setQueryError('학급 현황 조회 중 문제가 발생했습니다.')
+        setShowQueryErrorModal(true)
         setResponse(EMPTY_RESPONSE)
       }
     } finally {
@@ -324,7 +330,20 @@ export default function SchoolMileageClass() {
         </div>
       </Card>
 
-      {queryError && <NoticeBox type="error" message={queryError} />}
+      <SuccessModal
+        open={showQueryErrorModal && !!queryError}
+        onClose={() => setShowQueryErrorModal(false)}
+        type="error"
+        title="조회 실패"
+        description={queryError ?? ''}
+      />
+
+      {queryError && (
+        <NoticeBox
+          type="error"
+          message={queryError}
+        />
+      )}
 
       <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4">
 

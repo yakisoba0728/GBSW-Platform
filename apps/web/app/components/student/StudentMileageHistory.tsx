@@ -10,6 +10,7 @@ import {
   formatAwardedAtParts,
   formatAwardedAt,
 } from '@/app/components/teacher/teacher-shared'
+import SuccessModal from '@/app/components/ui/success-modal'
 import {
   AnimatedTableRow,
   AnimatedListItem,
@@ -73,10 +74,8 @@ export default function StudentMileageHistory() {
   const [response, setResponse] =
     useState<PaginatedSchoolMileageHistoryResponse>(INITIAL_RESPONSE)
   const [isLoading, setIsLoading] = useState(true)
-  const [notice, setNotice] = useState<{
-    type: 'success' | 'error'
-    message: string
-  } | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [showLoadErrorModal, setShowLoadErrorModal] = useState(false)
 
   const fetchAbortControllerRef = useRef<AbortController | null>(null)
   const hasLoadedOnceRef = useRef(false)
@@ -98,6 +97,8 @@ export default function StudentMileageHistory() {
     fetchAbortControllerRef.current = abortController
     setIsFetching(true)
     if (!hasLoadedOnceRef.current) setIsLoading(true)
+    setLoadError(null)
+    setShowLoadErrorModal(false)
 
     const params = new URLSearchParams()
     params.set('page', `${page}`)
@@ -116,10 +117,8 @@ export default function StudentMileageHistory() {
       if (fetchAbortControllerRef.current !== abortController) return
 
       if (!fetchResponse.ok) {
-        setNotice({
-          type: 'error',
-          message: result?.message ?? '상벌점 내역을 불러오지 못했습니다.',
-        })
+        setLoadError(result?.message ?? '상벌점 내역을 불러오지 못했습니다.')
+        setShowLoadErrorModal(true)
         setResponse((prev) => ({ ...prev, items: [], totalCount: 0, page }))
         return
       }
@@ -143,10 +142,8 @@ export default function StudentMileageHistory() {
       })
     } catch {
       if (abortController.signal.aborted) return
-      setNotice({
-        type: 'error',
-        message: '상벌점 내역 조회 중 문제가 발생했습니다.',
-      })
+      setLoadError('상벌점 내역 조회 중 문제가 발생했습니다.')
+      setShowLoadErrorModal(true)
       setResponse((prev) => ({ ...prev, items: [], totalCount: 0, page }))
     } finally {
       if (fetchAbortControllerRef.current === abortController) {
@@ -192,14 +189,15 @@ export default function StudentMileageHistory() {
   /* ── 렌더 ── */
 
   return (
-      <div className="flex flex-col h-full gap-3">
-      {notice && (
-        <NoticeBox
-          type={notice.type}
-          message={notice.message}
-          onDismiss={() => setNotice(null)}
-        />
-      )}
+    <div className="flex flex-col h-full gap-3">
+      <SuccessModal
+        open={showLoadErrorModal && !!loadError}
+        onClose={() => setShowLoadErrorModal(false)}
+        type="error"
+        title="조회 실패"
+        description={loadError ?? ''}
+      />
+      {loadError && <NoticeBox type="error" message={loadError} />}
 
       {/* ── 필터 바 ── */}
       <Card>
@@ -301,6 +299,19 @@ export default function StudentMileageHistory() {
         <div className="relative min-h-0 flex-1 overflow-y-auto pr-0.5 md:hidden">
           {isLoading ? (
             <ListSkeleton count={6} rowHeight="h-24" />
+          ) : loadError ? (
+            <EmptyStatePane
+              className="h-full"
+              icon={
+                <SearchIcon
+                  size={20}
+                  strokeWidth={1.5}
+                  style={{ color: 'var(--accent)' }}
+                />
+              }
+              title="내역을 불러오지 못했습니다"
+              description={loadError}
+            />
           ) : response.items.length === 0 ? (
             <EmptyStatePane
               className="h-full"
@@ -414,6 +425,18 @@ export default function StudentMileageHistory() {
                 <TableRowSkeleton columns={5} count={8} />
               </tbody>
             </table>
+          ) : loadError ? (
+            <EmptyStatePane
+              className="h-full"
+              icon={
+                <SearchIcon
+                  size={20}
+                  style={{ color: 'var(--accent)' }}
+                />
+              }
+              title="내역을 불러오지 못했습니다"
+              description={loadError}
+            />
           ) : response.items.length === 0 ? (
             <EmptyStatePane
               className="h-full"

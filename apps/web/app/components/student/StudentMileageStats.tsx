@@ -3,48 +3,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { StatCard, ScoreSummaryBar, Card, SectionTitle } from '@/app/components/teacher/teacher-shared'
+import { StatCardSkeleton } from '@/app/components/ui/list'
 import type { StudentMileageSummary, SchoolMileageHistoryItem } from './student-mileage-types'
 
 const ENTRY_PAGE_SIZE = 100
-
-// ─── Skeleton for Stat Cards ────────────────────────────────────────────────
-
-function StatCardSkeleton() {
-  return (
-    <div
-      className="rounded-xl border p-4"
-      style={{ backgroundColor: 'var(--bg-subtle)', borderColor: 'var(--border)' }}
-    >
-      <div
-        className="relative overflow-hidden rounded-md"
-        style={{ height: 12, width: '40%', backgroundColor: 'var(--border)' }}
-      >
-        <div
-          className="absolute inset-0 animate-shimmer"
-          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)' }}
-        />
-      </div>
-      <div
-        className="relative mt-3 overflow-hidden rounded-md"
-        style={{ height: 24, width: '50%', backgroundColor: 'var(--border)' }}
-      >
-        <div
-          className="absolute inset-0 animate-shimmer"
-          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)' }}
-        />
-      </div>
-      <div
-        className="relative mt-2 overflow-hidden rounded-md"
-        style={{ height: 12, width: '60%', backgroundColor: 'var(--border)' }}
-      >
-        <div
-          className="absolute inset-0 animate-shimmer"
-          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)' }}
-        />
-      </div>
-    </div>
-  )
-}
 
 // ─── Skeleton for Bar Charts ────────────────────────────────────────────────
 

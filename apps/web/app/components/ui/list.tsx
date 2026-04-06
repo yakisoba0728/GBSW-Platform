@@ -132,6 +132,47 @@ export function ListSkeleton({
   )
 }
 
+// ─── StatCardSkeleton ─────────────────────────────────────────────────────────
+// StatCard (teacher-shared.tsx) 와 동일한 치수의 스켈레톤.
+// label 11px · value 24px · subValue 12px 높이를 shimmer로 표현.
+
+export function StatCardSkeleton() {
+  return (
+    <div
+      className="rounded-xl border p-4"
+      style={{ backgroundColor: 'var(--bg-subtle)', borderColor: 'var(--border)' }}
+    >
+      <div
+        className="relative overflow-hidden rounded-md"
+        style={{ height: 11, width: '40%', backgroundColor: 'var(--border)' }}
+      >
+        <div
+          className="absolute inset-0 animate-shimmer"
+          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)' }}
+        />
+      </div>
+      <div
+        className="relative mt-2 overflow-hidden rounded-md"
+        style={{ height: 24, width: '50%', backgroundColor: 'var(--border)' }}
+      >
+        <div
+          className="absolute inset-0 animate-shimmer"
+          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)' }}
+        />
+      </div>
+      <div
+        className="relative mt-1.5 overflow-hidden rounded-md"
+        style={{ height: 12, width: '60%', backgroundColor: 'var(--border)' }}
+      >
+        <div
+          className="absolute inset-0 animate-shimmer"
+          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)' }}
+        />
+      </div>
+    </div>
+  )
+}
+
 // ─── TableRowSkeleton ─────────────────────────────────────────────────────────
 // 테이블 <tbody> 안에서 사용하는 <tr> 기반 스켈레톤.
 // 각 열 너비를 60%/80%/50% 순환하여 자연스럽게 표현.
@@ -157,7 +198,7 @@ export function TableRowSkeleton({
           {Array.from({ length: columns }, (_, col) => (
             <td
               key={col}
-              className="py-3 pr-3"
+              className="py-2 pr-3"
               style={col === 0 ? { paddingLeft: '10px' } : undefined}
             >
               <div

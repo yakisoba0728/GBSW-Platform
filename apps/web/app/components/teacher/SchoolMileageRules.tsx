@@ -5,8 +5,8 @@ import {
   Badge,
   Card,
   FilterRow,
-  NoticeBox,
   SectionHeader,
+  NoticeBox,
   inputStyle,
 } from './teacher-shared'
 import SuccessModal from '../ui/success-modal'
@@ -190,6 +190,14 @@ export default function SchoolMileageRules({
             <tbody>
               {isRulesLoading ? (
                 <TableRowSkeleton columns={readOnly ? 6 : 7} count={6} />
+              ) : rulesError ? (
+                <tr>
+                  <td colSpan={readOnly ? 6 : 7} className="p-0">
+                    <div className="flex min-h-[320px] items-center justify-center p-4">
+                      <NoticeBox type="error" message={rulesError} />
+                    </div>
+                  </td>
+                </tr>
               ) : filteredRules.length === 0 ? (
                 <tr>
                   <td colSpan={readOnly ? 6 : 7} className="p-0">
