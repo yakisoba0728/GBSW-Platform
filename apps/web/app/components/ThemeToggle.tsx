@@ -6,6 +6,25 @@ type DocumentWithVT = Document & {
   startViewTransition?: (callback: () => void) => { finished: Promise<void> }
 }
 
+function getThemeBackgroundColor(theme: 'light' | 'dark') {
+  const probe = document.createElement('div')
+  probe.style.display = 'none'
+
+  if (theme === 'dark') {
+    probe.classList.add('dark')
+  }
+
+  document.body.appendChild(probe)
+  const backgroundColor = getComputedStyle(probe).getPropertyValue('--bg').trim()
+  probe.remove()
+
+  if (backgroundColor) {
+    return backgroundColor
+  }
+
+  return theme === 'dark' ? '#0f1117' : '#ffffff'
+}
+
 export default function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
@@ -31,7 +50,7 @@ export default function ThemeToggle() {
     // 새 테마 배경색 오버레이로 화면 전체를 덮어 seam 제거
     // 오버레이가 불투명해진 뒤 테마를 바꾸고, 오버레이를 걷어냄
     const overlay = document.createElement('div')
-    const bg = next === 'dark' ? '#0e0e18' : '#f4f3ef'
+    const bg = getThemeBackgroundColor(next)
     overlay.style.cssText = `
       position:fixed; inset:0; z-index:9999;
       background:${bg};
@@ -72,7 +91,7 @@ export default function ThemeToggle() {
         relative w-9 h-9 rounded-lg flex items-center justify-center cursor-pointer
         ${isDark
           ? 'bg-white/10 hover:bg-white/15 text-yellow-300'
-          : 'bg-black/5 hover:bg-black/10 text-brand-navy'
+          : 'bg-black/5 hover:bg-black/10 text-black'
         }
       `}
       style={{ transition: 'background-color 250ms ease, color 250ms ease' }}

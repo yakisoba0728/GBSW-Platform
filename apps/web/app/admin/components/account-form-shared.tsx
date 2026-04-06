@@ -1,12 +1,13 @@
 export const inputBase = `
-  w-full rounded-md border px-3.5 py-2 text-sm outline-none transition-all duration-150
-  bg-white dark:bg-white/[0.05]
-  border-gray-200 dark:border-white/[0.08]
-  text-brand-navy dark:text-[#e2e1f0]
-  placeholder:text-gray-400 dark:placeholder:text-white/[0.18]
-  focus:border-[--admin-accent] focus:ring-2 focus:ring-[--admin-accent]/10
+  w-full rounded-lg border px-3.5 py-2 text-sm outline-none transition-all duration-150
   disabled:cursor-not-allowed disabled:opacity-60
 `.trim()
+
+export const inputBaseStyle = {
+  backgroundColor: 'var(--bg)',
+  borderColor: 'var(--border)',
+  color: 'var(--fg)',
+} satisfies Record<string, string>
 
 export type School = 'GBSW' | 'BYMS'
 
@@ -136,7 +137,7 @@ export function SectionLabel({ children }: { children: React.ReactNode }) {
       className="mb-4 text-[11px] font-semibold uppercase tracking-widest"
       style={{
         fontFamily: 'var(--font-space-grotesk)',
-        color: 'var(--admin-text-muted)',
+        color: 'var(--fg-muted)',
       }}
     >
       {children}
@@ -157,7 +158,7 @@ export function FieldLabel({
       className="mb-1.5 block text-xs font-medium"
       style={{
         fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-        color: 'var(--admin-text-muted)',
+        color: 'var(--fg-muted)',
       }}
     >
       {children}
@@ -183,7 +184,7 @@ export function FieldBlock({
 }
 
 export function Divider() {
-  return <div style={{ height: 1, backgroundColor: 'var(--admin-border)' }} />
+  return <div style={{ height: 1, backgroundColor: 'var(--border)' }} />
 }
 
 export function InfoBox({ children }: { children: React.ReactNode }) {
@@ -192,9 +193,9 @@ export function InfoBox({ children }: { children: React.ReactNode }) {
       className="rounded-md border px-3.5 py-3 text-sm"
       style={{
         fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-        color: 'var(--admin-text-muted)',
-        borderColor: 'var(--admin-border)',
-        backgroundColor: 'var(--admin-sidebar-bg)',
+        color: 'var(--fg-muted)',
+        borderColor: 'var(--border)',
+        backgroundColor: 'var(--bg-subtle)',
       }}
     >
       {children}
@@ -208,9 +209,9 @@ export function PasswordRuleBox({ children }: { children: React.ReactNode }) {
       className="rounded-md border px-3.5 py-3 text-sm"
       style={{
         fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-        color: 'var(--admin-text-muted)',
-        borderColor: 'var(--admin-border)',
-        backgroundColor: 'var(--admin-sidebar-bg)',
+        color: 'var(--fg-muted)',
+        borderColor: 'var(--border)',
+        backgroundColor: 'var(--bg-subtle)',
       }}
     >
       {children}
@@ -223,8 +224,8 @@ export function IdPreview({ studentId }: { studentId: string | null }) {
     <div
       className="flex items-center gap-3 rounded-md border px-3.5 py-3 transition-all duration-200"
       style={{
-        borderColor: studentId ? 'var(--admin-accent)' : 'var(--admin-border)',
-        backgroundColor: studentId ? 'var(--admin-accent-bg)' : 'transparent',
+        borderColor: studentId ? 'var(--accent)' : 'var(--border)',
+        backgroundColor: studentId ? 'var(--accent-subtle)' : 'transparent',
       }}
     >
       <svg
@@ -238,7 +239,7 @@ export function IdPreview({ studentId }: { studentId: string | null }) {
         strokeLinejoin="round"
         aria-hidden="true"
         style={{
-          color: studentId ? 'var(--admin-accent)' : 'var(--admin-text-muted)',
+          color: studentId ? 'var(--accent)' : 'var(--fg-muted)',
           flexShrink: 0,
         }}
       >
@@ -250,7 +251,7 @@ export function IdPreview({ studentId }: { studentId: string | null }) {
           className="flex-shrink-0 text-xs"
           style={{
             fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            color: 'var(--admin-text-muted)',
+            color: 'var(--fg-muted)',
           }}
         >
           생성될 아이디
@@ -260,7 +261,7 @@ export function IdPreview({ studentId }: { studentId: string | null }) {
             className="text-sm font-semibold tracking-widest"
             style={{
               fontFamily: 'var(--font-space-grotesk)',
-              color: 'var(--admin-accent)',
+              color: 'var(--accent)',
             }}
           >
             {studentId}
@@ -270,7 +271,7 @@ export function IdPreview({ studentId }: { studentId: string | null }) {
             className="text-xs"
             style={{
               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              color: 'var(--admin-text-muted)',
+              color: 'var(--fg-muted)',
             }}
           >
             아이디용 년도·반·번호를 입력하면 표시됩니다
@@ -298,7 +299,7 @@ export function FormActions({
         className="flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium text-white transition-all duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
         style={{
           fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-          backgroundColor: 'var(--admin-accent)',
+          backgroundColor: 'var(--accent)',
         }}
       >
         <svg
@@ -326,8 +327,8 @@ export function FormActions({
         className="rounded-md border px-4 py-2.5 text-sm transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60"
         style={{
           fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-          color: 'var(--admin-text-muted)',
-          borderColor: 'var(--admin-border)',
+          color: 'var(--fg-muted)',
+          borderColor: 'var(--border)',
         }}
       >
         초기화
@@ -346,7 +347,7 @@ export function FormNotice({ notice }: { notice: Notice }) {
       className="mt-4 whitespace-pre-line text-sm"
       style={{
         fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-        color: notice.type === 'success' ? 'var(--mileage-green)' : 'var(--mileage-red)',
+        color: notice.type === 'success' ? 'var(--reward)' : 'var(--penalty)',
       }}
     >
       {notice.text}

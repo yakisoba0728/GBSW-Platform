@@ -4,11 +4,12 @@ import { useState } from 'react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
+import { AnimatePresence, motion } from 'framer-motion'
 import LogoutButton from './LogoutButton'
 
 const ThemeToggle = dynamic(() => import('./ThemeToggle'), {
   ssr: false,
-  loading: () => <div className="h-9 w-9 rounded-lg" aria-hidden="true" />,
+  loading: () => <div style={{ width: 32, height: 32 }} aria-hidden="true" />,
 })
 
 type ChangePasswordFormProps = {
@@ -42,12 +43,8 @@ export default function ChangePasswordForm({
     try {
       const response = await fetch('/api/auth/change-password', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          newPassword,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newPassword }),
       })
 
       const payload = await response.json().catch(() => null)
@@ -72,56 +69,56 @@ export default function ChangePasswordForm({
   }
 
   return (
-    <section className="flex min-h-screen flex-1 flex-col bg-brand-offwhite transition-colors duration-300 dark:bg-brand-ink">
-      <div className="flex items-center justify-between px-8 pt-8 md:px-12">
-        <div className="flex items-center gap-2 md:hidden">
-          <Image src="/gbsw-logo.png" alt="GBSW" width={26} height={26} />
-          <span
-            className="text-sm font-semibold text-brand-navy dark:text-[#e2e1f0]"
-            style={{ fontFamily: 'var(--font-space-grotesk)' }}
-          >
+    <section style={{ display: 'flex', minHeight: '100svh', flex: 1, flexDirection: 'column', backgroundColor: 'var(--bg)', transition: 'background-color 0.3s' }}>
+      {/* 상단 바 */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 32px' }}>
+        <div className="flex lg:hidden" style={{ alignItems: 'center', gap: 8 }}>
+          <Image src="/gbsw-logo.png" alt="GBSW" width={22} height={22} style={{ opacity: 0.6 }} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)' }}>
             GBSW Platform
           </span>
         </div>
-        <div className="hidden md:block" />
+        <div className="hidden lg:block" />
         <ThemeToggle />
       </div>
 
-      <div className="flex flex-1 items-center justify-center px-8 py-12 md:px-16">
-        <div className="w-full max-w-[360px]">
-          <div className="mb-9">
-            <p
-              className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-accent dark:text-brand-accent-dark"
-              style={{ fontFamily: 'var(--font-space-grotesk)' }}
-            >
+      {/* 폼 영역 */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 32px 40px' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+          style={{ width: '100%', maxWidth: 380 }}
+        >
+          {/* 헤딩 */}
+          <div style={{ marginBottom: 28 }}>
+            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 10 }}>
               Password Update
             </p>
-            <h1
-              className="mt-3 text-[1.65rem] font-bold leading-tight text-brand-navy dark:text-[#e2e1f0]"
-              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-            >
+            <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--fg)', lineHeight: 1.2, letterSpacing: '-0.02em', marginBottom: 10 }}>
               첫 로그인 비밀번호를 바꿔주세요
             </h1>
-            <p
-              className="mt-2 text-sm leading-relaxed text-brand-muted"
-              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-            >
+            <p style={{ fontSize: 14, color: 'var(--fg-muted)', lineHeight: 1.6 }}>
               {role === 'student' ? '학생' : '교사'} 계정{' '}
-              <span className="font-semibold text-brand-navy dark:text-[#e2e1f0]">
-                {accountId}
-              </span>
-              는 임시 비밀번호 상태입니다. 현재 비밀번호 확인 없이 새 비밀번호를
-              설정한 뒤 계속 진행할 수 있습니다.
+              <span style={{ fontWeight: 600, color: 'var(--fg)' }}>{accountId}</span>
+              는 임시 비밀번호 상태입니다. 새 비밀번호를 설정한 뒤 계속 진행할 수 있습니다.
             </p>
-            <div
-              className="mt-3 rounded-md border border-brand-accent/15 bg-brand-accent/5 px-3.5 py-2.5 text-xs text-brand-muted dark:border-brand-accent-dark/20 dark:bg-brand-accent-dark/10"
-              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-            >
+            {/* 안내 박스 */}
+            <div style={{
+              marginTop: 12,
+              padding: '10px 14px',
+              borderRadius: 8,
+              border: '1px solid var(--accent-border)',
+              backgroundColor: 'var(--accent-subtle)',
+              fontSize: 12,
+              color: 'var(--fg-muted)',
+            }}>
               임시 비밀번호 변경 상태에서만 현재 비밀번호 입력이 생략됩니다.
             </div>
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* 폼 */}
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <PasswordField
               id="new-password"
               label="새 비밀번호"
@@ -130,10 +127,9 @@ export default function ChangePasswordForm({
               value={newPassword}
               onChange={setNewPassword}
               isVisible={showNewPassword}
-              onToggleVisibility={() => setShowNewPassword((value) => !value)}
+              onToggleVisibility={() => setShowNewPassword((v) => !v)}
               disabled={isSubmitting}
               helperText="10자 이상이어야 하며 공백만으로는 설정할 수 없습니다."
-              icon={<LockIcon />}
             />
             <PasswordField
               id="confirm-password"
@@ -143,60 +139,97 @@ export default function ChangePasswordForm({
               value={confirmPassword}
               onChange={setConfirmPassword}
               isVisible={showConfirmPassword}
-              onToggleVisibility={() =>
-                setShowConfirmPassword((value) => !value)
-              }
+              onToggleVisibility={() => setShowConfirmPassword((v) => !v)}
               disabled={isSubmitting}
-              icon={<LockIcon />}
             />
 
-            {errorMessage ? (
-              <p
-                className="rounded-md border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-600 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200"
-                style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-              >
-                {errorMessage}
-              </p>
-            ) : null}
+            {/* 에러 메시지 */}
+            <AnimatePresence>
+              {errorMessage && (
+                <motion.p
+                  key="error"
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.2 }}
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    border: '1px solid var(--penalty-border)',
+                    backgroundColor: 'var(--penalty-subtle)',
+                    fontSize: 13,
+                    color: 'var(--penalty)',
+                  }}
+                >
+                  {errorMessage}
+                </motion.p>
+              )}
+            </AnimatePresence>
 
-            <button
+            {/* 제출 버튼 */}
+            <motion.button
               type="submit"
               disabled={isSubmitting}
-              className="group relative w-full overflow-hidden rounded-md bg-brand-accent px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
-              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
+              whileTap={isSubmitting ? undefined : { scale: 0.98 }}
+              style={{
+                width: '100%',
+                height: 42,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                borderRadius: 8,
+                border: 'none',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                fontSize: 14,
+                fontWeight: 600,
+                color: 'white',
+                backgroundColor: 'var(--accent)',
+                opacity: isSubmitting ? 0.7 : 1,
+                transition: 'opacity 0.15s ease, filter 0.15s ease',
+                marginTop: 4,
+              }}
+              onMouseEnter={(e) => { if (!isSubmitting) e.currentTarget.style.filter = 'brightness(0.92)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.filter = 'none' }}
             >
-              <span
-                className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                style={{
-                  background:
-                    'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%)',
-                  animation: 'shimmer 1.8s linear infinite',
-                }}
-              />
-              <span className="relative">
-                {isSubmitting ? '변경 중...' : '비밀번호 변경'}
-              </span>
-            </button>
+              {isSubmitting && (
+                <motion.svg
+                  width="16" height="16" viewBox="0 0 16 16" fill="none"
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 0.7, ease: 'linear' }}
+                >
+                  <circle cx="8" cy="8" r="6" stroke="white" strokeWidth="2" strokeDasharray="28 8" fill="none" />
+                </motion.svg>
+              )}
+              {isSubmitting ? '변경 중...' : '비밀번호 변경'}
+            </motion.button>
           </form>
 
-          <div className="mt-6 flex items-center justify-between gap-3 text-xs text-brand-muted">
-            <span
-              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-            >
-              다른 계정으로 다시 로그인하려면
-            </span>
+          {/* 로그아웃 */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 20, fontSize: 13, color: 'var(--fg-muted)' }}>
+            <span>다른 계정으로 다시 로그인하려면</span>
             <LogoutButton
-              className="rounded-full border border-black/10 px-3 py-1.5 text-xs font-medium text-brand-navy transition-colors duration-150 hover:bg-black/[0.03] dark:border-white/10 dark:text-[#e2e1f0] dark:hover:bg-white/[0.05]"
-              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
+              style={{
+                padding: '6px 14px',
+                borderRadius: 9999,
+                border: '1px solid var(--border)',
+                background: 'none',
+                cursor: 'pointer',
+                fontSize: 12,
+                fontWeight: 500,
+                color: 'var(--fg)',
+              }}
             >
               로그아웃
             </LogoutButton>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   )
 }
+
+// ─── PasswordField ────────────────────────────────────────────────────────────
 
 type FieldProps = {
   id: string
@@ -209,37 +242,22 @@ type FieldProps = {
   onToggleVisibility: () => void
   disabled: boolean
   helperText?: string
-  icon: React.ReactNode
 }
 
 function PasswordField({
-  id,
-  label,
-  autoComplete,
-  placeholder,
-  value,
-  onChange,
-  isVisible,
-  onToggleVisibility,
-  disabled,
-  helperText,
-  icon,
+  id, label, autoComplete, placeholder, value, onChange,
+  isVisible, onToggleVisibility, disabled, helperText,
 }: FieldProps) {
+  const [focused, setFocused] = useState(false)
+
   return (
     <div>
-      <label
-        htmlFor={id}
-        className="mb-1.5 block text-xs font-semibold text-brand-navy dark:text-white/60"
-        style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-      >
+      <label htmlFor={id} style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--fg)', marginBottom: 6 }}>
         {label}
       </label>
-      <div className="relative">
-        <span
-          className="pointer-events-none absolute left-3.5 top-1/2 flex -translate-y-1/2 items-center text-gray-400 dark:text-white/25"
-          aria-hidden="true"
-        >
-          {icon}
+      <div style={{ position: 'relative' }}>
+        <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--fg-muted)', opacity: 0.6, pointerEvents: 'none', display: 'flex' }}>
+          <LockIcon />
         </span>
         <input
           id={id}
@@ -247,83 +265,71 @@ function PasswordField({
           autoComplete={autoComplete}
           placeholder={placeholder}
           value={value}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          className="w-full rounded-md border border-gray-200 bg-white py-2.5 pl-9 pr-10 text-sm text-brand-navy outline-none transition-all duration-200 placeholder:text-gray-400 focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/15 dark:border-white/10 dark:bg-white/[0.06] dark:text-[#e2e1f0] dark:placeholder:text-white/20 dark:focus:border-brand-accent-dark dark:focus:ring-brand-accent-dark/15"
-          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          style={{
+            width: '100%',
+            height: 40,
+            paddingLeft: 38,
+            paddingRight: 42,
+            fontSize: 14,
+            color: 'var(--fg)',
+            backgroundColor: 'var(--bg)',
+            border: `1px solid ${focused ? 'var(--accent)' : 'var(--border)'}`,
+            borderRadius: 8,
+            outline: 'none',
+            boxShadow: focused ? '0 0 0 3px var(--accent-subtle)' : 'none',
+            transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+            opacity: disabled ? 0.6 : 1,
+          }}
         />
         <button
           type="button"
           aria-label={isVisible ? '비밀번호 숨기기' : '비밀번호 표시'}
           onClick={onToggleVisibility}
-          className="absolute right-3.5 top-1/2 flex -translate-y-1/2 items-center text-gray-400 transition-colors duration-150 hover:text-brand-accent dark:text-white/25 dark:hover:text-brand-accent-dark"
+          style={{
+            position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
+            display: 'flex', alignItems: 'center',
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'var(--fg-muted)', padding: 2,
+          }}
         >
           {isVisible ? <EyeOffIcon /> : <EyeOpenIcon />}
         </button>
       </div>
-      {helperText ? (
-        <p
-          className="mt-1.5 text-xs text-brand-muted"
-          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-        >
-          {helperText}
-        </p>
-      ) : null}
+      {helperText && (
+        <p style={{ marginTop: 6, fontSize: 12, color: 'var(--fg-muted)' }}>{helperText}</p>
+      )}
     </div>
   )
 }
 
 function LockIcon() {
   return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
     </svg>
   )
 }
 
 function EyeOpenIcon() {
   return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-      <circle cx="12" cy="12" r="3" />
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
     </svg>
   )
 }
 
 function EyeOffIcon() {
   return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-      <line x1="1" y1="1" x2="23" y2="23" />
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
     </svg>
   )
 }

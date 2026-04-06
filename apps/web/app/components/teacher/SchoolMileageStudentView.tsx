@@ -291,13 +291,13 @@ export default function SchoolMileageStudentView() {
         <Card className="overflow-hidden p-0 flex flex-col min-h-0">
           <div
             className="px-4 py-3"
-            style={{ borderBottom: '1px solid var(--admin-border)' }}
+            style={{ borderBottom: '1px solid var(--border)' }}
           >
             <p
               className="text-xs font-semibold"
               style={{
                 fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                color: 'var(--admin-text-muted)',
+                color: 'var(--fg-muted)',
               }}
             >
               학생 목록
@@ -314,7 +314,7 @@ export default function SchoolMileageStudentView() {
           <div className="flex-1 min-h-0 overflow-y-auto p-3">
             {!filterSchool ? (
               <ListEmptyState
-                icon={<UserIcon style={{ color: 'var(--admin-accent)' }} />}
+                icon={<UserIcon style={{ color: 'var(--accent)' }} />}
                 title="학교를 선택하세요"
                 description="학교를 선택하면 학생 목록을 바로 불러옵니다."
               />
@@ -322,7 +322,7 @@ export default function SchoolMileageStudentView() {
               <ListSkeleton count={8} rowHeight="h-14" />
             ) : students.length === 0 ? (
               <ListEmptyState
-                icon={<UserIcon style={{ color: 'var(--admin-accent)' }} />}
+                icon={<UserIcon style={{ color: 'var(--accent)' }} />}
                 title="학생이 없습니다"
                 description="검색 조건을 변경해 보세요."
               />
@@ -345,10 +345,10 @@ export default function SchoolMileageStudentView() {
                         className="flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-colors"
                         style={{
                           borderColor: isSelected
-                            ? 'var(--admin-accent)'
-                            : 'var(--admin-border)',
+                            ? 'var(--accent)'
+                            : 'var(--border)',
                           backgroundColor: isSelected
-                            ? 'var(--admin-accent-bg)'
+                            ? 'var(--accent-subtle)'
                             : 'transparent',
                         }}
                       >
@@ -356,9 +356,9 @@ export default function SchoolMileageStudentView() {
                           className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold"
                           style={{
                             backgroundColor: isSelected
-                              ? 'var(--admin-accent)'
-                              : 'var(--admin-border)',
-                            color: isSelected ? '#fff' : 'var(--admin-text-muted)',
+                              ? 'var(--accent)'
+                              : 'var(--border)',
+                            color: isSelected ? '#fff' : 'var(--fg-muted)',
                             fontFamily: 'var(--font-space-grotesk)',
                           }}
                         >
@@ -369,7 +369,7 @@ export default function SchoolMileageStudentView() {
                             className="truncate text-sm font-medium"
                             style={{
                               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                              color: 'var(--admin-text)',
+                              color: 'var(--fg)',
                             }}
                           >
                             {student.name}
@@ -378,7 +378,7 @@ export default function SchoolMileageStudentView() {
                             className="text-[11px]"
                             style={{
                               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                              color: 'var(--admin-text-muted)',
+                              color: 'var(--fg-muted)',
                             }}
                           >
                             {student.grade !== null ? `${student.grade}학년 ` : ''}
@@ -386,7 +386,7 @@ export default function SchoolMileageStudentView() {
                           </p>
                         </div>
                         {isSelected && (
-                          <div style={{ color: 'var(--admin-accent)' }}>
+                          <div style={{ color: 'var(--accent)' }}>
                             <ChevronRightIcon />
                           </div>
                         )}
@@ -402,13 +402,13 @@ export default function SchoolMileageStudentView() {
         {!selectedStudentId ? (
           <Card>
             <ListEmptyState
-              icon={<UserIcon style={{ color: 'var(--admin-accent)' }} />}
+              icon={<UserIcon style={{ color: 'var(--accent)' }} />}
               title="학생을 선택하세요"
               description="좌측 목록에서 학생을 클릭하면 누적 점수와 처리 내역이 표시됩니다."
             />
           </Card>
         ) : (
-          <div className="animate-fade-in flex flex-col min-h-0 gap-4 overflow-hidden">
+          <div className="flex flex-col min-h-0 gap-4 overflow-hidden">
             <StudentSummaryCards summary={summary} isLoading={isSummaryLoading} />
 
             <StudentEntriesTable

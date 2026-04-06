@@ -57,7 +57,7 @@ export default function ReportFilters({
             className="mb-2 text-xs font-semibold"
             style={{
               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              color: 'var(--admin-text-muted)',
+              color: 'var(--fg-muted)',
             }}
           >
             보고서 유형
@@ -71,16 +71,16 @@ export default function ReportFilters({
                   fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                   borderColor:
                     reportType === type
-                      ? 'var(--admin-accent)'
-                      : 'var(--admin-border)',
+                      ? 'var(--accent)'
+                      : 'var(--border)',
                   backgroundColor:
                     reportType === type
-                      ? 'var(--admin-accent-bg)'
+                      ? 'var(--accent-subtle)'
                       : 'transparent',
                   color:
                     reportType === type
-                      ? 'var(--admin-accent)'
-                      : 'var(--admin-text)',
+                      ? 'var(--accent)'
+                      : 'var(--fg)',
                 }}
               >
                 <input
@@ -102,7 +102,7 @@ export default function ReportFilters({
             className="mb-2 text-xs font-semibold"
             style={{
               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              color: 'var(--admin-text-muted)',
+              color: 'var(--fg-muted)',
             }}
           >
             조회 조건
@@ -111,7 +111,7 @@ export default function ReportFilters({
             <select
               value={filterSchool}
               onChange={(event) => onSchoolChange(event.target.value)}
-              className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+              className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               style={inputStyle}
             >
               <option value="">전체 학교</option>
@@ -125,7 +125,7 @@ export default function ReportFilters({
             <select
               value={filterGrade}
               onChange={(event) => onGradeChange(event.target.value)}
-              className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+              className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               style={inputStyle}
             >
               <option value="">전체 학년</option>
@@ -138,17 +138,17 @@ export default function ReportFilters({
               type="date"
               value={startDate}
               onChange={(event) => onStartDateChange(event.target.value)}
-              className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+              className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               style={inputStyle}
             />
-            <span className="text-xs" style={{ color: 'var(--admin-text-muted)' }}>
+            <span className="text-xs" style={{ color: 'var(--fg-muted)' }}>
               ~
             </span>
             <input
               type="date"
               value={endDate}
               onChange={(event) => onEndDateChange(event.target.value)}
-              className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+              className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               style={inputStyle}
             />
           </FilterRow>
@@ -162,7 +162,7 @@ export default function ReportFilters({
             className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
             style={{
               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              backgroundColor: 'var(--admin-accent)',
+              backgroundColor: 'var(--accent)',
               color: '#fff',
             }}
           >
@@ -175,9 +175,9 @@ export default function ReportFilters({
             className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
             style={{
               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              borderColor: 'var(--admin-border)',
-              color: 'var(--admin-text)',
-              backgroundColor: 'var(--admin-sidebar-bg)',
+              borderColor: 'var(--border)',
+              color: 'var(--fg)',
+              backgroundColor: 'var(--bg-subtle)',
             }}
           >
             인쇄

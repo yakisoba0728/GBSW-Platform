@@ -7,6 +7,7 @@ import {
   FormActions,
   FormNotice,
   inputBase,
+  inputBaseStyle,
   PasswordRuleBox,
   type Notice,
   type TeacherFormState,
@@ -94,7 +95,7 @@ export default function TeacherCreateForm() {
           className="text-base font-semibold"
           style={{
             fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            color: 'var(--admin-text)',
+            color: 'var(--fg)',
           }}
         >
           교사 계정 생성
@@ -103,7 +104,7 @@ export default function TeacherCreateForm() {
           className="mt-1 text-xs leading-relaxed"
           style={{
             fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            color: 'var(--admin-text-muted)',
+            color: 'var(--fg-muted)',
           }}
         >
           새 교사 계정의 정보를 입력하세요. 교사 아이디는 직접 입력하고 임시
@@ -114,9 +115,9 @@ export default function TeacherCreateForm() {
       <form onSubmit={handleSubmit}>
         <div
           className="overflow-hidden rounded-2xl border"
-          style={{ borderColor: 'var(--admin-border)' }}
+          style={{ borderColor: 'var(--border)' }}
         >
-          <div className="px-6 py-5" style={{ backgroundColor: 'var(--admin-bg)' }}>
+          <div className="px-6 py-5" style={{ backgroundColor: 'var(--bg)' }}>
             <SectionLabel>교사 정보</SectionLabel>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldBlock label="교사 아이디" htmlFor="t-id">
@@ -129,7 +130,7 @@ export default function TeacherCreateForm() {
                   onChange={setTeacherField('teacherId')}
                   disabled={isSubmitting}
                   className={inputBase}
-                  style={{ fontFamily: 'var(--font-space-grotesk)' }}
+                  style={{ ...inputBaseStyle, fontFamily: 'var(--font-space-grotesk)' }}
                 />
               </FieldBlock>
               <FieldBlock label="이름" htmlFor="t-name">
@@ -142,7 +143,7 @@ export default function TeacherCreateForm() {
                   onChange={setTeacherField('name')}
                   disabled={isSubmitting}
                   className={inputBase}
-                  style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
+                  style={{ ...inputBaseStyle, fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
                 />
               </FieldBlock>
               <FieldBlock label="전화번호" htmlFor="t-phone">
@@ -157,7 +158,7 @@ export default function TeacherCreateForm() {
                   onChange={setTeacherField('phone')}
                   disabled={isSubmitting}
                   className={inputBase}
-                  style={{ fontFamily: 'var(--font-space-grotesk)' }}
+                  style={{ ...inputBaseStyle, fontFamily: 'var(--font-space-grotesk)' }}
                 />
               </FieldBlock>
             </div>
@@ -165,7 +166,7 @@ export default function TeacherCreateForm() {
 
           <Divider />
 
-          <div className="px-6 py-5" style={{ backgroundColor: 'var(--admin-bg)' }}>
+          <div className="px-6 py-5" style={{ backgroundColor: 'var(--bg)' }}>
             <SectionLabel>초기 비밀번호</SectionLabel>
             <PasswordRuleBox>
               교사 임시 비밀번호는 교사 아이디와 전화번호 뒤 4자리로

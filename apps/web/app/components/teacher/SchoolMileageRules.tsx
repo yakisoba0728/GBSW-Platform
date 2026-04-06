@@ -62,9 +62,9 @@ export default function SchoolMileageRules({
               className="flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-opacity hover:opacity-70"
               style={{
                 fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                backgroundColor: 'var(--admin-accent-bg)',
-                borderColor: 'var(--admin-accent)',
-                color: 'var(--admin-accent)',
+                backgroundColor: 'var(--accent-subtle)',
+                borderColor: 'var(--accent)',
+                color: 'var(--accent)',
               }}
             >
               <PlusIcon />
@@ -83,14 +83,14 @@ export default function SchoolMileageRules({
           <div className="relative flex-1" style={{ minWidth: '160px' }}>
             <SearchIcon
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
-              style={{ color: 'var(--admin-text-muted)' }}
+              style={{ color: 'var(--fg-muted)' }}
             />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="항목명 또는 카테고리 검색"
-              className="h-8 w-full rounded-md border pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+              className="h-8 w-full rounded-md border pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               style={inputStyle}
             />
           </div>
@@ -98,7 +98,7 @@ export default function SchoolMileageRules({
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value as '' | MileageType)}
-            className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+            className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             style={inputStyle}
           >
             <option value="">전체 유형</option>
@@ -109,7 +109,7 @@ export default function SchoolMileageRules({
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+            className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             style={inputStyle}
           >
             <option value="">전체 카테고리</option>
@@ -123,12 +123,12 @@ export default function SchoolMileageRules({
               type="button"
               onClick={() => { setSearch(''); setTypeFilter(''); setCategoryFilter('') }}
               className="h-8 rounded-md border px-2.5 text-xs transition-opacity hover:opacity-70"
-              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--admin-border)', color: 'var(--admin-text-muted)' }}
+              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--border)', color: 'var(--fg-muted)' }}
             >
               초기화
             </button>
           )}
-          <span className="ml-auto text-xs" style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-space-grotesk)' }}>
+          <span className="ml-auto text-xs" style={{ color: 'var(--fg-muted)', fontFamily: 'var(--font-space-grotesk)' }}>
             {filteredRules.length}건
           </span>
         </FilterRow>
@@ -153,7 +153,7 @@ export default function SchoolMileageRules({
                     <ListEmptyState
                       icon={
                         <FileIcon
-                          style={{ color: 'var(--admin-accent)' }}
+                          style={{ color: 'var(--accent)' }}
                         />
                       }
                       title="규칙이 없습니다"
@@ -168,39 +168,39 @@ export default function SchoolMileageRules({
                     index={i}
                     className="transition-colors"
                     style={{
-                      borderBottom: '1px solid var(--admin-border)',
+                      borderBottom: '1px solid var(--border)',
                       backgroundColor:
                         hoveredRowId === rule.id
-                          ? 'var(--admin-accent-bg)'
+                          ? 'var(--accent-subtle)'
                           : 'transparent',
                     }}
                     onMouseEnter={() => setHoveredRowId(rule.id)}
                     onMouseLeave={() => setHoveredRowId(null)}
                   >
-                    <td className="px-3 py-2" style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-space-grotesk)' }}>
+                    <td className="px-3 py-2" style={{ color: 'var(--fg-muted)', fontFamily: 'var(--font-space-grotesk)' }}>
                       {rule.id}
                     </td>
                     <td className="px-3 py-2">
                       <Badge type={rule.type}>{rule.type === 'reward' ? '상점' : '벌점'}</Badge>
                     </td>
-                    <td className="px-3 py-2" style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
+                    <td className="px-3 py-2" style={{ color: 'var(--fg-muted)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
                       {rule.category}
                     </td>
-                    <td className="px-3 py-3 font-medium" style={{ color: 'var(--admin-text)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
+                    <td className="px-3 py-3 font-medium" style={{ color: 'var(--fg)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
                       {rule.name}
                     </td>
-                    <td className="px-3 py-2 font-semibold" style={{ fontFamily: 'var(--font-space-grotesk)', color: rule.type === 'reward' ? 'var(--mileage-green)' : 'var(--mileage-red)' }}>
+                    <td className="px-3 py-2 font-semibold" style={{ fontFamily: 'var(--font-space-grotesk)', color: rule.type === 'reward' ? 'var(--reward)' : 'var(--penalty)' }}>
                       {rule.type === 'reward' ? '+' : '-'}{rule.defaultScore}점
                     </td>
-                    <td className="px-3 py-2" style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-space-grotesk)' }}>
+                    <td className="px-3 py-2" style={{ color: 'var(--fg-muted)', fontFamily: 'var(--font-space-grotesk)' }}>
                       {rule.displayOrder}
                     </td>
                     <td className="px-3 py-2">
                       <span
                         className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium"
                         style={{
-                          backgroundColor: rule.isActive ? 'var(--mileage-green-bg)' : 'rgba(156,163,175,0.15)',
-                          color: rule.isActive ? 'var(--mileage-green)' : 'var(--admin-text-muted)',
+                          backgroundColor: rule.isActive ? 'var(--reward-subtle)' : 'rgba(156,163,175,0.15)',
+                          color: rule.isActive ? 'var(--reward)' : 'var(--fg-muted)',
                         }}
                       >
                         {rule.isActive ? '활성' : '비활성'}
@@ -215,7 +215,7 @@ export default function SchoolMileageRules({
                           type="button"
                           onClick={() => setAlertOpen(true)}
                           className="flex items-center gap-1 rounded border px-2 py-1 text-[11px] transition-opacity hover:opacity-70"
-                          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--admin-border)', color: 'var(--admin-text-muted)' }}
+                          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--border)', color: 'var(--fg-muted)' }}
                         >
                           <EditIcon />수정
                         </button>
@@ -223,7 +223,7 @@ export default function SchoolMileageRules({
                           type="button"
                           onClick={() => setAlertOpen(true)}
                           className="flex items-center gap-1 rounded border px-2 py-1 text-[11px] transition-opacity hover:opacity-70"
-                          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--mileage-red-border)', color: 'var(--mileage-red)' }}
+                          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--penalty-border)', color: 'var(--penalty)' }}
                         >
                           <SlashIcon />비활성화
                         </button>

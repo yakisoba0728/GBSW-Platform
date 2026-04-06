@@ -18,8 +18,8 @@ export default function StudentSummaryCards({
             key={index}
             className="relative h-24 overflow-hidden rounded-xl border"
             style={{
-              borderColor: 'var(--admin-border)',
-              backgroundColor: 'var(--admin-sidebar-bg)',
+              borderColor: 'var(--border)',
+              backgroundColor: 'var(--bg-subtle)',
             }}
           >
             <div
@@ -65,7 +65,7 @@ export default function StudentSummaryCards({
           className="mb-3 text-xs font-medium"
           style={{
             fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            color: 'var(--admin-text-muted)',
+            color: 'var(--fg-muted)',
           }}
         >
           상점 / 벌점 비율

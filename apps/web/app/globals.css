@@ -2,85 +2,92 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Theme tokens ─────────────────────────────────────────── */
+/* ─── Design tokens ─────────────────────────────────────────── */
 :root {
-  /* Right panel */
-  --bg: #f4f3ef;
-  --fg: #1a1830;
+  /* Core palette */
+  --bg: #ffffff;
+  --bg-subtle: #f5f5f5;
+  --bg-muted: #ebebeb;
+  --border: #e0e0e0;
+  --fg: #111111;
+  --fg-muted: #666666;
+  --accent: #1a56db;
+  --accent-subtle: #eff6ff;
+  --accent-border: rgba(26, 86, 219, 0.3);
+  --accent-rgb: 26, 86, 219;
 
-  /* Left panel (BrandPanel) */
-  --panel-bg: linear-gradient(158deg, #eae7f5 0%, #e2ddf0 60%, #e8e4f5 100%);
-  --panel-dot: rgba(67, 56, 202, 0.07);
-  --panel-glow-top: rgba(99, 102, 241, 0.15);
-  --panel-glow-bottom: rgba(67, 56, 202, 0.12);
-  --panel-text: #1a1830;
-  --panel-text-muted: rgba(26, 24, 48, 0.42);
-  --panel-text-sub: rgba(26, 24, 48, 0.28);
-  --panel-text-copy: rgba(26, 24, 48, 0.20);
-  --panel-edge: #f4f3ef;
-  --panel-atmo-opacity: 0.1;
-  --panel-logo-opacity: 0.6;
+  /* Semantic: reward / penalty */
+  --reward: #16a34a;
+  --reward-subtle: #f0fdf4;
+  --reward-border: rgba(22, 163, 74, 0.25);
+  --penalty: #dc2626;
+  --penalty-subtle: #fef2f2;
+  --penalty-border: rgba(220, 38, 38, 0.25);
+
+  /* BrandPanel */
+  --panel-bg: #f5f5f5;
+  --panel-dot: rgba(0, 0, 0, 0.05);
+  --panel-text: #111111;
+  --panel-text-muted: rgba(17, 17, 17, 0.45);
+  --panel-text-sub: rgba(17, 17, 17, 0.28);
+  --panel-text-copy: rgba(17, 17, 17, 0.18);
+  --panel-edge: #e0e0e0;
+  --panel-wordmark: rgba(17, 17, 17, 0.45);
+  --panel-logo-opacity: 0.55;
   --panel-logo-brightness: 0.95;
-  --panel-wordmark: rgba(26, 24, 48, 0.45);
 
-  /* Admin/Dashboard page */
-  --admin-bg: #f7f6f3;
-  --admin-sidebar-bg: #f0edf8;
-  --admin-header-bg: rgba(247, 246, 243, 0.9);
-  --admin-border: #e4e1ec;
-  --admin-text: #1a1830;
-  --admin-text-muted: #6b7280;
-  --admin-accent: #3730a3;
-  --admin-accent-bg: rgba(55, 48, 163, 0.06);
-
-  /* Mileage semantic colors */
-  --mileage-green: #15803d;
-  --mileage-green-bg: rgba(22, 163, 74, 0.1);
-  --mileage-green-border: rgba(22, 163, 74, 0.25);
-  --mileage-red: #b91c1c;
-  --mileage-red-bg: rgba(239, 68, 68, 0.1);
-  --mileage-red-border: rgba(239, 68, 68, 0.25);
+  /* Backward-compat aliases (used by existing components) */
+  --admin-bg: var(--bg);
+  --admin-sidebar-bg: var(--bg-subtle);
+  --admin-header-bg: rgba(255, 255, 255, 0.9);
+  --admin-border: var(--border);
+  --admin-text: var(--fg);
+  --admin-text-muted: var(--fg-muted);
+  --admin-accent: var(--accent);
+  --admin-accent-bg: var(--accent-subtle);
+  --mileage-green: var(--reward);
+  --mileage-green-bg: var(--reward-subtle);
+  --mileage-green-border: var(--reward-border);
+  --mileage-red: var(--penalty);
+  --mileage-red-bg: var(--penalty-subtle);
+  --mileage-red-border: var(--penalty-border);
 
   /* Layout */
-  --sidebar-width: 220px;
-  --header-height: 48px;
+  --sidebar-width: 256px;
+  --header-height: 52px;
 }
 
 .dark {
-  --bg: #0e0e18;
-  --fg: #e2e1f0;
+  --bg: #0f1117;
+  --bg-subtle: #161b22;
+  --bg-muted: #1e2530;
+  --border: #2d3748;
+  --fg: #f0f0f0;
+  --fg-muted: #8b9cb6;
+  --accent: #4a8fe8;
+  --accent-subtle: #1e2f4a;
+  --accent-border: rgba(74, 143, 232, 0.3);
+  --accent-rgb: 74, 143, 232;
 
-  --panel-bg: linear-gradient(158deg, #201d38 0%, #18162c 55%, #211c3e 100%);
-  --panel-dot: rgba(255, 255, 255, 0.065);
-  --panel-glow-top: rgba(99, 102, 241, 0.28);
-  --panel-glow-bottom: rgba(67, 56, 202, 0.26);
-  --panel-text: #ffffff;
-  --panel-text-muted: rgba(255, 255, 255, 0.32);
-  --panel-text-sub: rgba(255, 255, 255, 0.20);
-  --panel-text-copy: rgba(255, 255, 255, 0.14);
-  --panel-edge: #0e0e18;
-  --panel-atmo-opacity: 0.13;
-  --panel-logo-opacity: 0.58;
-  --panel-logo-brightness: 1.08;
-  --panel-wordmark: rgba(255, 255, 255, 0.35);
+  --reward: #22c55e;
+  --reward-subtle: #052e16;
+  --reward-border: rgba(34, 197, 94, 0.2);
+  --penalty: #ef4444;
+  --penalty-subtle: #2d0a0a;
+  --penalty-border: rgba(239, 68, 68, 0.2);
 
-  /* Admin/Dashboard page */
-  --admin-bg: #0e0e18;
-  --admin-sidebar-bg: #111118;
-  --admin-header-bg: rgba(14, 14, 24, 0.9);
-  --admin-border: rgba(255, 255, 255, 0.07);
-  --admin-text: #e2e1f0;
-  --admin-text-muted: rgba(255, 255, 255, 0.38);
-  --admin-accent: #818cf8;
-  --admin-accent-bg: rgba(129, 140, 248, 0.08);
+  --panel-bg: #161b22;
+  --panel-dot: rgba(255, 255, 255, 0.04);
+  --panel-text: #f0f0f0;
+  --panel-text-muted: rgba(240, 240, 240, 0.35);
+  --panel-text-sub: rgba(240, 240, 240, 0.22);
+  --panel-text-copy: rgba(240, 240, 240, 0.14);
+  --panel-edge: #2d3748;
+  --panel-wordmark: rgba(240, 240, 240, 0.35);
+  --panel-logo-opacity: 0.65;
+  --panel-logo-brightness: 1.05;
 
-  /* Mileage semantic colors (dark) */
-  --mileage-green: #4ade80;
-  --mileage-green-bg: rgba(74, 222, 128, 0.08);
-  --mileage-green-border: rgba(74, 222, 128, 0.2);
-  --mileage-red: #f87171;
-  --mileage-red-bg: rgba(248, 113, 113, 0.08);
-  --mileage-red-border: rgba(248, 113, 113, 0.2);
+  --admin-header-bg: rgba(15, 17, 23, 0.9);
 }
 
 /* ─── Base reset ─────────────────────────────────────────────── */
@@ -211,11 +218,6 @@
 }
 
 /* ─── Keyframe animations ────────────────────────────────────── */
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -261,6 +263,11 @@
   to   { opacity: 0; }
 }
 
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ─── Animation utilities ────────────────────────────────────── */
 @layer utilities {
   .anim-delay-0   { animation-delay: 0ms; }
@@ -272,13 +279,14 @@
 
   .opacity-init-0 { opacity: 0; }
 
-  .animate-slide-down  { animation: slideDown  200ms ease both; }
-  .animate-slide-up    { animation: slideUp    150ms ease both; }
-  .animate-fade-in     { animation: fadeIn     180ms ease both; }
-  .animate-fade-out    { animation: fadeOut    150ms ease both; }
-  .animate-scale-in    { animation: scaleIn    200ms cubic-bezier(0.16,1,0.3,1) both; }
-  .animate-scale-out   { animation: scaleOut   150ms ease both; }
-  .animate-shimmer     { animation: shimmer    1.6s ease-in-out infinite; }
+  .animate-slide-down   { animation: slideDown  200ms ease both; }
+  .animate-slide-up     { animation: slideUp    150ms ease both; }
+  .animate-fade-in      { animation: fadeIn     180ms ease both; }
+  .animate-fade-out     { animation: fadeOut    150ms ease both; }
+  .animate-fade-in-up   { animation: fadeInUp   220ms ease both; }
+  .animate-scale-in     { animation: scaleIn    200ms cubic-bezier(0.16,1,0.3,1) both; }
+  .animate-scale-out    { animation: scaleOut   150ms ease both; }
+  .animate-shimmer      { animation: shimmer    1.6s ease-in-out infinite; }
   .animate-overlay-enter { animation: overlayEnter 280ms ease both; }
   .animate-overlay-exit  { animation: overlayExit  220ms ease both; }
 }

@@ -3,10 +3,10 @@ import Image from 'next/image'
 export default function BrandPanel() {
   return (
     <div
-      className="relative hidden md:flex flex-col justify-between w-[36%] min-h-screen overflow-hidden px-12 py-10 transition-colors duration-300"
-      style={{ background: 'var(--panel-bg)' }}
+      className="relative hidden lg:flex flex-col justify-between overflow-hidden px-12 py-10 transition-colors duration-300"
+      style={{ width: '40%', minHeight: '100svh', background: 'var(--panel-bg)' }}
     >
-      {/* Dot-grid texture */}
+      {/* 도트 그리드 텍스처 */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -17,13 +17,13 @@ export default function BrandPanel() {
         }}
       />
 
-      {/* Right-edge fade */}
+      {/* 우측 엣지 페이드 */}
       <div
         className="absolute right-0 top-0 h-full w-28 pointer-events-none z-20"
         style={{ background: 'linear-gradient(to right, transparent, var(--panel-edge))' }}
       />
 
-      {/* ── Top wordmark ── */}
+      {/* 워드마크 (상단) */}
       <div className="relative z-10 flex items-center gap-2.5">
         <Image
           src="/gbsw-logo.png"
@@ -31,59 +31,60 @@ export default function BrandPanel() {
           width={22}
           height={22}
           aria-hidden="true"
-          style={{ opacity: 'var(--panel-logo-opacity)' }}
+          style={{ opacity: 'var(--panel-logo-opacity)' as string }}
         />
         <span
-          className="text-xs font-medium transition-colors duration-300"
-          style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--panel-wordmark)' }}
+          style={{
+            fontFamily: 'var(--font-space-grotesk)',
+            fontSize: 12,
+            fontWeight: 500,
+            color: 'var(--panel-wordmark)',
+            transition: 'color 0.3s',
+          }}
         >
           GBSW Platform
         </span>
       </div>
 
-      {/* ── Center ── */}
+      {/* 중앙 콘텐츠 */}
       <div className="relative z-10 flex flex-col gap-8 my-auto">
-
-        {/* Logo */}
+        {/* 로고 */}
         <div className="relative w-fit">
           <Image
             src="/gbsw-logo.png"
             alt="경북소프트웨어마이스터고등학교 로고"
-            width={80}
-            height={80}
+            width={76}
+            height={76}
             priority
             style={{
-              opacity: 'var(--panel-logo-opacity)',
+              opacity: 'var(--panel-logo-opacity)' as string,
               filter: 'brightness(var(--panel-logo-brightness))',
             }}
           />
         </div>
 
-        {/* Text block */}
-        <div className="space-y-3">
-          <p
-            className="text-[11px] transition-colors duration-300"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              color: 'var(--panel-text-muted)',
-            }}
-          >
+        {/* 텍스트 */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <p style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', fontSize: 11, color: 'var(--panel-text-muted)', transition: 'color 0.3s' }}>
             경북소프트웨어마이스터고등학교 · 봉양중학교
           </p>
 
           <h1
-            className="leading-[1.08] transition-colors duration-300"
             style={{
-              fontFamily: 'var(--font-black-han-sans), var(--font-noto-sans-kr), sans-serif',
-              fontSize: 'clamp(2.1rem, 3.6vw, 3.2rem)',
+              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+              fontSize: 'clamp(2rem, 3.2vw, 3rem)',
+              fontWeight: 700,
+              lineHeight: 1.1,
               color: 'var(--panel-text)',
+              transition: 'color 0.3s',
+              letterSpacing: '-0.02em',
             }}
           >
             학교 생활의<br />
             모든 것을<br />
             <span
               style={{
-                background: 'linear-gradient(95deg, #818cf8 0%, #6366f1 55%, #4338ca 100%)',
+                background: 'linear-gradient(95deg, var(--accent) 0%, #2563eb 60%, #1d4ed8 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -92,28 +93,21 @@ export default function BrandPanel() {
               한 곳에.
             </span>
           </h1>
+
+          {/* 서브타이틀 */}
+          <p style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', fontSize: 13, color: 'var(--panel-text-muted)', marginTop: 4, lineHeight: 1.6 }}>
+            상벌점 관리, 학생 정보, 보고서까지<br />
+            교사와 학생을 위한 통합 플랫폼.
+          </p>
         </div>
       </div>
 
-      {/* ── Bottom copyright ── */}
-      <div className="relative z-10 space-y-0.5">
-        <p
-          className="text-[11px] transition-colors duration-300"
-          style={{
-            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            color: 'var(--panel-text-sub)',
-          }}
-        >
+      {/* 하단 저작권 */}
+      <div className="relative z-10" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <p style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', fontSize: 11, color: 'var(--panel-text-sub)', transition: 'color 0.3s' }}>
           ⓒ 2026. 경북소프트웨어마이스터고등학교 All Rights Reserved.
         </p>
-        <p
-          className="mt-1 text-xs"
-          style={{
-            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            color: 'var(--panel-text-sub)',
-            opacity: 0.5,
-          }}
-        >
+        <p style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', fontSize: 11, color: 'var(--panel-text-sub)', opacity: 0.6 }}>
           Made by <span style={{ opacity: 0.85 }}>김동혁</span>
         </p>
       </div>

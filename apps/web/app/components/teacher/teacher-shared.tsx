@@ -67,8 +67,8 @@ export function toDateTimeLocalValue(value: string) {
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <div
-      className={`rounded-lg border p-4 ${className}`}
-      style={{ backgroundColor: 'var(--admin-sidebar-bg)', borderColor: 'var(--admin-border)' }}
+      className={`rounded-xl border p-5 ${className}`}
+      style={{ backgroundColor: 'var(--bg-subtle)', borderColor: 'var(--border)' }}
     >
       {children}
     </div>
@@ -81,7 +81,7 @@ export function SectionTitle({ children }: { children: ReactNode }) {
   return (
     <h2
       className="mb-3 text-[13px] font-semibold"
-      style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text)' }}
+      style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg)' }}
     >
       {children}
     </h2>
@@ -113,19 +113,19 @@ export function StatCard({
 }) {
   const valueColor =
     colorToken === 'green'
-      ? 'var(--mileage-green)'
+      ? 'var(--reward)'
       : colorToken === 'red'
-        ? 'var(--mileage-red)'
-        : 'var(--admin-text)'
+        ? 'var(--penalty)'
+        : 'var(--fg)'
 
   return (
     <div
-      className="rounded-lg border p-4"
-      style={{ backgroundColor: 'var(--admin-sidebar-bg)', borderColor: 'var(--admin-border)' }}
+      className="rounded-xl border p-4"
+      style={{ backgroundColor: 'var(--bg-subtle)', borderColor: 'var(--border)' }}
     >
       <p
         className="text-[11px] uppercase tracking-wider"
-        style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--admin-text-muted)' }}
+        style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--fg-muted)' }}
       >
         {label}
       </p>
@@ -138,7 +138,7 @@ export function StatCard({
       {subValue && (
         <p
           className="mt-1.5 text-xs"
-          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}
+          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg-muted)' }}
         >
           {subValue}
         </p>
@@ -172,8 +172,8 @@ export function FilterSelect({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className={`h-8 rounded-md border bg-transparent px-2.5 text-xs transition-colors focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] ${className}`}
-      style={inputStyle}
+      className={`h-8 rounded-lg border bg-transparent px-2.5 text-xs outline-none transition-colors ${className}`}
+      style={{ ...inputStyle, borderColor: 'var(--border)' }}
     >
       {placeholder && <option value="">{placeholder}</option>}
       {options.map((opt) => (
@@ -201,14 +201,14 @@ export function SectionHeader({
       <div>
         <h2
           className="text-[13px] font-semibold"
-          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text)' }}
+          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg)' }}
         >
           {title}
         </h2>
         {subtitle && (
           <p
             className="mt-0.5 text-xs leading-5"
-            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}
+            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg-muted)' }}
           >
             {subtitle}
           </p>
@@ -242,15 +242,15 @@ export function ScoreSummaryBar({ reward, penalty }: { reward: number; penalty: 
         className="flex justify-between text-[11px]"
         style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
       >
-        <span style={{ color: 'var(--mileage-green)' }}>상점 {rewardPct}%</span>
-        <span style={{ color: 'var(--mileage-red)' }}>벌점 {penaltyPct}%</span>
+        <span style={{ color: 'var(--reward)' }}>상점 {rewardPct}%</span>
+        <span style={{ color: 'var(--penalty)' }}>벌점 {penaltyPct}%</span>
       </div>
-      <div className="flex h-1.5 overflow-hidden rounded-full" style={{ backgroundColor: 'var(--admin-border)' }}>
+      <div className="flex h-1.5 overflow-hidden rounded-full" style={{ backgroundColor: 'var(--border)' }}>
         <div
           className="h-full"
           style={{
             width: mounted ? `${rewardPct}%` : '0%',
-            backgroundColor: 'var(--mileage-green)',
+            backgroundColor: 'var(--reward)',
             transition: 'width 600ms cubic-bezier(0.16,1,0.3,1)',
           }}
         />
@@ -258,14 +258,14 @@ export function ScoreSummaryBar({ reward, penalty }: { reward: number; penalty: 
           className="h-full"
           style={{
             width: mounted ? `${penaltyPct}%` : '0%',
-            backgroundColor: 'var(--mileage-red)',
+            backgroundColor: 'var(--penalty)',
             transition: 'width 600ms cubic-bezier(0.16,1,0.3,1)',
           }}
         />
       </div>
       <div
         className="flex justify-between text-[11px]"
-        style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-space-grotesk)' }}
+        style={{ color: 'var(--fg-muted)', fontFamily: 'var(--font-space-grotesk)' }}
       >
         <span>+{reward}점</span>
         <span>-{penalty}점</span>

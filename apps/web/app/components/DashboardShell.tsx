@@ -3,15 +3,18 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
+import { AnimatePresence, motion } from 'framer-motion'
 import type { DashboardNavItem, DashboardNavMatch } from './dashboard-nav'
 import LogoutButton from './LogoutButton'
 import { ChevronRightIcon, LogOutIcon } from './ui/icons'
+import { TopProgressBar } from './ui/progress-bar'
+import { DASHBOARD_NAVIGATION_START_EVENT } from '@/lib/url-state'
 
 const ThemeToggle = dynamic(() => import('./ThemeToggle'), {
   ssr: false,
-  loading: () => <div className="h-8 w-8 rounded-md" aria-hidden="true" />,
+  loading: () => <div style={{ width: 32, height: 32 }} aria-hidden="true" />,
 })
 
 type Props = {
@@ -20,36 +23,7 @@ type Props = {
   children: React.ReactNode
 }
 
-function HamburgerIcon({ open }: { open: boolean }) {
-  const lineBase: React.CSSProperties = {
-    display: 'block',
-    position: 'absolute',
-    height: '1.5px',
-    width: '16px',
-    borderRadius: '9999px',
-    backgroundColor: 'currentColor',
-    transition:
-      'transform 250ms cubic-bezier(0.16,1,0.3,1), opacity 200ms ease, top 250ms cubic-bezier(0.16,1,0.3,1), bottom 250ms cubic-bezier(0.16,1,0.3,1)',
-  }
-
-  return (
-    <span
-      aria-hidden="true"
-      style={{
-        position: 'relative',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 16,
-        height: 12,
-      }}
-    >
-      <span style={{ ...lineBase, top: open ? '50%' : 0, transform: open ? 'translateY(-50%) rotate(45deg)' : 'none' }} />
-      <span style={{ ...lineBase, top: '50%', transform: 'translateY(-50%)', opacity: open ? 0 : 1 }} />
-      <span style={{ ...lineBase, bottom: open ? '50%' : 0, top: 'auto', transform: open ? 'translateY(50%) rotate(-45deg)' : 'none' }} />
-    </span>
-  )
-}
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function matchesPath(pathname: string, href: string, match: DashboardNavMatch = 'exact') {
   if (match === 'prefix') return pathname === href || pathname.startsWith(`${href}/`)
@@ -76,364 +50,465 @@ function getInitialOpenMenus(pathname: string, navItems: DashboardNavItem[]) {
   }, {})
 }
 
-export default function DashboardShell({ roleLabel, navItems, children }: Props) {
-  const pathname = usePathname()
-  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(() =>
-    getInitialOpenMenus(pathname, navItems),
+// ─── HamburgerIcon ────────────────────────────────────────────────────────────
+
+function HamburgerIcon({ open }: { open: boolean }) {
+  return (
+    <motion.span
+      aria-hidden="true"
+      style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 18, height: 14 }}
+    >
+      {[0, 1, 2].map((i) => (
+        <motion.span
+          key={i}
+          animate={
+            open
+              ? i === 0
+                ? { top: '50%', rotate: 45, translateY: '-50%' }
+                : i === 1
+                  ? { opacity: 0 }
+                  : { bottom: '50%', rotate: -45, translateY: '50%', top: 'auto' }
+              : i === 0
+                ? { top: 0, rotate: 0, translateY: 0 }
+                : i === 1
+                  ? { opacity: 1 }
+                  : { bottom: 0, rotate: 0, translateY: 0, top: 'auto' }
+          }
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            display: 'block',
+            position: 'absolute',
+            height: '1.5px',
+            width: '18px',
+            borderRadius: 9999,
+            backgroundColor: 'currentColor',
+            ...(i === 0 ? { top: 0 } : i === 1 ? { top: '50%', transform: 'translateY(-50%)' } : { bottom: 0 }),
+          }}
+        />
+      ))}
+    </motion.span>
   )
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [drawerVisible, setDrawerVisible] = useState(false)
-  const touchStartXRef = useRef<number | null>(null)
-  const touchStartYRef = useRef<number | null>(null)
-  const activeLabel = getActiveLabel(pathname, navItems)
+}
 
-  const closeDrawer = useCallback(() => {
-    setDrawerVisible(false)
-    setTimeout(() => setDrawerOpen(false), 260)
-  }, [])
+// ─── NavSidebar ───────────────────────────────────────────────────────────────
 
-  const openDrawer = useCallback(() => {
-    setDrawerOpen(true)
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => setDrawerVisible(true))
-    })
-  }, [])
-
-  const toggleMenu = useCallback((id: string) => {
-    setOpenMenus((prev) => ({ ...prev, [id]: !prev[id] }))
-  }, [])
-
-  useEffect(() => {
-    if (!drawerOpen) return
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') closeDrawer()
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => {
-      document.body.style.overflow = previousOverflow
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [closeDrawer, drawerOpen])
-
-  function handleTouchStart(event: React.TouchEvent) {
-    touchStartXRef.current = event.touches[0].clientX
-    touchStartYRef.current = event.touches[0].clientY
-  }
-
-  function handleTouchMove(event: React.TouchEvent) {
-    if (touchStartXRef.current === null) return
-    const dx = event.touches[0].clientX - touchStartXRef.current
-    const dy = Math.abs(event.touches[0].clientY - (touchStartYRef.current ?? 0))
-    if (dx < -30 && dy < Math.abs(dx) / 2) {
-      closeDrawer()
-      touchStartXRef.current = null
-    }
-  }
-
-  function handleTouchEnd() {
-    touchStartXRef.current = null
-    touchStartYRef.current = null
-  }
-
-  function NavSidebar({ inDrawer }: { inDrawer: boolean }) {
-    return (
-      <>
-        {/* 로고 헤더 */}
-        <div
-          className="flex h-12 flex-shrink-0 items-center gap-2.5 border-b px-4"
-          style={{ borderColor: 'var(--admin-border)' }}
-        >
-          <Image
-            src="/gbsw-logo.png"
-            alt=""
-            width={22}
-            height={22}
-            aria-hidden="true"
-            style={{ opacity: 0.6, flexShrink: 0 }}
-          />
-          <div className="min-w-0 flex-1">
-            <p
-              className="text-[13px] font-semibold leading-tight tracking-tight"
-              style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--admin-text)' }}
-            >
-              GBSW Platform
-            </p>
-            <p
-              className="text-[11px] leading-tight"
-              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}
-            >
-              {roleLabel}
-            </p>
-          </div>
+function NavSidebar({
+  roleLabel,
+  navItems,
+  pathname,
+  openMenus,
+  toggleMenu,
+  onNavLinkClick,
+  inDrawer,
+  closeDrawer,
+}: {
+  roleLabel: string
+  navItems: DashboardNavItem[]
+  pathname: string
+  openMenus: Record<string, boolean>
+  toggleMenu: (id: string) => void
+  onNavLinkClick: (href: string) => void
+  inDrawer: boolean
+  closeDrawer: () => void
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      {/* 로고 + 역할 */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 16px', height: 52, flexShrink: 0, borderBottom: '1px solid var(--border)' }}>
+        <Image src="/gbsw-logo.png" alt="" width={22} height={22} aria-hidden="true" style={{ opacity: 0.55, flexShrink: 0 }} />
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)', lineHeight: 1.3, letterSpacing: '-0.01em' }}>
+            GBSW Platform
+          </p>
+          <p style={{ fontSize: 11, color: 'var(--fg-muted)', lineHeight: 1.3 }}>
+            {roleLabel}
+          </p>
         </div>
+      </div>
 
-        {/* 네비게이션 */}
-        <nav className="flex-1 overflow-y-auto px-2 py-2.5" style={{ scrollbarWidth: 'none' }}>
-          {navItems.map((item) => {
-            const isActive = item.href ? matchesPath(pathname, item.href, item.match) : false
-            const isChildActive = hasActiveChild(pathname, item)
-            const hasChildren = Boolean(item.children?.length)
-            const isOpen = hasChildren ? Boolean(openMenus[item.id] || isChildActive) : false
+      {/* 네비게이션 */}
+      <nav style={{ flex: 1, overflowY: 'auto', padding: '10px 8px', scrollbarWidth: 'none' }}>
+        {navItems.map((item) => {
+          const isActive = item.href ? matchesPath(pathname, item.href, item.match) : false
+          const isChildActive = hasActiveChild(pathname, item)
+          const hasChildren = Boolean(item.children?.length)
+          const isOpen = hasChildren ? Boolean(openMenus[item.id] || isChildActive) : false
 
-            return (
-              <div key={item.id}>
-                {item.section && (
-                  <p
-                    className="select-none px-2 pb-1.5 pt-4 text-[10px] font-semibold uppercase tracking-widest"
-                    style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--admin-text-muted)', opacity: 0.5 }}
-                  >
-                    {item.section}
-                  </p>
-                )}
+          return (
+            <div key={item.id}>
+              {item.section && (
+                <p style={{
+                  fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase',
+                  color: 'var(--fg-muted)', opacity: 0.5,
+                  padding: '16px 8px 6px 8px', userSelect: 'none',
+                }}>
+                  {item.section}
+                </p>
+              )}
 
-                {hasChildren ? (
-                  <button
-                    type="button"
-                    onClick={() => toggleMenu(item.id)}
-                    className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] transition-colors duration-100 hover:bg-black/[0.03] active:scale-[0.98] dark:hover:bg-white/[0.04]"
-                    style={{
-                      fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                      color: isChildActive ? 'var(--admin-accent)' : 'var(--admin-text-muted)',
-                      fontWeight: isChildActive ? 500 : 400,
-                      backgroundColor: isChildActive ? 'var(--admin-accent-bg)' : 'transparent',
-                    }}
+              {hasChildren ? (
+                <motion.button
+                  type="button"
+                  onClick={() => toggleMenu(item.id)}
+                  whileTap={{ scale: 0.98 }}
+                  style={{
+                    display: 'flex', width: '100%', alignItems: 'center', gap: 9,
+                    padding: '7px 10px', borderRadius: 8, border: 'none', cursor: 'pointer', textAlign: 'left',
+                    fontSize: 13, fontWeight: isChildActive ? 500 : 400,
+                    color: isChildActive ? 'var(--accent)' : 'var(--fg-muted)',
+                    backgroundColor: isChildActive ? 'var(--accent-subtle)' : 'transparent',
+                    borderLeft: isChildActive ? '2px solid var(--accent)' : '2px solid transparent',
+                    transition: 'background-color 0.15s ease, color 0.15s ease',
+                  }}
+                >
+                  <span style={{ flexShrink: 0, color: isChildActive ? 'var(--accent)' : 'var(--fg-muted)', opacity: isChildActive ? 1 : 0.55 }}>
+                    {item.icon}
+                  </span>
+                  <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</span>
+                  <motion.span
+                    animate={{ rotate: isOpen ? 90 : 0 }}
+                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ flexShrink: 0, opacity: 0.35 }}
                   >
-                    <span
-                      className="flex-shrink-0"
-                      style={{
-                        color: isChildActive ? 'var(--admin-accent)' : 'var(--admin-text-muted)',
-                        opacity: isChildActive ? 1 : 0.6,
-                      }}
-                    >
-                      {item.icon}
-                    </span>
-                    <span className="flex-1 truncate">{item.label}</span>
-                    <ChevronRightIcon
-                      style={{
-                        flexShrink: 0,
-                        opacity: 0.35,
-                        width: 14,
-                        height: 14,
-                        transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-                        transition: 'transform 220ms cubic-bezier(0.16,1,0.3,1)',
-                      }}
-                    />
-                  </button>
-                ) : (
-                  <Link
-                    href={item.href ?? '#'}
-                    onClick={() => { if (inDrawer) closeDrawer() }}
-                    className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] transition-colors duration-100 hover:bg-black/[0.03] active:scale-[0.98] dark:hover:bg-white/[0.04]"
-                    style={{
-                      fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                      color: isActive ? 'var(--admin-accent)' : 'var(--admin-text-muted)',
-                      fontWeight: isActive ? 500 : 400,
-                      backgroundColor: isActive ? 'var(--admin-accent-bg)' : 'transparent',
-                    }}
-                  >
-                    <span
-                      className="flex-shrink-0"
-                      style={{
-                        color: isActive ? 'var(--admin-accent)' : 'var(--admin-text-muted)',
-                        opacity: isActive ? 1 : 0.6,
-                      }}
-                    >
-                      {item.icon}
-                    </span>
-                    <span className="flex-1 truncate">{item.label}</span>
-                  </Link>
-                )}
+                    <ChevronRightIcon style={{ width: 13, height: 13 }} />
+                  </motion.span>
+                </motion.button>
+              ) : (
+                <Link
+                  href={item.href ?? '#'}
+                  onClick={() => {
+                    if (item.href) onNavLinkClick(item.href)
+                    if (inDrawer) closeDrawer()
+                  }}
+                  style={{
+                    display: 'flex', width: '100%', alignItems: 'center', gap: 9,
+                    padding: '7px 10px', borderRadius: 8, textDecoration: 'none',
+                    fontSize: 13, fontWeight: isActive ? 500 : 400,
+                    color: isActive ? 'var(--accent)' : 'var(--fg-muted)',
+                    backgroundColor: isActive ? 'var(--accent-subtle)' : 'transparent',
+                    borderLeft: isActive ? '2px solid var(--accent)' : '2px solid transparent',
+                    transition: 'background-color 0.15s ease, color 0.15s ease',
+                  }}
+                >
+                  <span style={{ flexShrink: 0, color: isActive ? 'var(--accent)' : 'var(--fg-muted)', opacity: isActive ? 1 : 0.55 }}>
+                    {item.icon}
+                  </span>
+                  <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</span>
+                </Link>
+              )}
 
-                {hasChildren && (
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateRows: isOpen ? '1fr' : '0fr',
-                      marginBottom: isOpen ? '2px' : 0,
-                      transition: 'grid-template-rows 260ms cubic-bezier(0.16,1,0.3,1), margin-bottom 260ms ease',
-                    }}
-                  >
-                    <div style={{ overflow: 'hidden' }}>
-                      <div
-                        className="ml-[24px] space-y-0.5 border-l py-1 pl-3"
-                        style={{ borderColor: 'var(--admin-border)' }}
-                      >
-                        {item.children?.map((child, index) => {
-                          const isChildItemActive = matchesPath(pathname, child.href, child.match)
-                          return (
-                            <Link
-                              key={child.href}
-                              href={child.href}
-                              tabIndex={isOpen ? 0 : -1}
-                              onClick={() => { if (inDrawer) closeDrawer() }}
-                              className="flex w-full items-center gap-2 rounded-md px-2.5 py-[7px] text-left text-[12.5px] hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
-                              style={{
-                                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                                color: isChildItemActive ? 'var(--admin-accent)' : 'var(--admin-text-muted)',
-                                fontWeight: isChildItemActive ? 500 : 400,
-                                backgroundColor: isChildItemActive ? 'var(--admin-accent-bg)' : 'transparent',
-                                opacity: isOpen ? 1 : 0,
-                                transform: isOpen ? 'translateX(0)' : 'translateX(-4px)',
-                                transition: 'background 120ms ease, color 120ms ease, opacity 180ms ease, transform 180ms cubic-bezier(0.16,1,0.3,1)',
-                                transitionDelay: isOpen ? `${index * 30}ms` : '0ms',
-                              }}
-                            >
-                              <span
-                                className="flex-shrink-0 rounded-full"
-                                style={{
-                                  width: isChildItemActive ? 5 : 3.5,
-                                  height: isChildItemActive ? 5 : 3.5,
-                                  backgroundColor: isChildItemActive ? 'var(--admin-accent)' : 'var(--admin-text-muted)',
-                                  opacity: isChildItemActive ? 1 : 0.35,
-                                  transition: 'all 160ms ease',
-                                }}
-                              />
-                              {child.label}
-                            </Link>
-                          )
-                        })}
-                      </div>
+              {/* 서브메뉴 (collapse/expand) */}
+              {hasChildren && (
+                <div style={{
+                  display: 'grid',
+                  gridTemplateRows: isOpen ? '1fr' : '0fr',
+                  marginBottom: isOpen ? 2 : 0,
+                  transition: 'grid-template-rows 240ms cubic-bezier(0.16,1,0.3,1), margin-bottom 240ms ease',
+                }}>
+                  <div style={{ overflow: 'hidden' }}>
+                    <div style={{ marginLeft: 22, borderLeft: '1px solid var(--border)', padding: '4px 0 4px 12px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {item.children?.map((child, idx) => {
+                        const isChildItemActive = matchesPath(pathname, child.href, child.match)
+                        return (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            tabIndex={isOpen ? 0 : -1}
+                            onClick={() => {
+                              onNavLinkClick(child.href)
+                              if (inDrawer) closeDrawer()
+                            }}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: 8,
+                              padding: '6px 10px', borderRadius: 6, textDecoration: 'none',
+                              fontSize: 12.5, fontWeight: isChildItemActive ? 500 : 400,
+                              color: isChildItemActive ? 'var(--accent)' : 'var(--fg-muted)',
+                              backgroundColor: isChildItemActive ? 'var(--accent-subtle)' : 'transparent',
+                              opacity: isOpen ? 1 : 0,
+                              transform: isOpen ? 'translateX(0)' : 'translateX(-4px)',
+                              transition: `background-color 0.12s ease, color 0.12s ease, opacity 0.18s ease ${idx * 25}ms, transform 0.18s cubic-bezier(0.16,1,0.3,1) ${idx * 25}ms`,
+                            }}
+                          >
+                            <span style={{
+                              width: isChildItemActive ? 5 : 3.5, height: isChildItemActive ? 5 : 3.5,
+                              borderRadius: '50%', flexShrink: 0,
+                              backgroundColor: isChildItemActive ? 'var(--accent)' : 'var(--fg-muted)',
+                              opacity: isChildItemActive ? 1 : 0.35,
+                              transition: 'all 0.16s ease',
+                            }} />
+                            {child.label}
+                          </Link>
+                        )
+                      })}
                     </div>
                   </div>
-                )}
-              </div>
-            )
-          })}
-        </nav>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </nav>
 
-        {/* 로그아웃 */}
-        <div
-          className="flex-shrink-0 border-t px-2 py-2"
-          style={{ borderColor: 'var(--admin-border)', paddingBottom: inDrawer ? 'max(8px, env(safe-area-inset-bottom))' : undefined }}
-        >
+      {/* 하단 영역: 다크모드 + 로그아웃 */}
+      <div style={{ flexShrink: 0, borderTop: '1px solid var(--border)', padding: '8px', paddingBottom: inDrawer ? 'max(8px, env(safe-area-inset-bottom))' : 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 8px' }}>
+          <ThemeToggle />
           <LogoutButton
-            className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] transition-colors hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
-            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 8, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--fg-muted)', transition: 'background-color 0.15s ease' }}
           >
             <LogOutIcon style={{ opacity: 0.5, flexShrink: 0, width: 15, height: 15 }} />
             로그아웃
           </LogoutButton>
         </div>
-      </>
-    )
-  }
+      </div>
+    </div>
+  )
+}
+
+// ─── DashboardShell ───────────────────────────────────────────────────────────
+
+export default function DashboardShell({ roleLabel, navItems, children }: Props) {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const searchQuery = searchParams.toString()
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(() =>
+    getInitialOpenMenus(pathname, navItems),
+  )
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [isNavigating, setIsNavigating] = useState(false)
+  const locationKey = searchQuery ? `${pathname}?${searchQuery}` : pathname
+  const prevLocationKey = useRef(locationKey)
+  const navigationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const activeLabel = getActiveLabel(pathname, navItems)
+
+  const stopNavigating = useCallback(() => {
+    if (navigationTimeoutRef.current !== null) {
+      clearTimeout(navigationTimeoutRef.current)
+      navigationTimeoutRef.current = null
+    }
+    setIsNavigating(false)
+  }, [])
+
+  const startNavigating = useCallback(() => {
+    if (navigationTimeoutRef.current !== null) {
+      clearTimeout(navigationTimeoutRef.current)
+    }
+    setIsNavigating(true)
+    navigationTimeoutRef.current = setTimeout(() => {
+      navigationTimeoutRef.current = null
+      setIsNavigating(false)
+    }, 10000)
+  }, [])
+
+  // 실제 URL 반영 시점에 progress bar 종료
+  useEffect(() => {
+    if (prevLocationKey.current !== locationKey) {
+      prevLocationKey.current = locationKey
+      const frameId = window.requestAnimationFrame(stopNavigating)
+      return () => window.cancelAnimationFrame(frameId)
+    }
+  }, [locationKey, stopNavigating])
+
+  // 쿼리스트링 기반 이동은 공통 이벤트에서 시작
+  useEffect(() => {
+    const handleNavigationStart = () => startNavigating()
+    window.addEventListener(DASHBOARD_NAVIGATION_START_EVENT, handleNavigationStart)
+    return () => {
+      window.removeEventListener(DASHBOARD_NAVIGATION_START_EVENT, handleNavigationStart)
+    }
+  }, [startNavigating])
+
+  useEffect(() => {
+    return () => {
+      if (navigationTimeoutRef.current !== null) {
+        clearTimeout(navigationTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  const closeDrawer = useCallback(() => setDrawerOpen(false), [])
+  const openDrawer = useCallback(() => setDrawerOpen(true), [])
+  const toggleMenu = useCallback((id: string) => {
+    setOpenMenus((prev) => ({ ...prev, [id]: !prev[id] }))
+  }, [])
+  const handleNavLinkClick = useCallback((href: string) => {
+    const isSamePath = pathname === href
+    const hasQuery = searchQuery.length > 0
+
+    if (!isSamePath || hasQuery) {
+      startNavigating()
+    }
+  }, [pathname, searchQuery, startNavigating])
+
+  // Escape 키 + body scroll lock
+  useEffect(() => {
+    if (!drawerOpen) return
+    document.body.style.overflow = 'hidden'
+    const handle = (e: KeyboardEvent) => { if (e.key === 'Escape') closeDrawer() }
+    window.addEventListener('keydown', handle)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', handle)
+    }
+  }, [drawerOpen, closeDrawer])
+
+  const navProps = { roleLabel, navItems, pathname, openMenus, toggleMenu, onNavLinkClick: handleNavLinkClick, closeDrawer }
 
   return (
-    <div className="flex h-dvh overflow-hidden" style={{ backgroundColor: 'var(--admin-bg)' }}>
-      {/* 데스크톱 사이드바 */}
+    <div style={{ display: 'flex', height: '100dvh', overflow: 'hidden', backgroundColor: 'var(--bg)' }}>
+      {/* TopProgressBar */}
+      <TopProgressBar active={isNavigating} />
+
+      {/* PC 사이드바 (≥1024px) */}
       <aside
-        className="hidden flex-shrink-0 flex-col md:flex"
+        className="hidden lg:flex"
         style={{
           width: 'var(--sidebar-width)',
-          borderRight: '1px solid var(--admin-border)',
-          backgroundColor: 'var(--admin-sidebar-bg)',
+          flexShrink: 0,
+          flexDirection: 'column',
+          borderRight: '1px solid var(--border)',
+          backgroundColor: 'var(--bg-subtle)',
+          height: '100vh',
         }}
       >
-        <NavSidebar inDrawer={false} />
+        <NavSidebar {...navProps} inDrawer={false} />
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        {/* 헤더 */}
+      {/* 우측 영역 */}
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+        {/* PC 헤더 */}
         <header
-          className="sticky top-0 z-20 flex flex-shrink-0 items-center justify-between border-b px-4"
+          className="hidden lg:flex"
           style={{
             height: 'var(--header-height)',
+            flexShrink: 0,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 24px',
+            borderBottom: '1px solid var(--border)',
             backgroundColor: 'var(--admin-header-bg)',
-            borderColor: 'var(--admin-border)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
+            position: 'sticky',
+            top: 0,
+            zIndex: 20,
+          }}
+        >
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--fg)', letterSpacing: '-0.02em' }}>
+            {activeLabel}
+          </h1>
+        </header>
+
+        {/* 모바일 헤더 (<1024px) */}
+        <header
+          className="flex lg:hidden"
+          style={{
+            height: 'var(--header-height)',
+            flexShrink: 0,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 16px',
+            borderBottom: '1px solid var(--border)',
+            backgroundColor: 'var(--admin-header-bg)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            position: 'sticky',
+            top: 0,
+            zIndex: 20,
           }}
         >
           <button
             type="button"
-            aria-label={drawerVisible ? '메뉴 닫기' : '메뉴 열기'}
-            aria-expanded={drawerVisible}
+            aria-label={drawerOpen ? '메뉴 닫기' : '메뉴 열기'}
+            aria-expanded={drawerOpen}
             aria-controls="mobile-drawer"
-            onClick={drawerVisible ? closeDrawer : openDrawer}
-            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md transition-colors hover:bg-black/[0.05] md:hidden dark:hover:bg-white/[0.06]"
-            style={{ color: 'var(--admin-text)' }}
+            onClick={drawerOpen ? closeDrawer : openDrawer}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 36, height: 36, borderRadius: 8, border: 'none', background: 'none',
+              cursor: 'pointer', color: 'var(--fg)',
+            }}
           >
-            <HamburgerIcon open={drawerVisible} />
+            <HamburgerIcon open={drawerOpen} />
           </button>
 
-          <div className="pointer-events-none absolute left-1/2 flex -translate-x-1/2 select-none items-center gap-1.5 md:hidden">
-            <Image src="/gbsw-logo.png" alt="" width={16} height={16} aria-hidden="true" style={{ opacity: 0.55 }} />
-            <span className="text-[13px] font-semibold" style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--admin-text)' }}>
-              GBSW
-            </span>
-          </div>
-
-          <span
-            className="hidden truncate text-[13px] font-medium md:block"
-            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}
-          >
-            {activeLabel}
+          {/* 중앙 타이틀 */}
+          <span style={{
+            position: 'absolute', left: '50%', transform: 'translateX(-50%)',
+            fontSize: 14, fontWeight: 600, color: 'var(--fg)',
+            maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            pointerEvents: 'none', userSelect: 'none',
+          }}>
+            {activeLabel || 'GBSW Platform'}
           </span>
 
           <ThemeToggle />
         </header>
 
-        {/* 모바일 드로어 */}
-        {drawerOpen && (
-          <div className="md:hidden">
-            <div
-              aria-hidden="true"
-              onClick={closeDrawer}
-              style={{
-                position: 'fixed',
-                top: 48,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                zIndex: 30,
-                backgroundColor: 'rgba(0,0,0,0.4)',
-                opacity: drawerVisible ? 1 : 0,
-                transition: 'opacity 280ms ease',
-              }}
-            />
-            <aside
-              id="mobile-drawer"
-              role="navigation"
-              aria-label="모바일 메뉴"
-              className="flex flex-col"
-              style={{
-                position: 'fixed',
-                top: 48,
-                left: 0,
-                height: 'calc(100% - 48px)',
-                width: 'min(280px, 85vw)',
-                zIndex: 40,
-                backgroundColor: 'var(--admin-sidebar-bg)',
-                borderRight: '1px solid var(--admin-border)',
-                willChange: 'transform',
-                transform: drawerVisible ? 'translateX(0)' : 'translateX(-100%)',
-                transition: drawerVisible
-                  ? 'transform 280ms cubic-bezier(0.32,0.72,0,1)'
-                  : 'transform 220ms ease-in',
-              }}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-            >
-              <NavSidebar inDrawer={true} />
-            </aside>
-          </div>
-        )}
+        {/* 모바일 드로어 + 오버레이 */}
+        <AnimatePresence>
+          {drawerOpen && (
+            <>
+              {/* 오버레이 */}
+              <motion.div
+                key="overlay"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                onClick={closeDrawer}
+                aria-hidden="true"
+                style={{
+                  position: 'fixed', inset: 0,
+                  top: 'var(--header-height)',
+                  zIndex: 30,
+                  backgroundColor: 'rgba(0,0,0,0.4)',
+                  backdropFilter: 'blur(2px)',
+                }}
+              />
+
+              {/* 드로어 패널 */}
+              <motion.aside
+                key="drawer"
+                id="mobile-drawer"
+                role="navigation"
+                aria-label="모바일 메뉴"
+                initial={{ x: -280 }}
+                animate={{ x: 0 }}
+                exit={{ x: -280 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                drag="x"
+                dragConstraints={{ left: -280, right: 0 }}
+                dragElastic={0.1}
+                onDragEnd={(_, info) => {
+                  if (info.offset.x < -60) closeDrawer()
+                }}
+                style={{
+                  position: 'fixed',
+                  top: 'var(--header-height)',
+                  left: 0,
+                  height: 'calc(100% - var(--header-height))',
+                  width: 'min(280px, 85vw)',
+                  zIndex: 40,
+                  backgroundColor: 'var(--bg-subtle)',
+                  borderRight: '1px solid var(--border)',
+                  boxShadow: '4px 0 24px rgba(0,0,0,0.08)',
+                  touchAction: 'pan-y',
+                }}
+              >
+                <NavSidebar {...navProps} inDrawer={true} />
+              </motion.aside>
+            </>
+          )}
+        </AnimatePresence>
 
         {/* 메인 콘텐츠 */}
-        <main className="flex min-h-0 flex-1 flex-col overflow-hidden px-5 pt-4 md:px-7 md:pt-6">
-          {activeLabel && (
-            <h1
-              key={activeLabel}
-              className="mb-4 flex-shrink-0 animate-fade-in text-[13px] font-semibold md:hidden"
-              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text)' }}
-            >
-              {activeLabel}
-            </h1>
-          )}
-          <div className="min-h-0 flex-1 overflow-hidden pb-5 md:pb-7">
+        <main className="flex flex-col flex-1 min-h-0 overflow-hidden">
+          <div
+            className="flex-1 min-h-0 overflow-auto px-4 py-4 pb-6 lg:px-6 lg:py-6"
+            style={{ maxWidth: 1280, width: '100%', margin: '0 auto' }}
+          >
             {children}
           </div>
         </main>

@@ -13,7 +13,7 @@ type HistoryFilters = {
 
 function activeInputStyle(active: boolean) {
   return active
-    ? { ...inputStyle, borderColor: 'var(--admin-accent)' }
+    ? { ...inputStyle, borderColor: 'var(--accent)' }
     : inputStyle
 }
 
@@ -42,7 +42,7 @@ export default function HistoryFilters({
             strokeLinecap="round"
             strokeLinejoin="round"
             aria-hidden="true"
-            style={{ color: 'var(--admin-text-muted)' }}
+            style={{ color: 'var(--fg-muted)' }}
           >
             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
           </svg>
@@ -50,7 +50,7 @@ export default function HistoryFilters({
             className="text-xs font-semibold"
             style={{
               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              color: 'var(--admin-text-muted)',
+              color: 'var(--fg-muted)',
             }}
           >
             필터
@@ -58,13 +58,13 @@ export default function HistoryFilters({
         </div>
         <div
           className="h-4 w-px flex-shrink-0"
-          style={{ backgroundColor: 'var(--admin-border)' }}
+          style={{ backgroundColor: 'var(--border)' }}
         />
 
         <select
           value={filters.school}
           onChange={(event) => onChange('school', event.target.value)}
-          className="h-8 rounded-md border pl-2.5 pr-6 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+          className="h-8 rounded-md border pl-2.5 pr-6 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
           style={activeInputStyle(!!filters.school)}
         >
           <option value="">전체 학교</option>
@@ -78,7 +78,7 @@ export default function HistoryFilters({
         <select
           value={filters.type}
           onChange={(event) => onChange('type', event.target.value)}
-          className="h-8 rounded-md border pl-2.5 pr-6 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+          className="h-8 rounded-md border pl-2.5 pr-6 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
           style={activeInputStyle(!!filters.type)}
         >
           <option value="">전체 구분</option>
@@ -89,7 +89,7 @@ export default function HistoryFilters({
         <select
           value={filters.year}
           onChange={(event) => onChange('year', event.target.value)}
-          className="h-8 rounded-md border pl-2.5 pr-6 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+          className="h-8 rounded-md border pl-2.5 pr-6 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
           style={activeInputStyle(!!filters.year)}
         >
           <option value="">전체 학년</option>
@@ -108,7 +108,7 @@ export default function HistoryFilters({
             onChange={(event) => onChange('startDate', event.target.value)}
             className="bg-transparent py-1.5 text-xs outline-none"
             style={{
-              color: 'var(--admin-text)',
+              color: 'var(--fg)',
               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
               minWidth: 0,
               width: '112px',
@@ -116,7 +116,7 @@ export default function HistoryFilters({
           />
           <span
             style={{
-              color: 'var(--admin-text-muted)',
+              color: 'var(--fg-muted)',
               fontSize: '0.7rem',
               flexShrink: 0,
             }}
@@ -129,7 +129,7 @@ export default function HistoryFilters({
             onChange={(event) => onChange('endDate', event.target.value)}
             className="bg-transparent py-1.5 text-xs outline-none"
             style={{
-              color: 'var(--admin-text)',
+              color: 'var(--fg)',
               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
               minWidth: 0,
               width: '112px',
@@ -142,7 +142,7 @@ export default function HistoryFilters({
           value={filters.studentName}
           onChange={(event) => onChange('studentName', event.target.value)}
           placeholder="학생 이름"
-          className="h-8 rounded-md border px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+          className="h-8 rounded-md border px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
           style={{ ...activeInputStyle(!!filters.studentName), width: '100px' }}
         />
 
@@ -152,8 +152,8 @@ export default function HistoryFilters({
             onClick={onReset}
             className="ml-auto rounded-md border px-2 py-1 text-[11px] font-medium transition-opacity hover:opacity-70"
             style={{
-              borderColor: 'var(--admin-accent)',
-              color: 'var(--admin-accent)',
+              borderColor: 'var(--accent)',
+              color: 'var(--accent)',
               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
             }}
           >

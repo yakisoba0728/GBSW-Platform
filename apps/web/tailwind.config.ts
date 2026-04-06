@@ -9,14 +9,16 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          navy: '#1a1830',
-          ink: '#0e0e18',
-          panel: '#13121f',
-          accent: '#4338ca',
-          'accent-dark': '#818cf8',
-          muted: '#6b7280',
-          offwhite: '#f4f3ef',
-          'offwhite-dark': '#eceae4',
+          bg: '#ffffff',
+          'bg-subtle': '#f5f5f5',
+          'bg-muted': '#ebebeb',
+          border: '#e0e0e0',
+          fg: '#111111',
+          'fg-muted': '#666666',
+          accent: '#1a56db',
+          'accent-subtle': '#eff6ff',
+          reward: '#16a34a',
+          penalty: '#dc2626',
         },
       },
       fontFamily: {
@@ -24,29 +26,31 @@ const config: Config = {
         mono: ['JetBrains Mono', 'monospace'],
       },
       animation: {
-        'fade-in-up': 'fadeInUp 0.5s ease forwards',
-        float: 'float 6s ease-in-out infinite',
-        'float-slow': 'float 9s ease-in-out infinite',
-        'float-fast': 'float 4s ease-in-out infinite',
+        'page-enter': 'pageEnter 0.25s ease forwards',
         shimmer: 'shimmer 2.5s linear infinite',
-        'spin-slow': 'spin 12s linear infinite',
+        'shimmer-slide': 'shimmerSlide 1.6s ease-in-out infinite',
       },
       keyframes: {
-        fadeInUp: {
-          '0%': { opacity: '0', transform: 'translateY(14px)' },
+        pageEnter: {
+          '0%': { opacity: '0', transform: 'translateY(12px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-10px)' },
         },
         shimmer: {
           '0%': { backgroundPosition: '-200% center' },
           '100%': { backgroundPosition: '200% center' },
         },
+        shimmerSlide: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
       },
       transitionDuration: {
+        '220': '220ms',
+        '250': '250ms',
         '400': '400ms',
+      },
+      borderRadius: {
+        'card': '12px',
       },
     },
   },

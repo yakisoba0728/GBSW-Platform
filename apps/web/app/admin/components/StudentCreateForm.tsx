@@ -10,6 +10,7 @@ import {
   IdPreview,
   InfoBox,
   inputBase,
+  inputBaseStyle,
   PasswordRuleBox,
   type Notice,
   type StudentFormState,
@@ -200,7 +201,7 @@ export default function StudentCreateForm() {
           className="text-base font-semibold"
           style={{
             fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            color: 'var(--admin-text)',
+            color: 'var(--fg)',
           }}
         >
           학생 계정 생성
@@ -209,7 +210,7 @@ export default function StudentCreateForm() {
           className="mt-1 text-xs leading-relaxed"
           style={{
             fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            color: 'var(--admin-text-muted)',
+            color: 'var(--fg-muted)',
           }}
         >
           학생 아이디 생성 정보로 아이디를 만들고, 현재 년도/반/번호와
@@ -221,9 +222,9 @@ export default function StudentCreateForm() {
       <form onSubmit={handleSubmit}>
         <div
           className="overflow-hidden rounded-2xl border"
-          style={{ borderColor: 'var(--admin-border)' }}
+          style={{ borderColor: 'var(--border)' }}
         >
-          <div className="px-6 py-5" style={{ backgroundColor: 'var(--admin-bg)' }}>
+          <div className="px-6 py-5" style={{ backgroundColor: 'var(--bg)' }}>
             <SectionLabel>학생 정보</SectionLabel>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldBlock label="이름" htmlFor="s-name">
@@ -236,7 +237,7 @@ export default function StudentCreateForm() {
                   onChange={setStudentField('name')}
                   disabled={isSubmitting}
                   className={inputBase}
-                  style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
+                  style={{ ...inputBaseStyle, fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
                 />
               </FieldBlock>
               <FieldBlock label="전화번호" htmlFor="s-phone">
@@ -251,7 +252,7 @@ export default function StudentCreateForm() {
                   onChange={setStudentField('phone')}
                   disabled={isSubmitting}
                   className={inputBase}
-                  style={{ fontFamily: 'var(--font-space-grotesk)' }}
+                  style={{ ...inputBaseStyle, fontFamily: 'var(--font-space-grotesk)' }}
                 />
               </FieldBlock>
             </div>
@@ -259,7 +260,7 @@ export default function StudentCreateForm() {
 
           <Divider />
 
-          <div className="px-6 py-5" style={{ backgroundColor: 'var(--admin-bg)' }}>
+          <div className="px-6 py-5" style={{ backgroundColor: 'var(--bg)' }}>
             <SectionLabel>아이디 생성 정보</SectionLabel>
 
             <div className="mb-4">
@@ -267,7 +268,7 @@ export default function StudentCreateForm() {
                 className="mb-1.5 block text-xs font-medium"
                 style={{
                   fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                  color: 'var(--admin-text-muted)',
+                  color: 'var(--fg-muted)',
                 }}
               >
                 학교
@@ -275,8 +276,8 @@ export default function StudentCreateForm() {
               <div
                 className="inline-flex rounded-lg border p-0.5"
                 style={{
-                  backgroundColor: 'var(--admin-sidebar-bg)',
-                  borderColor: 'var(--admin-border)',
+                  backgroundColor: 'var(--bg-subtle)',
+                  borderColor: 'var(--border)',
                 }}
               >
                 {SCHOOLS.map((school) => {
@@ -291,10 +292,10 @@ export default function StudentCreateForm() {
                       className="flex flex-col items-start rounded-md px-4 py-2 transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-60"
                       style={{
                         backgroundColor: isActive
-                          ? 'var(--admin-accent-bg)'
+                          ? 'var(--accent-subtle)'
                           : 'transparent',
                         border: isActive
-                          ? '1px solid var(--admin-accent)'
+                          ? '1px solid var(--accent)'
                           : '1px solid transparent',
                       }}
                     >
@@ -303,8 +304,8 @@ export default function StudentCreateForm() {
                         style={{
                           fontFamily: 'var(--font-space-grotesk)',
                           color: isActive
-                            ? 'var(--admin-accent)'
-                            : 'var(--admin-text-muted)',
+                            ? 'var(--accent)'
+                            : 'var(--fg-muted)',
                         }}
                       >
                         {school.label}
@@ -314,8 +315,8 @@ export default function StudentCreateForm() {
                         style={{
                           fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                           color: isActive
-                            ? 'var(--admin-accent)'
-                            : 'var(--admin-text-muted)',
+                            ? 'var(--accent)'
+                            : 'var(--fg-muted)',
                           opacity: 0.75,
                         }}
                       >
@@ -339,7 +340,7 @@ export default function StudentCreateForm() {
                   onChange={setStudentField('admissionYear')}
                   disabled={isSubmitting}
                   className={inputBase}
-                  style={{ fontFamily: 'var(--font-space-grotesk)' }}
+                  style={{ ...inputBaseStyle, fontFamily: 'var(--font-space-grotesk)' }}
                 />
               </FieldBlock>
               <FieldBlock label="아이디용 반" htmlFor="s-admission-class">
@@ -353,7 +354,7 @@ export default function StudentCreateForm() {
                   onChange={setStudentField('admissionClassNumber')}
                   disabled={isSubmitting}
                   className={inputBase}
-                  style={{ fontFamily: 'var(--font-space-grotesk)' }}
+                  style={{ ...inputBaseStyle, fontFamily: 'var(--font-space-grotesk)' }}
                 />
               </FieldBlock>
               <FieldBlock label="아이디용 번호" htmlFor="s-admission-number">
@@ -367,7 +368,7 @@ export default function StudentCreateForm() {
                   onChange={setStudentField('admissionStudentNumber')}
                   disabled={isSubmitting}
                   className={inputBase}
-                  style={{ fontFamily: 'var(--font-space-grotesk)' }}
+                  style={{ ...inputBaseStyle, fontFamily: 'var(--font-space-grotesk)' }}
                 />
               </FieldBlock>
             </div>
@@ -377,14 +378,14 @@ export default function StudentCreateForm() {
 
           <Divider />
 
-          <div className="px-6 py-5" style={{ backgroundColor: 'var(--admin-bg)' }}>
+          <div className="px-6 py-5" style={{ backgroundColor: 'var(--bg)' }}>
             <SectionLabel>현재 정보</SectionLabel>
 
             <label
               className="mb-4 inline-flex cursor-pointer items-center gap-2"
               style={{
                 fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                color: 'var(--admin-text)',
+                color: 'var(--fg)',
               }}
             >
               <input
@@ -454,7 +455,7 @@ export default function StudentCreateForm() {
                 className="mb-1.5 block text-xs font-medium"
                 style={{
                   fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                  color: 'var(--admin-text-muted)',
+                  color: 'var(--fg-muted)',
                 }}
               >
                 전공과목
@@ -465,7 +466,7 @@ export default function StudentCreateForm() {
                 onChange={setStudentField('majorSubject')}
                 disabled={isSubmitting}
                 className={inputBase}
-                style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
+                style={{ ...inputBaseStyle, fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
               >
                 <option value="">전공과목을 선택하세요</option>
                 {majorSubjectOptions.map((subject) => (
@@ -478,7 +479,7 @@ export default function StudentCreateForm() {
                 className="mt-1 text-xs"
                 style={{
                   fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                  color: 'var(--admin-text-muted)',
+                  color: 'var(--fg-muted)',
                 }}
               >
                 기존 학생 데이터에서 중복 제거한 전공과목만 선택지에
@@ -494,7 +495,7 @@ export default function StudentCreateForm() {
                 onChange={(event) => setMajorSubjectDraft(event.target.value)}
                 disabled={isSubmitting}
                 className={inputBase}
-                style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
+                style={{ ...inputBaseStyle, fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
               />
               <button
                 type="button"
@@ -503,9 +504,9 @@ export default function StudentCreateForm() {
                 className="rounded-xl border px-4 py-2.5 text-sm transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60"
                 style={{
                   fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                  color: 'var(--admin-text)',
-                  borderColor: 'var(--admin-border)',
-                  backgroundColor: 'var(--admin-sidebar-bg)',
+                  color: 'var(--fg)',
+                  borderColor: 'var(--border)',
+                  backgroundColor: 'var(--bg-subtle)',
                 }}
               >
                 추가하기
@@ -515,7 +516,7 @@ export default function StudentCreateForm() {
 
           <Divider />
 
-          <div className="px-6 py-5" style={{ backgroundColor: 'var(--admin-bg)' }}>
+          <div className="px-6 py-5" style={{ backgroundColor: 'var(--bg)' }}>
             <SectionLabel>초기 비밀번호</SectionLabel>
             <PasswordRuleBox>
               학생 임시 비밀번호는 생성된 아이디와 전화번호 뒤 4자리로

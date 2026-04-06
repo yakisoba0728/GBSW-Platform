@@ -34,7 +34,7 @@ function BarChartIcon() {
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
-      style={{ color: 'var(--admin-accent)' }}
+      style={{ color: 'var(--accent)' }}
       aria-hidden="true"
     >
       <line x1="18" y1="20" x2="18" y2="10" />
@@ -61,7 +61,7 @@ function CategoryBarRow({
   mounted: boolean
 }) {
   const pct = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0
-  const barColor = type === 'reward' ? '#16a34a' : '#dc2626'
+  const barColor = type === 'reward' ? 'var(--reward)' : 'var(--penalty)'
 
   return (
     <div className="flex items-center gap-3 py-1.5">
@@ -69,14 +69,14 @@ function CategoryBarRow({
         className="w-[100px] flex-shrink-0 truncate text-xs"
         style={{
           fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-          color: 'var(--admin-text)',
+          color: 'var(--fg)',
         }}
       >
         {label}
       </span>
       <div
         className="h-2 flex-1 overflow-hidden rounded-full"
-        style={{ backgroundColor: 'var(--admin-border)' }}
+        style={{ backgroundColor: 'var(--border)' }}
       >
         <div
           className="h-full rounded-full"
@@ -91,7 +91,7 @@ function CategoryBarRow({
         className="flex w-[80px] flex-shrink-0 justify-end gap-2 text-[11px]"
         style={{ fontFamily: 'var(--font-space-grotesk)' }}
       >
-        <span style={{ color: 'var(--admin-text-muted)' }}>{count}건</span>
+        <span style={{ color: 'var(--fg-muted)' }}>{count}건</span>
         <span style={{ color: barColor }}>
           {type === 'reward' ? '+' : '-'}
           {totalScore}점
@@ -231,7 +231,7 @@ export default function SchoolMileageStats() {
               onChange={(event) =>
                 updateSearchParams({ school: event.target.value, page: null })
               }
-              className="rounded-lg border px-3 py-2 text-xs outline-none"
+              className="h-8 rounded-lg border bg-transparent px-2.5 text-xs outline-none"
               style={inputStyle}
             >
               <option value="">전체 학교</option>
@@ -245,7 +245,7 @@ export default function SchoolMileageStats() {
             <select
               value={filterYear}
               onChange={(event) => updateSearchParams({ year: event.target.value })}
-              className="rounded-lg border px-3 py-2 text-xs outline-none"
+              className="h-8 rounded-lg border bg-transparent px-2.5 text-xs outline-none"
               style={inputStyle}
             >
               <option value="">전체 학년</option>
@@ -260,10 +260,10 @@ export default function SchoolMileageStats() {
               onChange={(event) =>
                 updateSearchParams({ startDate: event.target.value })
               }
-              className="rounded-lg border px-3 py-2 text-xs outline-none"
+              className="h-8 rounded-lg border px-2.5 text-xs outline-none"
               style={inputStyle}
             />
-            <span className="text-xs" style={{ color: 'var(--admin-text-muted)' }}>
+            <span className="text-xs" style={{ color: 'var(--fg-muted)' }}>
               ~
             </span>
             <input
@@ -272,7 +272,7 @@ export default function SchoolMileageStats() {
               onChange={(event) =>
                 updateSearchParams({ endDate: event.target.value })
               }
-              className="rounded-lg border px-3 py-2 text-xs outline-none"
+              className="h-8 rounded-lg border px-2.5 text-xs outline-none"
               style={inputStyle}
             />
 
@@ -282,10 +282,10 @@ export default function SchoolMileageStats() {
                 void loadStats()
               }}
               disabled={isLoading}
-              className="rounded-lg px-4 py-2 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+              className="h-8 rounded-lg px-3 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
               style={{
                 fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                backgroundColor: 'var(--admin-accent)',
+                backgroundColor: 'var(--accent)',
                 color: '#fff',
               }}
             >
@@ -436,7 +436,7 @@ export default function SchoolMileageStats() {
                         className="min-w-0 flex-1 truncate text-sm"
                         style={{
                           fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                          color: 'var(--admin-text)',
+                          color: 'var(--fg)',
                         }}
                       >
                         {rule.ruleName}
@@ -445,7 +445,7 @@ export default function SchoolMileageStats() {
                         className="flex-shrink-0 text-xs font-semibold"
                         style={{
                           fontFamily: 'var(--font-space-grotesk)',
-                          color: rule.type === 'reward' ? '#16a34a' : '#dc2626',
+                          color: rule.type === 'reward' ? 'var(--reward)' : 'var(--penalty)',
                         }}
                       >
                         {rule.count}건 · {rule.type === 'reward' ? '+' : '-'}

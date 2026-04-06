@@ -4,11 +4,92 @@ import { useState } from 'react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
+import { AnimatePresence, motion } from 'framer-motion'
 
 const ThemeToggle = dynamic(() => import('./ThemeToggle'), {
   ssr: false,
-  loading: () => <div className="w-9 h-9 rounded-lg" aria-hidden="true" />,
+  loading: () => <div style={{ width: 32, height: 32 }} aria-hidden="true" />,
 })
+
+// ─── 인라인 InputField (로그인 폼 전용, 아이콘 포함) ─────────────────────────
+
+function InputField({
+  id,
+  label,
+  type,
+  placeholder,
+  value,
+  onChange,
+  disabled,
+  autoComplete,
+  icon,
+  rightAction,
+  delay,
+}: {
+  id: string
+  label: string
+  type: string
+  placeholder: string
+  value: string
+  onChange: (v: string) => void
+  disabled: boolean
+  autoComplete: string
+  icon: React.ReactNode
+  rightAction?: React.ReactNode
+  delay: number
+}) {
+  const [focused, setFocused] = useState(false)
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay, ease: 'easeOut' }}
+    >
+      <label htmlFor={id} style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--fg)', marginBottom: 6 }}>
+        {label}
+      </label>
+      <div style={{ position: 'relative' }}>
+        <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--fg-muted)', opacity: 0.6, pointerEvents: 'none', display: 'flex' }}>
+          {icon}
+        </span>
+        <input
+          id={id}
+          type={type}
+          autoComplete={autoComplete}
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          disabled={disabled}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          style={{
+            width: '100%',
+            height: 40,
+            paddingLeft: 38,
+            paddingRight: rightAction ? 42 : 12,
+            fontSize: 14,
+            color: 'var(--fg)',
+            backgroundColor: 'var(--bg)',
+            border: `1px solid ${focused ? 'var(--accent)' : 'var(--border)'}`,
+            borderRadius: 8,
+            outline: 'none',
+            boxShadow: focused ? '0 0 0 3px var(--accent-subtle)' : 'none',
+            transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+            opacity: disabled ? 0.6 : 1,
+          }}
+        />
+        {rightAction && (
+          <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', display: 'flex' }}>
+            {rightAction}
+          </span>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
+// ─── LoginForm ────────────────────────────────────────────────────────────────
 
 export default function LoginForm() {
   const router = useRouter()
@@ -26,13 +107,8 @@ export default function LoginForm() {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id,
-          password: pw,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, password: pw }),
       })
 
       const payload = await response.json().catch(() => null)
@@ -57,133 +133,82 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-brand-offwhite dark:bg-brand-ink transition-colors duration-300 min-h-screen">
-
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-8 pt-8 md:px-12">
-        {/* Mobile: logo */}
-        <div className="flex md:hidden items-center gap-2">
-          <Image src="/gbsw-logo.png" alt="GBSW" width={26} height={26} />
-          <span
-            className="text-brand-navy dark:text-[#e2e1f0] font-semibold text-sm"
-            style={{ fontFamily: 'var(--font-space-grotesk)' }}
-          >
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg)', minHeight: '100svh', transition: 'background-color 0.3s' }}>
+      {/* 상단 바 */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 32px' }}>
+        {/* 모바일: 로고 */}
+        <div className="flex lg:hidden" style={{ alignItems: 'center', gap: 8 }}>
+          <Image src="/gbsw-logo.png" alt="GBSW" width={22} height={22} style={{ opacity: 0.6 }} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)' }}>
             GBSW Platform
           </span>
         </div>
-        <div className="hidden md:block" />
+        <div className="hidden lg:block" />
         <ThemeToggle />
       </div>
 
-      {/* Form area */}
-      <div className="flex-1 flex items-center justify-center px-8 py-12 md:px-16">
-        <div className="w-full max-w-[360px]">
-
-          {/* Heading */}
-          <div
-            className="mb-9 opacity-init-0 animate-fade-in-up anim-delay-0"
-            style={{ animationFillMode: 'forwards' }}
+      {/* 폼 영역 */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 32px 40px' }}>
+        <div style={{ width: '100%', maxWidth: 360 }}>
+          {/* 헤딩 */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            style={{ marginBottom: 32 }}
           >
-            <h2
-              className="text-[1.65rem] font-bold text-brand-navy dark:text-[#e2e1f0] leading-tight"
-              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-            >
+            <h2 style={{ fontSize: 26, fontWeight: 700, color: 'var(--fg)', lineHeight: 1.2, letterSpacing: '-0.02em' }}>
               다시 돌아오셨군요
             </h2>
-            <p
-              className="mt-1.5 text-sm text-brand-muted"
-              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-            >
+            <p style={{ marginTop: 8, fontSize: 14, color: 'var(--fg-muted)' }}>
               아이디와 비밀번호를 입력해 로그인하세요.
             </p>
-          </div>
+          </motion.div>
 
-          {/* Form */}
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* 폼 */}
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* 아이디 */}
+            <InputField
+              id="login-id"
+              label="아이디"
+              type="text"
+              placeholder="아이디를 입력하세요"
+              value={id}
+              onChange={setId}
+              disabled={isSubmitting}
+              autoComplete="username"
+              delay={0.05}
+              icon={
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              }
+            />
 
-            {/* ID field */}
-            <div
-              className="opacity-init-0 animate-fade-in-up anim-delay-80"
-              style={{ animationFillMode: 'forwards' }}
-            >
-              <label
-                htmlFor="login-id"
-                className="block text-xs font-semibold text-brand-navy dark:text-white/60 mb-1.5"
-                style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-              >
-                아이디
-              </label>
-              <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-white/25 pointer-events-none flex items-center" aria-hidden="true">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                  </svg>
-                </span>
-                <input
-                  id="login-id"
-                  type="text"
-                  autoComplete="username"
-                  placeholder="아이디를 입력하세요"
-                  value={id}
-                  onChange={(e) => setId(e.target.value)}
-                  disabled={isSubmitting}
-                  style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-                  className="w-full pl-9 pr-4 py-2.5 rounded-md text-sm outline-none transition-all duration-200
-                    bg-white dark:bg-white/[0.06]
-                    border border-gray-200 dark:border-white/10
-                    text-brand-navy dark:text-[#e2e1f0]
-                    placeholder:text-gray-400 dark:placeholder:text-white/20
-                    focus:border-brand-accent dark:focus:border-brand-accent-dark
-                    focus:ring-2 focus:ring-brand-accent/15 dark:focus:ring-brand-accent-dark/15"
-                />
-              </div>
-            </div>
-
-            {/* Password field */}
-            <div
-              className="opacity-init-0 animate-fade-in-up anim-delay-160"
-              style={{ animationFillMode: 'forwards' }}
-            >
-              <label
-                htmlFor="login-pw"
-                className="block text-xs font-semibold text-brand-navy dark:text-white/60 mb-1.5"
-                style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-              >
-                비밀번호
-              </label>
-              <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-white/25 pointer-events-none flex items-center" aria-hidden="true">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                  </svg>
-                </span>
-                <input
-                  id="login-pw"
-                  type={showPw ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  placeholder="비밀번호를 입력하세요"
-                  value={pw}
-                  onChange={(e) => setPw(e.target.value)}
-                  disabled={isSubmitting}
-                  style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-                  className="w-full pl-9 pr-10 py-2.5 rounded-md text-sm outline-none transition-all duration-200
-                    bg-white dark:bg-white/[0.06]
-                    border border-gray-200 dark:border-white/10
-                    text-brand-navy dark:text-[#e2e1f0]
-                    placeholder:text-gray-400 dark:placeholder:text-white/20
-                    focus:border-brand-accent dark:focus:border-brand-accent-dark
-                    focus:ring-2 focus:ring-brand-accent/15 dark:focus:ring-brand-accent-dark/15"
-                />
+            {/* 비밀번호 */}
+            <InputField
+              id="login-pw"
+              label="비밀번호"
+              type={showPw ? 'text' : 'password'}
+              placeholder="비밀번호를 입력하세요"
+              value={pw}
+              onChange={setPw}
+              disabled={isSubmitting}
+              autoComplete="current-password"
+              delay={0.1}
+              icon={
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              }
+              rightAction={
                 <button
                   type="button"
                   aria-label={showPw ? '비밀번호 숨기기' : '비밀번호 표시'}
                   onClick={() => setShowPw((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center
-                    text-gray-400 dark:text-white/25
-                    hover:text-brand-accent dark:hover:text-brand-accent-dark
-                    transition-colors duration-150"
+                  style={{ display: 'flex', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--fg-muted)', padding: 2 }}
                 >
                   {showPw ? (
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -198,69 +223,92 @@ export default function LoginForm() {
                     </svg>
                   )}
                 </button>
-              </div>
-            </div>
+              }
+            />
 
-            {/* Submit */}
-            <div
-              className="pt-1 opacity-init-0 animate-fade-in-up anim-delay-240"
-              style={{ animationFillMode: 'forwards' }}
+            {/* 에러 메시지 */}
+            <AnimatePresence>
+              {errorMessage && (
+                <motion.p
+                  key="error"
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.2 }}
+                  style={{ fontSize: 13, color: 'var(--penalty)', marginTop: -4 }}
+                >
+                  {errorMessage}
+                </motion.p>
+              )}
+            </AnimatePresence>
+
+            {/* 제출 버튼 */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.15, ease: 'easeOut' }}
+              style={{ paddingTop: 4 }}
             >
-              <button
+              <motion.button
                 type="submit"
                 disabled={isSubmitting}
-                className="group relative w-full py-2.5 px-6 rounded-md font-semibold text-sm text-white overflow-hidden
-                  bg-brand-accent hover:brightness-110 active:scale-[0.98]
-                  transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-70"
-                style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
+                whileTap={isSubmitting ? undefined : { scale: 0.98 }}
+                style={{
+                  width: '100%',
+                  height: 42,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  borderRadius: 8,
+                  border: 'none',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: 'white',
+                  backgroundColor: 'var(--accent)',
+                  opacity: isSubmitting ? 0.7 : 1,
+                  transition: 'opacity 0.15s ease, filter 0.15s ease',
+                }}
+                onMouseEnter={(e) => { if (!isSubmitting) e.currentTarget.style.filter = 'brightness(0.92)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.filter = 'none' }}
               >
-                <span
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{
-                    background: 'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%)',
-                    animation: 'shimmer 1.8s linear infinite',
-                  }}
-                />
-                <span className="relative">{isSubmitting ? '로그인 중...' : '로그인'}</span>
-              </button>
-            </div>
-
-            {errorMessage ? (
-              <p
-                className="text-sm text-red-500"
-                style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-              >
-                {errorMessage}
-              </p>
-            ) : null}
+                {isSubmitting && (
+                  <motion.svg
+                    width="16" height="16" viewBox="0 0 16 16" fill="none"
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 0.7, ease: 'linear' }}
+                  >
+                    <circle cx="8" cy="8" r="6" stroke="white" strokeWidth="2" strokeDasharray="28 8" fill="none" />
+                  </motion.svg>
+                )}
+                {isSubmitting ? '로그인 중...' : '로그인'}
+              </motion.button>
+            </motion.div>
           </form>
 
-          {/* 학생회 문의 안내 */}
-          <div
-            className="mt-8 opacity-init-0 animate-fade-in-up anim-delay-320"
-            style={{ animationFillMode: 'forwards' }}
+          {/* 안내 문구 */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.25 }}
+            style={{ marginTop: 28, textAlign: 'center' }}
           >
-            <p
-              className="text-center text-xs text-brand-muted"
-              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-            >
+            <p style={{ fontSize: 12, color: 'var(--fg-muted)' }}>
               정보를 찾을 수 없나요?{' '}
-              <span className="text-brand-accent dark:text-brand-accent-dark font-medium">
-                학생회로 문의해 주세요.
-              </span>
+              <span style={{ color: 'var(--accent)', fontWeight: 500 }}>학생회로 문의해 주세요.</span>
             </p>
-          </div>
-
+          </motion.div>
         </div>
       </div>
 
-      {/* Mobile bottom */}
-      <div className="md:hidden flex flex-col items-center justify-center gap-0.5 pb-8">
-        <p className="text-xs text-brand-muted/50" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
+      {/* 모바일 하단 저작권 */}
+      <div className="flex lg:hidden" style={{ flexDirection: 'column', alignItems: 'center', gap: 2, paddingBottom: 24 }}>
+        <p style={{ fontSize: 11, color: 'var(--fg-muted)', opacity: 0.5 }}>
           ⓒ 2026. 경북소프트웨어마이스터고등학교 All Rights Reserved.
         </p>
-        <p className="text-xs text-brand-muted/30" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
-          Made by <span className="text-brand-muted/50">김동혁</span>
+        <p style={{ fontSize: 11, color: 'var(--fg-muted)', opacity: 0.35 }}>
+          Made by <span style={{ opacity: 0.85 }}>김동혁</span>
         </p>
       </div>
     </div>

@@ -6,6 +6,12 @@ import type { ReadonlyURLSearchParams } from 'next/navigation'
 
 type QueryValue = string | number | null | undefined
 
+export const DASHBOARD_NAVIGATION_START_EVENT = 'gbsw:dashboard-navigation-start'
+
+export function dispatchDashboardNavigationStart() {
+  window.dispatchEvent(new Event(DASHBOARD_NAVIGATION_START_EVENT))
+}
+
 export function useUpdateSearchParams() {
   const router = useRouter()
   const pathname = usePathname()
@@ -27,6 +33,16 @@ export function useUpdateSearchParams() {
       const nextUrl = params.toString()
         ? `${pathname}?${params.toString()}`
         : pathname
+
+      const currentUrl = searchParams.toString()
+        ? `${pathname}?${searchParams.toString()}`
+        : pathname
+
+      if (nextUrl === currentUrl) {
+        return
+      }
+
+      dispatchDashboardNavigationStart()
 
       startTransition(() => {
         router.replace(nextUrl, { scroll: false })

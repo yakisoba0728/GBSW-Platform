@@ -5,7 +5,7 @@ export default function AdminTeachersPage() {
         className="text-base font-semibold"
         style={{
           fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-          color: 'var(--admin-text)',
+          color: 'var(--fg)',
         }}
       >
         교사 관리
@@ -14,7 +14,7 @@ export default function AdminTeachersPage() {
         className="mt-1 text-xs leading-relaxed"
         style={{
           fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-          color: 'var(--admin-text-muted)',
+          color: 'var(--fg-muted)',
         }}
       >
         지금 단계에서는 교사 계정 생성만 연결되어 있습니다. 교사 조회, 수정,

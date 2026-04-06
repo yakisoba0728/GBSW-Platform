@@ -66,7 +66,7 @@ export default function HistoryTable({
                 <td colSpan={7} style={{ verticalAlign: 'middle', height: '220px' }}>
                   <ListEmptyState
                     icon={
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--admin-accent)' }} aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--accent)' }} aria-hidden="true">
                         <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
                       </svg>
                     }
@@ -81,13 +81,13 @@ export default function HistoryTable({
                   key={item.id}
                   index={index}
                   className="transition-colors hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
-                  style={{ borderBottom: '1px solid var(--admin-border)' }}
+                  style={{ borderBottom: '1px solid var(--border)' }}
                 >
                   {/* 일시 */}
                   <td
                     className="py-2 pr-3 text-[11px]"
                     style={{
-                      borderLeft: `2px solid ${item.type === 'reward' ? 'var(--mileage-green)' : 'var(--mileage-red)'}`,
+                      borderLeft: `2px solid ${item.type === 'reward' ? 'var(--reward)' : 'var(--penalty)'}`,
                       paddingLeft: '10px',
                     }}
                   >
@@ -95,8 +95,8 @@ export default function HistoryTable({
                       const { date, time } = formatAwardedAtParts(item.awardedAt)
                       return (
                         <>
-                          <p style={{ color: 'var(--admin-text-muted)', whiteSpace: 'nowrap' }}>{date}</p>
-                          <p className="mt-0.5" style={{ color: 'var(--admin-text-muted)', opacity: 0.6, whiteSpace: 'nowrap' }}>{time}</p>
+                          <p style={{ color: 'var(--fg-muted)', whiteSpace: 'nowrap' }}>{date}</p>
+                          <p className="mt-0.5" style={{ color: 'var(--fg-muted)', opacity: 0.6, whiteSpace: 'nowrap' }}>{time}</p>
                         </>
                       )
                     })()}
@@ -105,14 +105,14 @@ export default function HistoryTable({
                   {/* 학생 */}
                   <td className="overflow-hidden py-2 pr-3">
                     <div className="flex min-w-0 items-baseline gap-1">
-                      <p className="truncate text-[13px] font-semibold" style={{ color: 'var(--admin-text)', flexShrink: 0, maxWidth: '55%' }}>
+                      <p className="truncate text-[13px] font-semibold" style={{ color: 'var(--fg)', flexShrink: 0, maxWidth: '55%' }}>
                         {item.studentName}
                       </p>
-                      <p className="truncate text-[11px]" style={{ color: 'var(--admin-text-muted)' }}>
+                      <p className="truncate text-[11px]" style={{ color: 'var(--fg-muted)' }}>
                         {item.grade ? `${item.grade}학년 ` : ''}{item.classNumber}반 {item.studentNumber}번
                       </p>
                     </div>
-                    <p className="mt-0.5 truncate text-[11px]" style={{ color: 'var(--admin-text-muted)' }}>
+                    <p className="mt-0.5 truncate text-[11px]" style={{ color: 'var(--fg-muted)' }}>
                       {getSchoolLabel(item.school)} · {item.studentId}
                     </p>
                   </td>
@@ -124,23 +124,23 @@ export default function HistoryTable({
 
                   {/* 규정 항목 */}
                   <td className="overflow-hidden py-2 pr-3">
-                    <p className="truncate text-[13px] font-medium" style={{ color: 'var(--admin-text)' }}>{item.ruleName}</p>
-                    <p className="mt-0.5 truncate text-[11px]" style={{ color: 'var(--admin-text-muted)' }}>{item.ruleCategory}</p>
+                    <p className="truncate text-[13px] font-medium" style={{ color: 'var(--fg)' }}>{item.ruleName}</p>
+                    <p className="mt-0.5 truncate text-[11px]" style={{ color: 'var(--fg-muted)' }}>{item.ruleCategory}</p>
                   </td>
 
                   {/* 사유 */}
                   <td className="py-2 pr-3 text-[11px]">
                     {item.reason?.trim() ? (
                       <div className="group relative">
-                        <div className="truncate" style={{ color: 'var(--admin-text-muted)' }}>
+                        <div className="truncate" style={{ color: 'var(--fg-muted)' }}>
                           {item.reason.trim()}
                         </div>
                         <div
                           className="pointer-events-none absolute bottom-full left-0 z-20 mb-1.5 hidden w-max max-w-[240px] rounded-md border px-2.5 py-2 text-xs shadow-sm group-hover:block"
                           style={{
-                            backgroundColor: 'var(--admin-sidebar-bg)',
-                            borderColor: 'var(--admin-border)',
-                            color: 'var(--admin-text)',
+                            backgroundColor: 'var(--bg-subtle)',
+                            borderColor: 'var(--border)',
+                            color: 'var(--fg)',
                             fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                             whiteSpace: 'normal',
                             wordBreak: 'break-word',
@@ -151,14 +151,14 @@ export default function HistoryTable({
                         </div>
                       </div>
                     ) : (
-                      <span style={{ color: 'var(--admin-text-muted)', opacity: 0.4 }}>—</span>
+                      <span style={{ color: 'var(--fg-muted)', opacity: 0.4 }}>—</span>
                     )}
                   </td>
 
                   {/* 부여 교사 */}
                   <td className="overflow-hidden py-2 pr-3 text-[11px]">
-                    <p className="truncate" style={{ color: 'var(--admin-text-muted)' }}>{item.teacherName}</p>
-                    <p className="mt-0.5 truncate text-[11px]" style={{ color: 'var(--admin-text-muted)', opacity: 0.6 }}>{item.teacherId}</p>
+                    <p className="truncate" style={{ color: 'var(--fg-muted)' }}>{item.teacherName}</p>
+                    <p className="mt-0.5 truncate text-[11px]" style={{ color: 'var(--fg-muted)', opacity: 0.6 }}>{item.teacherId}</p>
                   </td>
 
                   {/* 액션 */}

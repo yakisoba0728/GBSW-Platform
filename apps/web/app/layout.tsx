@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Black_Han_Sans, Noto_Sans_KR } from "next/font/google";
+import { Space_Grotesk, Noto_Sans_KR } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { ToastProvider } from "@/app/components/ui/toast";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-});
-
-const blackHanSans = Black_Han_Sans({
-  variable: "--font-black-han-sans",
-  subsets: ["latin"],
-  weight: "400",
 });
 
 const notoSansKR = Noto_Sans_KR({
@@ -34,12 +29,14 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${spaceGrotesk.variable} ${blackHanSans.variable} ${notoSansKR.variable}`}
+      className={`${spaceGrotesk.variable} ${notoSansKR.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>

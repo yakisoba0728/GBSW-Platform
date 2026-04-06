@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
 import { ListSkeleton } from '../ui/list'
 import RuleSelectionModal from './RuleSelectionModal'
 import StudentSelectionModal from './StudentSelectionModal'
@@ -204,12 +205,12 @@ export default function SchoolMileageGrant({
               type="button"
               onClick={applyFirstRowToAll}
               disabled={!canApplyFirstRow || isSubmitting}
-              className="rounded-md border px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
               style={{
                 fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                color: 'var(--admin-accent)',
-                borderColor: 'var(--admin-accent)',
-                backgroundColor: 'var(--admin-accent-bg)',
+                color: 'var(--accent)',
+                borderColor: 'var(--accent)',
+                backgroundColor: 'var(--accent-subtle)',
               }}
             >
               첫 행 설정 모두 적용
@@ -219,8 +220,8 @@ export default function SchoolMileageGrant({
             type="button"
             onClick={() => setIsStudentModalOpen(true)}
             disabled={isSubmitting}
-            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
-            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', backgroundColor: 'var(--admin-accent)' }}
+            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', backgroundColor: 'var(--accent)' }}
           >
             <svg
               width="13"
@@ -258,7 +259,7 @@ export default function SchoolMileageGrant({
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
               <div
                 className="flex h-12 w-12 items-center justify-center rounded-lg"
-                style={{ backgroundColor: 'var(--admin-accent-bg)' }}
+                style={{ backgroundColor: 'var(--accent-subtle)' }}
               >
                 <svg
                   width="24"
@@ -269,7 +270,7 @@ export default function SchoolMileageGrant({
                   strokeWidth="1.7"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  style={{ color: 'var(--admin-accent)' }}
+                  style={{ color: 'var(--accent)' }}
                   aria-hidden="true"
                 >
                   <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -283,7 +284,7 @@ export default function SchoolMileageGrant({
                   className="text-sm font-semibold"
                   style={{
                     fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                    color: 'var(--admin-text)',
+                    color: 'var(--fg)',
                   }}
                 >
                   선택된 학생이 없습니다
@@ -292,7 +293,7 @@ export default function SchoolMileageGrant({
                   className="mt-1 text-xs leading-relaxed"
                   style={{
                     fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                    color: 'var(--admin-text-muted)',
+                    color: 'var(--fg-muted)',
                   }}
                 >
                   상단 버튼으로 학생을 추가한 뒤
@@ -332,34 +333,33 @@ export default function SchoolMileageGrant({
                 ))}
               </div>
 
-              <button
+              <motion.button
                 type="button"
                 onClick={submitEntries}
                 disabled={!canSubmit || isSubmitting}
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
-                style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', backgroundColor: 'var(--admin-accent)' }}
+                whileTap={!canSubmit || isSubmitting ? undefined : { scale: 0.97 }}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+                style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', backgroundColor: 'var(--accent)' }}
               >
                 {isSubmitting ? (
                   <>
-                    <svg
-                      className="animate-spin"
+                    <motion.svg
                       width="14"
                       height="14"
-                      viewBox="0 0 24 24"
+                      viewBox="0 0 16 16"
                       fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
+                      animate={{ rotate: 360 }}
+                      transition={{ repeat: Infinity, duration: 0.7, ease: 'linear' }}
                       aria-hidden="true"
                     >
-                      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                    </svg>
+                      <circle cx="8" cy="8" r="6" stroke="white" strokeWidth="2" strokeDasharray="28 8" fill="none" />
+                    </motion.svg>
                     부여 중...
                   </>
                 ) : (
                   `전체 부여하기 (${rows.length}명)`
                 )}
-              </button>
+              </motion.button>
             </>
           )}
         </Card>

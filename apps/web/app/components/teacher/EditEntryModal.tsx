@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import { ModalBase } from '../ui/modal'
 import { XIcon } from '../ui/icons'
 import { NoticeBox } from './teacher-shared'
@@ -64,7 +65,7 @@ export default function EditEntryModal({
 
   const readonlyStyle: React.CSSProperties = {
     ...inputStyle,
-    color: 'var(--admin-text-muted)',
+    color: 'var(--fg-muted)',
     cursor: 'default',
     opacity: 0.8,
   }
@@ -83,7 +84,7 @@ export default function EditEntryModal({
               상벌점 내역 편집
             </p>
             {item && (
-              <p className="mt-0.5 text-xs" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}>
+              <p className="mt-0.5 text-xs" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg-muted)' }}>
                 {item.studentName} · {item.grade ? `${item.grade}학년 ` : ''}{item.classNumber}반 {item.studentNumber}번 · {getSchoolLabel(item.school)}
               </p>
             )}
@@ -92,7 +93,7 @@ export default function EditEntryModal({
             type="button"
             onClick={onClose}
             className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:opacity-70"
-            style={{ color: 'var(--admin-text-muted)' }}
+            style={{ color: 'var(--fg-muted)' }}
             aria-label="닫기"
           >
             <XIcon />
@@ -105,7 +106,7 @@ export default function EditEntryModal({
 
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <span className="text-xs font-medium" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}>
+                <span className="text-xs font-medium" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg-muted)' }}>
                   상벌점 항목
                 </span>
                 <div
@@ -134,13 +135,13 @@ export default function EditEntryModal({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <span className="text-xs font-medium" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}>부여 일시</span>
+                  <span className="text-xs font-medium" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg-muted)' }}>부여 일시</span>
                   <p className="rounded-lg border px-3 py-2 text-sm" style={readonlyStyle}>
                     {formatAwardedAt(item.awardedAt)}
                   </p>
                 </div>
                 <div className="space-y-1.5">
-                  <span className="text-xs font-medium" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}>부여 교사</span>
+                  <span className="text-xs font-medium" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg-muted)' }}>부여 교사</span>
                   <p className="rounded-lg border px-3 py-2 text-sm" style={readonlyStyle}>
                     {item.teacherName}
                   </p>
@@ -148,7 +149,7 @@ export default function EditEntryModal({
               </div>
 
               <label className="space-y-1.5">
-                <span className="text-xs font-medium" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}>사유</span>
+                <span className="text-xs font-medium" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg-muted)' }}>사유</span>
                 <input
                   type="text"
                   value={reason}
@@ -169,7 +170,7 @@ export default function EditEntryModal({
             type="button"
             onClick={onClose}
             className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
-            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--admin-border)', color: 'var(--admin-text-muted)' }}
+            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--admin-border)', color: 'var(--fg-muted)' }}
           >
             취소
           </button>
@@ -178,13 +179,18 @@ export default function EditEntryModal({
             onClick={() => void handleSubmit()}
             disabled={isSubmitting || !item}
             className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
-            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', backgroundColor: 'var(--admin-accent)' }}
+            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', backgroundColor: 'var(--accent)' }}
           >
             {isSubmitting ? (
               <>
-                <svg className="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                </svg>
+                <motion.svg
+                  width="13" height="13" viewBox="0 0 16 16" fill="none"
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 0.7, ease: 'linear' }}
+                  aria-hidden="true"
+                >
+                  <circle cx="8" cy="8" r="6" stroke="white" strokeWidth="2" strokeDasharray="28 8" fill="none" />
+                </motion.svg>
                 저장 중...
               </>
             ) : '저장'}
