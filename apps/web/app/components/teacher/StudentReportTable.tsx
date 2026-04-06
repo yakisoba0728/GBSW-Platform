@@ -8,7 +8,7 @@ import type {
   SchoolMileageHistoryItem,
   StudentMileageSummary,
 } from './school-mileage-types'
-import { formatAwardedAt, formatSignedScore } from './teacher-shared'
+import { formatAwardedAt, formatSignedScore } from '../mileage/shared'
 import { EmptyStatePane, ListSkeleton } from '../ui/list'
 import { SearchIcon } from '../ui/icons'
 import { RefetchWrapper } from '../ui/primitives'
@@ -163,6 +163,10 @@ function StudentDetailPanel({
           { signal: ctrl.signal, cache: 'no-store' },
         )
         const data = await res.json().catch(() => null)
+
+        if (abortRef.current !== ctrl || ctrl.signal.aborted) {
+          return
+        }
 
         if (!res.ok) {
           setError(data?.message ?? '데이터를 불러오지 못했습니다.')

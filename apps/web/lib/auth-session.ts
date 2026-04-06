@@ -1,109 +1,118 @@
-import { createHmac, timingSafeEqual } from 'node:crypto'
+import { cache } from 'react'
 import type { NextRequest } from 'next/server'
-import {
-  getAuthSessionSecret,
-  getSuperAdminCredentials,
-} from './runtime-env'
+import { getApiBaseUrl } from './api-base-url'
+import { getInternalApiSecret } from './runtime-env'
 
 export type AuthRole = 'super-admin' | 'student' | 'teacher'
 
 export type AuthSession = {
-  version: number
+  id: string
   accountId: string
   role: AuthRole
   mustChangePassword: boolean
-  iat: number
-  exp: number
-}
-
-type AuthSessionTokenInput = {
-  accountId: string
-  role: AuthRole
-  mustChangePassword: boolean
-  iat?: number
-  exp?: number
+  expiresAt: string
 }
 
 export const AUTH_SESSION_COOKIE = 'gbsw-auth-session'
 
-const SESSION_VERSION = 1
-const SESSION_DURATION_SECONDS = 60 * 60 * 8
-
-export function isValidSuperAdminLogin(id: string, password: string) {
-  const credentials = getSuperAdminCredentials()
-
-  return (
-    safeEqual(id, credentials.id) &&
-    safeEqual(password, credentials.password)
-  )
+export class AuthSessionLookupError extends Error {
+  constructor(message = '세션 정보를 확인하지 못했습니다.') {
+    super(message)
+    this.name = 'AuthSessionLookupError'
+  }
 }
 
-export function createAuthSessionToken(session: AuthSessionTokenInput) {
-  const issuedAt = getCurrentUnixTimestamp()
-  const payload = Buffer.from(
-    JSON.stringify({
-      version: SESSION_VERSION,
-      accountId: session.accountId,
-      role: session.role,
-      mustChangePassword: session.mustChangePassword,
-      iat: session.iat ?? issuedAt,
-      exp: session.exp ?? issuedAt + SESSION_DURATION_SECONDS,
-    }),
-    'utf8',
-  ).toString('base64url')
+export const resolveAuthSession = cache(
+  async (sessionId: string | null | undefined): Promise<AuthSession | null> => {
+    const normalizedSessionId = readAuthSessionId(sessionId)
 
-  return `${payload}.${sign(payload)}`
-}
-
-export function readAuthSession(token?: string) {
-  if (!token) {
-    return null
-  }
-
-  const [payload, signature, ...rest] = token.split('.')
-
-  if (!payload || !signature || rest.length > 0) {
-    return null
-  }
-
-  if (!safeEqual(signature, sign(payload))) {
-    return null
-  }
-
-  try {
-    const parsed = JSON.parse(
-      Buffer.from(payload, 'base64url').toString('utf8'),
-    ) as Partial<AuthSession>
-
-    if (
-      parsed.version !== SESSION_VERSION ||
-      !isAuthRole(parsed.role) ||
-      typeof parsed.accountId !== 'string' ||
-      parsed.accountId.trim().length === 0 ||
-      typeof parsed.mustChangePassword !== 'boolean' ||
-      !isValidUnixTimestamp(parsed.iat) ||
-      !isValidUnixTimestamp(parsed.exp) ||
-      parsed.exp <= parsed.iat ||
-      parsed.exp <= getCurrentUnixTimestamp()
-    ) {
+    if (!normalizedSessionId) {
       return null
     }
 
-    return {
-      version: SESSION_VERSION,
-      accountId: parsed.accountId.trim(),
-      role: parsed.role,
-      mustChangePassword: parsed.mustChangePassword,
-      iat: parsed.iat,
-      exp: parsed.exp,
-    } satisfies AuthSession
-  } catch {
-    return null
+    let response: Response
+
+    try {
+      response = await fetch(`${getApiBaseUrl()}/auth/sessions/resolve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-internal-api-secret': getInternalApiSecret(),
+        },
+        body: JSON.stringify({ sessionId: normalizedSessionId }),
+        cache: 'no-store',
+      })
+    } catch {
+      throw new AuthSessionLookupError()
+    }
+
+    if (!response.ok) {
+      throw new AuthSessionLookupError()
+    }
+
+    const payload = await response.json().catch(() => undefined)
+
+    if (!payload || typeof payload !== 'object') {
+      throw new AuthSessionLookupError('세션 조회 응답이 올바르지 않습니다.')
+    }
+
+    const parsedPayload = payload as {
+      ok?: unknown
+      session?: unknown
+    }
+
+    if (parsedPayload.ok === false) {
+      return null
+    }
+
+    if (parsedPayload.ok !== true) {
+      throw new AuthSessionLookupError('세션 조회 응답이 올바르지 않습니다.')
+    }
+
+    const session = parseAuthSession(parsedPayload.session)
+
+    if (!session) {
+      throw new AuthSessionLookupError('세션 조회 응답이 올바르지 않습니다.')
+    }
+
+    return session
+  },
+)
+
+export async function revokeAuthSession(sessionId: string) {
+  const normalizedSessionId = readAuthSessionId(sessionId)
+
+  if (!normalizedSessionId) {
+    return
+  }
+
+  const response = await fetch(`${getApiBaseUrl()}/auth/sessions/revoke`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-internal-api-secret': getInternalApiSecret(),
+    },
+    body: JSON.stringify({ sessionId: normalizedSessionId }),
+    cache: 'no-store',
+  })
+
+  if (!response.ok) {
+    throw new Error('세션 종료 요청을 처리하지 못했습니다.')
   }
 }
 
 export function isAuthRole(value: unknown): value is AuthRole {
   return value === 'super-admin' || value === 'student' || value === 'teacher'
+}
+
+export function readAuthSessionId(token?: string | null) {
+  const value = token?.trim()
+
+  if (!value) {
+    return null
+  }
+
+  return value
 }
 
 export function getDefaultRedirectPathForRole(role: AuthRole) {
@@ -127,8 +136,15 @@ export function getRedirectPathForSession(
   return getDefaultRedirectPathForRole(session.role)
 }
 
-export function getSessionCookieMaxAge() {
-  return SESSION_DURATION_SECONDS
+export function getSessionCookieMaxAge(expiresAt: string | Date) {
+  const expiresAtMs =
+    expiresAt instanceof Date ? expiresAt.getTime() : Date.parse(expiresAt)
+
+  if (!Number.isFinite(expiresAtMs)) {
+    return 0
+  }
+
+  return Math.max(0, Math.floor((expiresAtMs - Date.now()) / 1000))
 }
 
 export function shouldUseSecureCookie(request: NextRequest) {
@@ -147,27 +163,36 @@ export function shouldUseSecureCookie(request: NextRequest) {
   return protocol === 'https:'
 }
 
-function sign(payload: string) {
-  return createHmac('sha256', getAuthSessionSecret())
-    .update(payload)
-    .digest('hex')
-}
-
-function safeEqual(left: string, right: string) {
-  const leftBuffer = Buffer.from(left)
-  const rightBuffer = Buffer.from(right)
-
-  if (leftBuffer.length !== rightBuffer.length) {
-    return false
+function parseAuthSession(value: unknown) {
+  if (!value || typeof value !== 'object') {
+    return null
   }
 
-  return timingSafeEqual(leftBuffer, rightBuffer)
-}
+  const session = value as Record<string, unknown>
 
-function getCurrentUnixTimestamp() {
-  return Math.floor(Date.now() / 1000)
-}
+  if (
+    typeof session.id !== 'string' ||
+    session.id.trim().length === 0 ||
+    typeof session.accountId !== 'string' ||
+    session.accountId.trim().length === 0 ||
+    !isAuthRole(session.role) ||
+    typeof session.mustChangePassword !== 'boolean' ||
+    typeof session.expiresAt !== 'string'
+  ) {
+    return null
+  }
 
-function isValidUnixTimestamp(value: unknown): value is number {
-  return typeof value === 'number' && Number.isInteger(value) && value > 0
+  const expiresAtMs = Date.parse(session.expiresAt)
+
+  if (!Number.isFinite(expiresAtMs) || expiresAtMs <= Date.now()) {
+    return null
+  }
+
+  return {
+    id: session.id.trim(),
+    accountId: session.accountId.trim(),
+    role: session.role,
+    mustChangePassword: session.mustChangePassword,
+    expiresAt: new Date(expiresAtMs).toISOString(),
+  } satisfies AuthSession
 }

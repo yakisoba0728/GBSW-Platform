@@ -6,10 +6,20 @@ import type { ReadonlyURLSearchParams } from 'next/navigation'
 
 type QueryValue = string | number | null | undefined
 
-export const DASHBOARD_NAVIGATION_START_EVENT = 'gbsw:dashboard-navigation-start'
+export const APP_NAVIGATION_START_EVENT = 'gbsw:app-navigation-start'
+export const APP_NAVIGATION_COMPLETE_EVENT = 'gbsw:app-navigation-complete'
+export const DASHBOARD_NAVIGATION_START_EVENT = APP_NAVIGATION_START_EVENT
+
+export function dispatchAppNavigationStart() {
+  window.dispatchEvent(new Event(APP_NAVIGATION_START_EVENT))
+}
+
+export function dispatchAppNavigationComplete() {
+  window.dispatchEvent(new Event(APP_NAVIGATION_COMPLETE_EVENT))
+}
 
 export function dispatchDashboardNavigationStart() {
-  window.dispatchEvent(new Event(DASHBOARD_NAVIGATION_START_EVENT))
+  dispatchAppNavigationStart()
 }
 
 export function useUpdateSearchParams() {
@@ -41,8 +51,6 @@ export function useUpdateSearchParams() {
       if (nextUrl === currentUrl) {
         return
       }
-
-      dispatchDashboardNavigationStart()
 
       startTransition(() => {
         router.replace(nextUrl, { scroll: false })

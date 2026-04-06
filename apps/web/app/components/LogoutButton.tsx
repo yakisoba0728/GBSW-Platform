@@ -42,9 +42,26 @@ export default function LogoutButton({
       onClick={handleLogout}
       disabled={isLoggingOut}
       className={className}
-      style={style}
+      style={{ position: 'relative', ...style }}
     >
-      {isLoggingOut ? '로그아웃 중...' : (children ?? '로그아웃')}
+      <span style={{ visibility: isLoggingOut ? 'hidden' : 'visible' }}>
+        {children ?? '로그아웃'}
+      </span>
+      {isLoggingOut && (
+        <span
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          로그아웃 중...
+        </span>
+      )}
     </button>
   )
 }

@@ -1,34 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {
   AUTH_SESSION_COOKIE,
-  createAuthSessionToken,
   getRedirectPathForSession,
   getSessionCookieMaxAge,
-  isAuthRole,
-  isValidSuperAdminLogin,
   shouldUseSecureCookie,
 } from '@/lib/auth-session'
 import { getApiBaseUrl } from '@/lib/api-base-url'
-import {
-  clearFailedLoginAttempts,
-  getClientIpFromRequestHeaders,
-  getRemainingLoginCooldownSeconds,
-  registerFailedLoginAttempt,
-} from '@/lib/login-rate-limit'
 
 export async function POST(request: NextRequest) {
-  const clientIp = getClientIpFromRequestHeaders(request.headers)
-  const cooldownSeconds = getRemainingLoginCooldownSeconds(clientIp)
-
-  if (cooldownSeconds > 0) {
-    return NextResponse.json(
-      {
-        message: `로그인 시도가 너무 많습니다. ${cooldownSeconds}초 후 다시 시도해주세요.`,
-      },
-      { status: 429 },
-    )
-  }
-
   const body = await request.json().catch(() => null)
   const id = typeof body?.id === 'string' ? body.id.trim() : ''
   const password = typeof body?.password === 'string' ? body.password : ''
@@ -40,87 +19,62 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  let accountId = id
-  let role: 'super-admin' | 'student' | 'teacher' = 'super-admin'
-  let mustChangePassword = false
+  try {
+    const upstreamResponse = await fetch(`${getApiBaseUrl()}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(forwardHeaderValue('x-forwarded-for', request) && {
+          'x-forwarded-for': forwardHeaderValue('x-forwarded-for', request)!,
+        }),
+        ...(forwardHeaderValue('x-real-ip', request) && {
+          'x-real-ip': forwardHeaderValue('x-real-ip', request)!,
+        }),
+      },
+      body: JSON.stringify({ id, password }),
+      cache: 'no-store',
+    })
 
-  if (!isValidSuperAdminLogin(id, password)) {
-    try {
-      const upstreamResponse = await fetch(`${getApiBaseUrl()}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': clientIp,
-        },
-        body: JSON.stringify({ id, password }),
-        cache: 'no-store',
-      })
+    const payload = await upstreamResponse.json().catch(() => null)
 
-      const payload = await upstreamResponse.json().catch(() => null)
-
-      if (!upstreamResponse.ok) {
-        if (upstreamResponse.status === 401) {
-          registerFailedLoginAttempt(clientIp)
-        }
-
-        return NextResponse.json(
-          { message: getErrorMessage(payload, '로그인에 실패했습니다.') },
-          { status: upstreamResponse.status },
-        )
-      }
-
-      const user = payload?.user
-
-      if (
-        !user ||
-        !isAuthRole(user.role) ||
-        user.role === 'super-admin' ||
-        typeof user.accountId !== 'string' ||
-        user.accountId.trim().length === 0 ||
-        typeof user.mustChangePassword !== 'boolean'
-      ) {
-        return NextResponse.json(
-          { message: '로그인 응답이 올바르지 않습니다.' },
-          { status: 502 },
-        )
-      }
-
-      role = user.role
-      accountId = user.accountId.trim()
-      mustChangePassword = user.mustChangePassword
-    } catch {
+    if (!upstreamResponse.ok) {
       return NextResponse.json(
-        { message: '로그인 요청을 처리하지 못했습니다.' },
+        { message: getErrorMessage(payload, '로그인에 실패했습니다.') },
+        { status: upstreamResponse.status },
+      )
+    }
+
+    const session = parseAuthSession(payload?.session)
+
+    if (!session) {
+      return NextResponse.json(
+        { message: '로그인 응답이 올바르지 않습니다.' },
         { status: 502 },
       )
     }
+
+    const response = NextResponse.json({
+      ok: true,
+      redirectTo: getRedirectPathForSession(session),
+    })
+
+    response.cookies.set({
+      name: AUTH_SESSION_COOKIE,
+      value: session.id,
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: shouldUseSecureCookie(request),
+      path: '/',
+      maxAge: getSessionCookieMaxAge(session.expiresAt),
+    })
+
+    return response
+  } catch {
+    return NextResponse.json(
+      { message: '로그인 요청을 처리하지 못했습니다.' },
+      { status: 502 },
+    )
   }
-
-  clearFailedLoginAttempts(clientIp)
-
-  const response = NextResponse.json({
-    ok: true,
-    redirectTo: getRedirectPathForSession({
-      role,
-      mustChangePassword,
-    }),
-  })
-
-  response.cookies.set({
-    name: AUTH_SESSION_COOKIE,
-    value: createAuthSessionToken({
-      accountId,
-      role,
-      mustChangePassword,
-    }),
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: shouldUseSecureCookie(request),
-    path: '/',
-    maxAge: getSessionCookieMaxAge(),
-  })
-
-  return response
 }
 
 function getErrorMessage(payload: unknown, fallback: string) {
@@ -135,4 +89,52 @@ function getErrorMessage(payload: unknown, fallback: string) {
   }
 
   return fallback
+}
+
+function forwardHeaderValue(name: 'x-forwarded-for' | 'x-real-ip', request: NextRequest) {
+  const value = request.headers.get(name)?.trim()
+
+  return value && value.length > 0 ? value : null
+}
+
+function parseAuthSession(value: unknown): {
+  id: string
+  accountId: string
+  role: 'super-admin' | 'student' | 'teacher'
+  mustChangePassword: boolean
+  expiresAt: string
+} | null {
+  if (!value || typeof value !== 'object') {
+    return null
+  }
+
+  const session = value as Record<string, unknown>
+
+  if (
+    typeof session.id !== 'string' ||
+    session.id.trim().length === 0 ||
+    typeof session.accountId !== 'string' ||
+    session.accountId.trim().length === 0 ||
+    (session.role !== 'super-admin' &&
+      session.role !== 'student' &&
+      session.role !== 'teacher') ||
+    typeof session.mustChangePassword !== 'boolean' ||
+    typeof session.expiresAt !== 'string'
+  ) {
+    return null
+  }
+
+  const expiresAtMs = Date.parse(session.expiresAt)
+
+  if (!Number.isFinite(expiresAtMs) || expiresAtMs <= Date.now()) {
+    return null
+  }
+
+  return {
+    id: session.id.trim(),
+    accountId: session.accountId.trim(),
+    role: session.role,
+    mustChangePassword: session.mustChangePassword,
+    expiresAt: session.expiresAt,
+  }
 }

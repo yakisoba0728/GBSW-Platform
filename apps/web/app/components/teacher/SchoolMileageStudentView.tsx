@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Card, NoticeBox } from './teacher-shared'
+import { Card, NoticeBox } from '../mileage/shared'
 import SuccessModal from '../ui/success-modal'
 import {
   AnimatedListItem,
@@ -93,6 +93,10 @@ export default function SchoolMileageStudentView() {
       )
       const data = await res.json().catch(() => null)
 
+      if (abortStudentsRef.current !== ctrl || ctrl.signal.aborted) {
+        return
+      }
+
       if (!res.ok) {
         setStudentsError(data?.message ?? '학생 목록을 불러오지 못했습니다.')
         setShowErrorModal(true)
@@ -108,7 +112,10 @@ export default function SchoolMileageStudentView() {
         setStudents([])
       }
     } finally {
-      setIsStudentsLoading(false)
+      if (abortStudentsRef.current === ctrl) {
+        abortStudentsRef.current = null
+        setIsStudentsLoading(false)
+      }
     }
   }, [filterClass, filterGrade, filterName, filterSchool])
 
@@ -138,6 +145,10 @@ export default function SchoolMileageStudentView() {
         .json()
         .catch(() => null)
 
+      if (abortSummaryRef.current !== ctrl || ctrl.signal.aborted) {
+        return
+      }
+
       if (!res.ok) {
         setDetailError(
           (data as { message?: string } | null)?.message ??
@@ -156,7 +167,10 @@ export default function SchoolMileageStudentView() {
         setSummary(null)
       }
     } finally {
-      setIsSummaryLoading(false)
+      if (abortSummaryRef.current === ctrl) {
+        abortSummaryRef.current = null
+        setIsSummaryLoading(false)
+      }
     }
   }, [selectedStudentId])
 
@@ -191,6 +205,10 @@ export default function SchoolMileageStudentView() {
         .json()
         .catch(() => EMPTY_ENTRY_RESPONSE)
 
+      if (abortEntriesRef.current !== ctrl || ctrl.signal.aborted) {
+        return
+      }
+
       if (!res.ok) {
         setDetailError('학생 처리 내역을 불러오지 못했습니다.')
         setShowErrorModal(true)
@@ -209,7 +227,10 @@ export default function SchoolMileageStudentView() {
         setTotalEntryCount(0)
       }
     } finally {
-      setIsEntriesLoading(false)
+      if (abortEntriesRef.current === ctrl) {
+        abortEntriesRef.current = null
+        setIsEntriesLoading(false)
+      }
     }
   }, [page, pageSize, selectedStudentId])
 
@@ -328,7 +349,7 @@ export default function SchoolMileageStudentView() {
               )}
             </p>
           </div>
-          <div className="flex-1 min-h-0 overflow-y-auto p-3">
+          <div className="flex-1 min-h-0 p-3">
             {!filterSchool ? (
               <div className="flex h-full items-center justify-center">
                 <ListEmptyState

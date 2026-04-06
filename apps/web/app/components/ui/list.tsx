@@ -1,24 +1,12 @@
 'use client'
 
 import type { CSSProperties, ReactNode } from 'react'
+import { motion } from 'framer-motion'
+import { getItemMotion, useMotionPreference } from './motion'
 
 // ─── 공유 리스트 애니메이션 시스템 ────────────────────────────────────────────
 // 학생 탭, 교사 탭 등 모든 탭에서 사용 가능한 범용 리스트 UI 컴포넌트.
 // globals.css 의 animate-fade-in-up / animate-pulse-soft / anim-delay-* 클래스 활용.
-
-// stagger delay 클래스 (globals.css 에 정의됨)
-const STAGGER_DELAYS = [
-  'anim-delay-0',
-  'anim-delay-80',
-  'anim-delay-160',
-  'anim-delay-240',
-  'anim-delay-320',
-  'anim-delay-400',
-] as const
-
-function getStaggerClass(index: number) {
-  return STAGGER_DELAYS[Math.min(index, STAGGER_DELAYS.length - 1)]
-}
 
 // ─── AnimatedListItem ─────────────────────────────────────────────────────────
 // 모바일 카드 · 수직 리스트 아이템용 div 래퍼.
@@ -42,14 +30,18 @@ export function AnimatedListItem({
   className?: string
   style?: CSSProperties
 }) {
-  const delay = getStaggerClass(index)
+  const prefersReducedMotion = useMotionPreference()
+  const motionProps = getItemMotion(prefersReducedMotion, index)
   return (
-    <div
-      className={`animate-fade-in-up opacity-init-0 ${delay} ${className}`}
+    <motion.div
+      initial={motionProps.initial}
+      animate={motionProps.animate}
+      transition={motionProps.transition}
+      className={className}
       style={style}
     >
       {children}
-    </div>
+    </motion.div>
   )
 }
 
@@ -86,17 +78,21 @@ export function AnimatedTableRow({
   onMouseLeave?: () => void
   onClick?: () => void
 }) {
-  const delay = getStaggerClass(index)
+  const prefersReducedMotion = useMotionPreference()
+  const motionProps = getItemMotion(prefersReducedMotion, index)
   return (
-    <tr
-      className={`animate-fade-in-up opacity-init-0 ${delay} ${className}`}
+    <motion.tr
+      initial={motionProps.initial}
+      animate={motionProps.animate}
+      transition={motionProps.transition}
+      className={className}
       style={style}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onClick={onClick}
     >
       {children}
-    </tr>
+    </motion.tr>
   )
 }
 
@@ -129,6 +125,37 @@ export function ListSkeleton({
         </div>
       ))}
     </div>
+  )
+}
+
+export function CardListSkeleton({
+  count = 3,
+  rowHeight = 'h-32',
+}: {
+  count?: number
+  rowHeight?: string
+}) {
+  return (
+    <>
+      {Array.from({ length: count }, (_, i) => (
+        <div
+          key={i}
+          className={`relative overflow-hidden rounded-xl border ${rowHeight}`}
+          style={{
+            backgroundColor: 'var(--bg-subtle)',
+            borderColor: 'var(--border)',
+          }}
+        >
+          <div
+            className="absolute inset-0 animate-shimmer"
+            style={{
+              background:
+                'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)',
+            }}
+          />
+        </div>
+      ))}
+    </>
   )
 }
 

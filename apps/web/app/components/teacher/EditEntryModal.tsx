@@ -5,12 +5,12 @@ import { ModalBase } from '../ui/modal'
 import { XIcon } from '../ui/icons'
 import { Button } from '../ui/button'
 import { IconButton } from '../ui/primitives'
-import { NoticeBox } from './teacher-shared'
+import { NoticeBox } from '../mileage/shared'
 import {
   formatAwardedAt,
   getSchoolLabel,
   inputStyle,
-} from './teacher-shared'
+} from '../mileage/shared'
 import type {
   SchoolMileageHistoryItem,
   UpdateSchoolMileageEntryPayload,

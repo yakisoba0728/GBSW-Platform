@@ -1,8 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { NoticeBox } from '@/app/components/teacher/teacher-shared'
-import { useRulesContext } from './RulesContext'
+import { NoticeBox } from '@/app/components/mileage/shared'
+import { useRulesContext } from '@/app/components/mileage/rules-context'
+import { StatsGridSkeleton } from '@/app/components/ui/page-skeletons'
+import { getSectionMotion, useMotionPreference } from '@/app/components/ui/motion'
 
 const stagger = {
   container: { transition: { staggerChildren: 0.06 } },
@@ -22,9 +24,9 @@ function StatCard({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
+      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       style={{
         borderRadius: 12,
         border: '1px solid var(--border)',
@@ -48,7 +50,25 @@ function StatCard({
         }}
       >
         {isLoading ? (
-          <span style={{ display: 'inline-block', width: 48, height: 30, borderRadius: 6, backgroundColor: 'var(--bg-muted)', verticalAlign: 'bottom' }} />
+          <span
+            className="relative inline-block overflow-hidden"
+            style={{
+              width: '100%',
+              maxWidth: 84,
+              height: 30,
+              borderRadius: 6,
+              backgroundColor: 'var(--bg-muted)',
+              verticalAlign: 'bottom',
+            }}
+          >
+            <span
+              className="absolute inset-0 animate-shimmer"
+              style={{
+                background:
+                  'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)',
+              }}
+            />
+          </span>
         ) : (
           value
         )}
@@ -58,6 +78,8 @@ function StatCard({
 }
 
 export default function TeacherHome() {
+  const prefersReducedMotion = useMotionPreference()
+  const sectionMotion = getSectionMotion(prefersReducedMotion)
   const { rules, isRulesLoading, rulesError } = useRulesContext()
 
   const rewardRules = rules.filter((rule) => rule.type === 'reward').length
@@ -72,9 +94,9 @@ export default function TeacherHome() {
       {!rulesError && (
         <>
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
+            initial={sectionMotion.initial}
+            animate={sectionMotion.animate}
+            transition={sectionMotion.transition}
             style={{
               borderRadius: 12,
               border: '1px solid var(--border)',
@@ -90,16 +112,20 @@ export default function TeacherHome() {
             </p>
           </motion.div>
 
-          <motion.div
-            {...stagger.container}
-            animate="animate"
-            initial="initial"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}
-          >
-            <StatCard label="활성 규칙 수" value={rules.length} isLoading={isRulesLoading} />
-            <StatCard label="상점 규칙" value={rewardRules} color="var(--reward)" isLoading={isRulesLoading} />
-            <StatCard label="벌점 규칙" value={penaltyRules} color="var(--penalty)" isLoading={isRulesLoading} />
-          </motion.div>
+          {isRulesLoading ? (
+            <StatsGridSkeleton count={3} />
+          ) : (
+            <motion.div
+              {...stagger.container}
+              animate="animate"
+              initial="initial"
+              style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}
+            >
+              <StatCard label="활성 규칙 수" value={rules.length} isLoading={false} />
+              <StatCard label="상점 규칙" value={rewardRules} color="var(--reward)" isLoading={false} />
+              <StatCard label="벌점 규칙" value={penaltyRules} color="var(--penalty)" isLoading={false} />
+            </motion.div>
+          )}
         </>
       )}
     </div>

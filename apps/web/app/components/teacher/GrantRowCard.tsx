@@ -4,7 +4,7 @@ import { AnimatedListItem } from '../ui/list'
 import { XIcon } from '../ui/icons'
 import AnimatedCheckbox from '../ui/animated-checkbox'
 import Tooltip from '../ui/tooltip'
-import { getSchoolLabel, inputStyle } from './teacher-shared'
+import { getSchoolLabel, inputStyle } from '../mileage/shared'
 import type {
   SchoolMileageRuleSummary,
   SchoolMileageStudentOption,

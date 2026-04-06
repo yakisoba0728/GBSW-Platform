@@ -27,11 +27,13 @@ export class SchoolMileageRulesService {
   async getRules(
     actorTeacherId: string | undefined,
     actorSuperAdminId?: string,
+    actorSessionId?: string,
   ) {
     await assertTeacherOrSuperAdmin(
       this.prisma,
       actorTeacherId,
       actorSuperAdminId,
+      actorSessionId,
     );
 
     const rules = await this.prisma.schoolMileageRule.findMany({
@@ -59,9 +61,10 @@ export class SchoolMileageRulesService {
 
   async createRule(
     actorSuperAdminId: string | undefined,
+    actorSessionId: string | undefined,
     body: Record<string, unknown>,
   ) {
-    assertSuperAdmin(actorSuperAdminId);
+    await assertSuperAdmin(this.prisma, actorSuperAdminId, actorSessionId);
     const input = parseCreateRuleInput(body);
 
     await this.assertRuleNameAvailable(input.type, input.category, input.name);
@@ -96,10 +99,11 @@ export class SchoolMileageRulesService {
 
   async updateRule(
     actorSuperAdminId: string | undefined,
+    actorSessionId: string | undefined,
     id: string,
     body: Record<string, unknown>,
   ) {
-    assertSuperAdmin(actorSuperAdminId);
+    await assertSuperAdmin(this.prisma, actorSuperAdminId, actorSessionId);
     const ruleId = parseRuleId(id);
     const input = parseUpdateRuleInput(body);
 

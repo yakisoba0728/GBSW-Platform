@@ -1,10 +1,10 @@
-'use client'
-
-import { useEffect, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
-import type { MileageType, SchoolCode, SchoolMileageRuleSummary } from './school-mileage-types'
+import type {
+  MileageType,
+  SchoolCode,
+  SchoolMileageRuleSummary,
+} from '../teacher/school-mileage-types'
 
-// NoticeBox는 components/ui/notice.tsx 로 이동됨. 기존 import 호환을 위해 re-export.
 export { NoticeBox } from '../ui/notice'
 
 export const SCHOOL_OPTIONS: Array<{ value: SchoolCode; label: string }> = [
@@ -19,8 +19,6 @@ export const inputStyle: CSSProperties = {
   color: 'var(--admin-text)',
   fontSize: '0.8rem',
 }
-
-// ─── 유틸 함수 ────────────────────────────────────────────────────────────────
 
 export function getSchoolLabel(school: SchoolCode) {
   return SCHOOL_OPTIONS.find((option) => option.value === school)?.label ?? school
@@ -46,12 +44,22 @@ export function formatAwardedAt(value: string) {
   }).format(date)
 }
 
-export function formatAwardedAtParts(value: string): { date: string; time: string } {
+export function formatAwardedAtParts(value: string): {
+  date: string
+  time: string
+} {
   const d = new Date(value)
   if (Number.isNaN(d.getTime())) return { date: value, time: '' }
   return {
-    date: new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(d),
-    time: new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit' }).format(d),
+    date: new Intl.DateTimeFormat('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(d),
+    time: new Intl.DateTimeFormat('ko-KR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(d),
   }
 }
 
@@ -62,9 +70,13 @@ export function toDateTimeLocalValue(value: string) {
   return localDate.toISOString().slice(0, 16)
 }
 
-// ─── Card ─────────────────────────────────────────────────────────────────────
-
-export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
+export function Card({
+  children,
+  className = '',
+}: {
+  children: ReactNode
+  className?: string
+}) {
   return (
     <div
       className={`rounded-xl border p-5 ${className}`}
@@ -74,8 +86,6 @@ export function Card({ children, className = '' }: { children: ReactNode; classN
     </div>
   )
 }
-
-// ─── SectionTitle ─────────────────────────────────────────────────────────────
 
 export function SectionTitle({ children }: { children: ReactNode }) {
   return (
@@ -88,17 +98,15 @@ export function SectionTitle({ children }: { children: ReactNode }) {
   )
 }
 
-// ─── Badge ────────────────────────────────────────────────────────────────────
-
-export function Badge({ type, children }: { type: MileageType; children: ReactNode }) {
-  return (
-    <span className={type === 'reward' ? 'badge-reward' : 'badge-penalty'}>
-      {children}
-    </span>
-  )
+export function Badge({
+  type,
+  children,
+}: {
+  type: MileageType
+  children: ReactNode
+}) {
+  return <span className={type === 'reward' ? 'badge-reward' : 'badge-penalty'}>{children}</span>
 }
-
-// ─── StatCard ─────────────────────────────────────────────────────────────────
 
 export function StatCard({
   label,
@@ -147,13 +155,9 @@ export function StatCard({
   )
 }
 
-// ─── FilterRow ────────────────────────────────────────────────────────────────
-
 export function FilterRow({ children }: { children: ReactNode }) {
   return <div className="flex flex-wrap items-center gap-2">{children}</div>
 }
-
-// ─── FilterSelect ─────────────────────────────────────────────────────────────
 
 export function FilterSelect({
   value,
@@ -184,8 +188,6 @@ export function FilterSelect({
     </select>
   )
 }
-
-// ─── SectionHeader ────────────────────────────────────────────────────────────
 
 export function SectionHeader({
   title,
@@ -219,56 +221,42 @@ export function SectionHeader({
   )
 }
 
-// ─── ScoreSummaryBar ──────────────────────────────────────────────────────────
-
-export function ScoreSummaryBar({ reward, penalty }: { reward: number; penalty: number }) {
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => {
-    const t = requestAnimationFrame(() => {
-      requestAnimationFrame(() => setMounted(true))
-    })
-    return () => cancelAnimationFrame(t)
-  }, [reward, penalty])
-
+export function ScoreSummaryBar({
+  reward,
+  penalty,
+}: {
+  reward: number
+  penalty: number
+}) {
   const total = reward + penalty
-  const rewardPct = total > 0 ? Math.round((reward / total) * 100) : 0
-  const penaltyPct = total > 0 ? 100 - rewardPct : 0
 
-  if (total === 0) return null
+  if (total === 0) {
+    return null
+  }
+
+  const rewardWidth = total > 0 ? `${(reward / total) * 100}%` : '50%'
+  const penaltyWidth = total > 0 ? `${(penalty / total) * 100}%` : '50%'
 
   return (
-    <div className="space-y-1.5">
+    <div>
       <div
-        className="flex justify-between text-[11px]"
-        style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
+        className="flex h-3 overflow-hidden rounded-full"
+        style={{ backgroundColor: 'var(--border)' }}
       >
-        <span style={{ color: 'var(--reward)' }}>상점 {rewardPct}%</span>
-        <span style={{ color: 'var(--penalty)' }}>벌점 {penaltyPct}%</span>
+        <div style={{ width: rewardWidth, backgroundColor: 'var(--reward)' }} />
+        <div style={{ width: penaltyWidth, backgroundColor: 'var(--penalty)' }} />
       </div>
-      <div className="flex h-1.5 overflow-hidden rounded-full" style={{ backgroundColor: 'var(--border)' }}>
-        <div
-          className="h-full"
-          style={{
-            width: mounted ? `${rewardPct}%` : '0%',
-            backgroundColor: 'var(--reward)',
-            transition: 'width 600ms cubic-bezier(0.16,1,0.3,1)',
-          }}
-        />
-        <div
-          className="h-full"
-          style={{
-            width: mounted ? `${penaltyPct}%` : '0%',
-            backgroundColor: 'var(--penalty)',
-            transition: 'width 600ms cubic-bezier(0.16,1,0.3,1)',
-          }}
-        />
-      </div>
-      <div
-        className="flex justify-between text-[11px]"
-        style={{ color: 'var(--fg-muted)', fontFamily: 'var(--font-space-grotesk)' }}
-      >
-        <span>+{reward}점</span>
-        <span>-{penalty}점</span>
+      <div className="mt-3 flex items-center justify-between gap-4 text-xs">
+        <span
+          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--reward)' }}
+        >
+          상점 {reward}점
+        </span>
+        <span
+          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--penalty)' }}
+        >
+          벌점 {penalty}점
+        </span>
       </div>
     </div>
   )

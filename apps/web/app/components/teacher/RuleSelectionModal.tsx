@@ -5,7 +5,7 @@ import { ModalBase } from '../ui/modal'
 import { SearchIcon, XIcon } from '../ui/icons'
 import { EmptyStatePane } from '../ui/list'
 import type { SchoolMileageRuleSummary } from './school-mileage-types'
-import { inputStyle } from './teacher-shared'
+import { inputStyle } from '../mileage/shared'
 import { koreanIncludes } from '@/lib/korean-search'
 
 type RuleSelectionModalProps = {

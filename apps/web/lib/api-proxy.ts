@@ -5,7 +5,8 @@ import {
   AUTH_SESSION_COOKIE,
   type AuthRole,
   type AuthSession,
-  readAuthSession,
+  readAuthSessionId,
+  resolveAuthSession,
 } from './auth-session'
 import { getInternalApiSecret } from './runtime-env'
 
@@ -29,8 +30,19 @@ export async function proxyApiRequest(
     actorHeaders,
   }: ProxyApiRequestOptions,
 ) {
-  const token = (await cookies()).get(AUTH_SESSION_COOKIE)?.value
-  const session = readAuthSession(token)
+  let session: AuthSession | null = null
+
+  try {
+    const sessionId = readAuthSessionId(
+      (await cookies()).get(AUTH_SESSION_COOKIE)?.value,
+    )
+    session = await resolveAuthSession(sessionId)
+  } catch {
+    return NextResponse.json(
+      { message: proxyFailureMessage },
+      { status: 502 },
+    )
+  }
 
   if (!session || session.role !== allowedRole) {
     return NextResponse.json(
@@ -77,6 +89,7 @@ function buildProxyHeaders(
 ) {
   const headers: Record<string, string> = {
     'x-internal-api-secret': getInternalApiSecret(),
+    'x-actor-session-id': session.id,
   }
 
   if (hasJsonBody) {

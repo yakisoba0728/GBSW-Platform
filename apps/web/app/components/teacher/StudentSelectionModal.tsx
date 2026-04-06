@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '../ui/button'
 import { EmptyStatePane, ListSkeleton } from '../ui/list'
 import { ModalBase } from '../ui/modal'
@@ -11,7 +11,7 @@ import {
   SCHOOL_OPTIONS,
   getSchoolLabel,
   inputStyle,
-} from './teacher-shared'
+} from '../mileage/shared'
 import { koreanIncludes } from '@/lib/korean-search'
 
 type StudentSelectionModalProps = {
@@ -37,6 +37,7 @@ export default function StudentSelectionModal({
   >(new Map())
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const fetchAbortControllerRef = useRef<AbortController | null>(null)
 
   const visibleStudents = useMemo(() => {
     const query = name.trim()
@@ -70,40 +71,60 @@ export default function StudentSelectionModal({
   useEffect(() => {
     if (!isOpen) return
 
-    const timeoutId = window.setTimeout(() => {
-      void (async () => {
-        setIsLoading(true)
-        setError(null)
+    const abortController = new AbortController()
+    fetchAbortControllerRef.current?.abort()
+    fetchAbortControllerRef.current = abortController
 
-        const params = new URLSearchParams()
-        if (school) params.set('school', school)
-        if (grade) params.set('year', grade)
-        if (classNumber) params.set('classNumber', classNumber)
+    void (async () => {
+      setIsLoading(true)
+      setError(null)
 
-        try {
-          const response = await fetch(
-            `/api/teacher/school-mileage/students?${params.toString()}`,
-            { cache: 'no-store' },
-          )
-          const result = await response.json().catch(() => null)
+      const params = new URLSearchParams()
+      if (school) params.set('school', school)
+      if (grade) params.set('year', grade)
+      if (classNumber) params.set('classNumber', classNumber)
 
-          if (!response.ok) {
-            setError(result?.message ?? '학생 목록을 불러오지 못했습니다.')
-            setStudents([])
-            return
-          }
+      try {
+        const response = await fetch(
+          `/api/teacher/school-mileage/students?${params.toString()}`,
+          {
+            cache: 'no-store',
+            signal: abortController.signal,
+          },
+        )
+        const result = await response.json().catch(() => null)
 
-          setStudents(Array.isArray(result?.students) ? result.students : [])
-        } catch {
-          setError('학생 목록을 불러오는 중 문제가 발생했습니다.')
+        if (
+          fetchAbortControllerRef.current !== abortController ||
+          abortController.signal.aborted
+        ) {
+          return
+        }
+
+        if (!response.ok) {
+          setError(result?.message ?? '학생 목록을 불러오지 못했습니다.')
           setStudents([])
-        } finally {
+          return
+        }
+
+        setStudents(Array.isArray(result?.students) ? result.students : [])
+      } catch {
+        if (abortController.signal.aborted) {
+          return
+        }
+        setError('학생 목록을 불러오는 중 문제가 발생했습니다.')
+        setStudents([])
+      } finally {
+        if (fetchAbortControllerRef.current === abortController) {
+          fetchAbortControllerRef.current = null
           setIsLoading(false)
         }
-      })()
-    }, 200)
+      }
+    })()
 
-    return () => window.clearTimeout(timeoutId)
+    return () => {
+      abortController.abort()
+    }
   }, [classNumber, grade, isOpen, school])
 
   function toggleStudent(student: SchoolMileageStudentOption) {

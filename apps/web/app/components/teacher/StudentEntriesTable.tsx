@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge, Card, SectionTitle, formatAwardedAtParts, formatSignedScore } from './teacher-shared'
+import { Badge, Card, SectionTitle, formatAwardedAtParts, formatSignedScore } from '../mileage/shared'
 import {
   AnimatedTableRow,
   EmptyStatePane,
@@ -46,7 +46,7 @@ export default function StudentEntriesTable({
       </div>
 
       {/* 테이블 */}
-      <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-x-auto">
         {isLoading ? (
           <TableRowSkeleton columns={6} count={5} />
         ) : entries.length === 0 ? (

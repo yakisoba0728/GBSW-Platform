@@ -1,6 +1,8 @@
 'use client'
 
-import { Card, ScoreSummaryBar, StatCard } from './teacher-shared'
+import { Card, ScoreSummaryBar, StatCard } from '../mileage/shared'
+import { StatCardSkeleton } from '../ui/list'
+import { SummaryBarSkeleton } from '../ui/page-skeletons'
 import type { StudentMileageSummary } from './school-mileage-types'
 
 export default function StudentSummaryCards({
@@ -12,26 +14,14 @@ export default function StudentSummaryCards({
 }) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-3 gap-3">
-        {[0, 1, 2].map((index) => (
-          <div
-            key={index}
-            className="relative h-24 overflow-hidden rounded-xl border"
-            style={{
-              borderColor: 'var(--border)',
-              backgroundColor: 'var(--bg-subtle)',
-            }}
-          >
-            <div
-              className="absolute inset-0 animate-shimmer"
-              style={{
-                background:
-                  'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)',
-              }}
-            />
-          </div>
-        ))}
-      </div>
+      <>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <StatCardSkeleton key={index} />
+          ))}
+        </div>
+        <SummaryBarSkeleton />
+      </>
     )
   }
 
@@ -41,7 +31,7 @@ export default function StudentSummaryCards({
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatCard
           label="상점 합계"
           value={`+${summary.rewardTotal}점`}
@@ -59,6 +49,26 @@ export default function StudentSummaryCards({
           subValue="상점 - 벌점"
           colorToken={summary.netScore >= 0 ? 'green' : 'red'}
         />
+        <Card>
+          <p
+            className="text-[11px] uppercase tracking-wider"
+            style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--fg-muted)' }}
+          >
+            전체 건수
+          </p>
+          <p
+            className="mt-2 text-2xl font-semibold leading-none"
+            style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--fg)' }}
+          >
+            {summary.entryCount}건
+          </p>
+          <p
+            className="mt-1.5 text-xs"
+            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg-muted)' }}
+          >
+            조회된 총 상벌점 기록
+          </p>
+        </Card>
       </div>
       <Card>
         <p

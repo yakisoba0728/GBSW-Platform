@@ -97,6 +97,7 @@ export function Button({
   const isInert = disabled || loading
 
   const baseStyle: React.CSSProperties = {
+    position: 'relative',
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -131,9 +132,32 @@ export function Button({
         style={baseStyle}
         aria-busy={loading}
       >
-        {loading && <LoadingSpinner />}
-        {!loading && iconEl}
-        {!loading && children}
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            visibility: loading ? 'hidden' : 'visible',
+          }}
+        >
+          {iconEl}
+          {children}
+        </span>
+        {loading && (
+          <span
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              pointerEvents: 'none',
+            }}
+          >
+            <LoadingSpinner />
+          </span>
+        )}
       </button>
     )
   }
@@ -148,9 +172,32 @@ export function Button({
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
     >
-      {loading && <LoadingSpinner />}
-      {!loading && iconEl}
-      {children}
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          visibility: loading ? 'hidden' : 'visible',
+        }}
+      >
+        {iconEl}
+        {children}
+      </span>
+      {loading && (
+        <span
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          <LoadingSpinner />
+        </span>
+      )}
     </motion.button>
   )
 }

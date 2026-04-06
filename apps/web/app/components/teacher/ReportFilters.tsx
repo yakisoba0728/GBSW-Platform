@@ -3,7 +3,7 @@
 import { RefreshCw, Printer, Download } from 'lucide-react'
 import { Button } from '../ui/button'
 import { UsersIcon } from '../ui/icons'
-import { Card, FilterRow, SectionHeader, inputStyle } from './teacher-shared'
+import { Card, FilterRow, SectionHeader, inputStyle } from '../mileage/shared'
 import type { SchoolCode } from './school-mileage-types'
 
 type ReportType = 'student' | 'class' | 'all'

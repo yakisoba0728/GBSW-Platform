@@ -1,7 +1,7 @@
+import { AuthRole } from '@prisma/client';
 import { UnauthorizedException } from '@nestjs/common';
 import type { PrismaService } from '../prisma/prisma.service';
 import { parseRequiredTextInput } from '../common/parsers';
-import { getApiRuntimeEnv } from '../config/runtime-env';
 
 export async function assertTeacherExists(
   prisma: PrismaService,
@@ -32,19 +32,10 @@ export async function assertTeacherOrSuperAdmin(
   prisma: PrismaService,
   actorTeacherId: string | undefined,
   actorSuperAdminId: string | undefined,
+  actorSessionId: string | undefined,
 ) {
   if (typeof actorSuperAdminId === 'string' && actorSuperAdminId.trim()) {
-    const { SUPER_ADMIN_ID } = getApiRuntimeEnv();
-    const superAdminId = actorSuperAdminId.trim();
-
-    if (superAdminId !== SUPER_ADMIN_ID) {
-      throw new UnauthorizedException('유효한 최고관리자 계정이 아닙니다.');
-    }
-
-    return {
-      role: 'super-admin' as const,
-      accountId: superAdminId,
-    };
+    return assertSuperAdmin(prisma, actorSuperAdminId, actorSessionId);
   }
 
   const teacher = await assertTeacherExists(prisma, actorTeacherId);
@@ -55,16 +46,36 @@ export async function assertTeacherOrSuperAdmin(
   };
 }
 
-export function assertSuperAdmin(
+export async function assertSuperAdmin(
+  prisma: PrismaService,
   actorSuperAdminId: string | undefined,
+  actorSessionId: string | undefined,
 ) {
-  const { SUPER_ADMIN_ID } = getApiRuntimeEnv();
   const superAdminId = parseRequiredTextInput(
     actorSuperAdminId,
     '최고관리자 계정 정보가 올바르지 않습니다.',
   );
+  const sessionId = parseRequiredTextInput(
+    actorSessionId,
+    '최고관리자 세션 정보가 올바르지 않습니다.',
+  );
 
-  if (superAdminId !== SUPER_ADMIN_ID) {
+  const session = await prisma.authSession.findFirst({
+    where: {
+      id: sessionId,
+      accountId: superAdminId,
+      role: AuthRole.SUPER_ADMIN,
+      revokedAt: null,
+      expiresAt: {
+        gt: new Date(),
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!session) {
     throw new UnauthorizedException('유효한 최고관리자 계정이 아닙니다.');
   }
 

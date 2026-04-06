@@ -1,7 +1,7 @@
 'use client'
 
 import SchoolMileageGrant from '@/app/components/teacher/SchoolMileageGrant'
-import { useRulesContext } from '../../_components/RulesContext'
+import { useRulesContext } from '@/app/components/mileage/rules-context'
 
 export default function TeacherMileageGrantPage() {
   const { rules, isRulesLoading, rulesError } = useRulesContext()

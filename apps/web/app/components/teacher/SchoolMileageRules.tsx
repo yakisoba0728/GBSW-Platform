@@ -8,7 +8,7 @@ import {
   SectionHeader,
   NoticeBox,
   inputStyle,
-} from './teacher-shared'
+} from '../mileage/shared'
 import SuccessModal from '../ui/success-modal'
 import { AnimatedTableRow, ListEmptyState, TableRowSkeleton } from '../ui/list'
 import { Button } from '../ui/button'
@@ -178,7 +178,7 @@ export default function SchoolMileageRules({
       </Card>
 
       <Card className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
-        <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto">
+        <div className="min-h-0 flex-1 overflow-x-auto">
           <table className="w-full text-xs">
             <thead className="table-header">
               <tr>

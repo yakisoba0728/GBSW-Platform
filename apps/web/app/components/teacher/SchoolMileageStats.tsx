@@ -12,7 +12,7 @@ import {
   SectionTitle,
   StatCard,
   inputStyle,
-} from './teacher-shared'
+} from '../mileage/shared'
 import SuccessModal from '../ui/success-modal'
 import { Button } from '../ui/button'
 import { AnimatedListItem, ListEmptyState, ListSkeleton, StatCardSkeleton } from '../ui/list'
@@ -159,6 +159,10 @@ export default function SchoolMileageStats() {
       )
       const data = await res.json().catch(() => null)
 
+      if (abortRef.current !== ctrl || ctrl.signal.aborted) {
+        return
+      }
+
       if (!res.ok) {
         setQueryError(data?.message ?? '통계 데이터를 불러오지 못했습니다.')
         setShowQueryErrorModal(true)
@@ -176,13 +180,20 @@ export default function SchoolMileageStats() {
           : [],
       })
     } catch (error) {
+      if (abortRef.current !== ctrl || ctrl.signal.aborted) {
+        return
+      }
+
       if ((error as Error).name !== 'AbortError') {
         setQueryError('통계 조회 중 문제가 발생했습니다.')
         setShowQueryErrorModal(true)
         setResponse(EMPTY_RESPONSE)
       }
     } finally {
-      setIsLoading(false)
+      if (abortRef.current === ctrl) {
+        abortRef.current = null
+        setIsLoading(false)
+      }
     }
   }, [endDate, filterSchool, filterYear, startDate])
 
@@ -287,7 +298,7 @@ export default function SchoolMileageStats() {
         </div>
       </Card>
 
-      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4">
+      <div className="flex flex-col gap-4">
       <SuccessModal
         open={showQueryErrorModal && !!queryError}
         onClose={() => setShowQueryErrorModal(false)}

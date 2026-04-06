@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import type { SchoolMileageRuleSummary } from '@/app/components/teacher/school-mileage-types'
+import type { SchoolMileageRuleSummary } from '../teacher/school-mileage-types'
 
 type RulesContextValue = {
   rules: SchoolMileageRuleSummary[]
@@ -12,7 +12,13 @@ type RulesContextValue = {
 
 const RulesContext = createContext<RulesContextValue | null>(null)
 
-export function RulesProvider({ children, apiPath = '/api/teacher/school-mileage/rules' }: { children: React.ReactNode; apiPath?: string }) {
+export function RulesProvider({
+  children,
+  apiPath = '/api/teacher/school-mileage/rules',
+}: {
+  children: React.ReactNode
+  apiPath?: string
+}) {
   const [rules, setRules] = useState<SchoolMileageRuleSummary[]>([])
   const [isRulesLoading, setIsRulesLoading] = useState(true)
   const [rulesError, setRulesError] = useState<string | null>(null)

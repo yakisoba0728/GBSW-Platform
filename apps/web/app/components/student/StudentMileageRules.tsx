@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Card } from '@/app/components/teacher/teacher-shared'
+import { Card } from '@/app/components/mileage/shared'
 import { AnimatedListItem, ListEmptyState, ListSkeleton } from '@/app/components/ui/list'
 import { MileageBadge } from '@/app/components/ui/primitives'
 import { SearchIcon } from '@/app/components/ui/icons'
@@ -158,7 +158,7 @@ export default function StudentMileageRules() {
         </div>
 
         {/* 규정 리스트 */}
-        <div className="min-h-0 flex-1 overflow-y-auto pr-0.5">
+        <div className="min-h-0 flex-1 pr-0.5">
           {isLoading ? (
             <ListSkeleton count={8} />
           ) : error ? (

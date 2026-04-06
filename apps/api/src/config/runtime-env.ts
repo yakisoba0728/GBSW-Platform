@@ -1,5 +1,4 @@
 const REQUIRED_RUNTIME_ENV_NAMES = [
-  'AUTH_SESSION_SECRET',
   'SUPER_ADMIN_ID',
   'SUPER_ADMIN_PASSWORD',
   'INTERNAL_API_SECRET',
@@ -29,6 +28,19 @@ export function getApiRuntimeEnv() {
   cachedRuntimeEnv = runtimeEnv;
 
   return runtimeEnv;
+}
+
+export function getInternalApiSecret() {
+  return getApiRuntimeEnv().INTERNAL_API_SECRET;
+}
+
+export function getSuperAdminCredentials() {
+  const { SUPER_ADMIN_ID, SUPER_ADMIN_PASSWORD } = getApiRuntimeEnv();
+
+  return {
+    id: SUPER_ADMIN_ID,
+    password: SUPER_ADMIN_PASSWORD,
+  };
 }
 
 function readRequiredEnv(name: RequiredRuntimeEnvName) {

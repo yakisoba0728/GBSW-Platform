@@ -1,5 +1,5 @@
 import TeacherShell from './_components/TeacherShell'
-import { RulesProvider } from './_components/RulesContext'
+import { RulesProvider } from '@/app/components/mileage/rules-context'
 import { requireRoleSession } from '@/lib/route-guards'
 
 export default async function TeacherLayout({

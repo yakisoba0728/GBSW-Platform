@@ -11,7 +11,7 @@ import {
   SectionHeader,
   StatCard,
   inputStyle,
-} from './teacher-shared'
+} from '../mileage/shared'
 import SuccessModal from '../ui/success-modal'
 import { Button } from '../ui/button'
 import { AnimatedListItem, ListEmptyState } from '../ui/list'
@@ -257,6 +257,10 @@ export default function SchoolMileageClass() {
       )
       const data = await res.json().catch(() => null)
 
+      if (abortRef.current !== ctrl || ctrl.signal.aborted) {
+        return
+      }
+
       if (!res.ok) {
         setQueryError(data?.message ?? '학급 현황 데이터를 불러오지 못했습니다.')
         setShowQueryErrorModal(true)
@@ -345,7 +349,7 @@ export default function SchoolMileageClass() {
         />
       )}
 
-      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4">
+      <div className="flex flex-1 min-h-0 flex-col gap-4">
 
       {!filterSchool && !isLoading && (
         <Card className="flex flex-1 flex-col">

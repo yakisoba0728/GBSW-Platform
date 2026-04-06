@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
+import { getModalMotion, getOverlayMotion, useMotionPreference } from './motion'
+import { acquireBodyScrollLock } from './scroll-lock'
 
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false })
 
@@ -64,6 +66,9 @@ function SuccessModalContent({
   description,
   autoCloseMs = 3000,
 }: Omit<SuccessModalProps, 'open'>) {
+  const prefersReducedMotion = useMotionPreference()
+  const overlayMotion = getOverlayMotion(prefersReducedMotion)
+  const modalMotion = getModalMotion(prefersReducedMotion)
   const [animationData, setAnimationData] = useState<object | null>(
     () => preloadLottie(type),
   )
@@ -114,19 +119,16 @@ function SuccessModalContent({
   }, [onClose])
 
   useEffect(() => {
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = ''
-    }
+    return acquireBodyScrollLock()
   }, [])
 
   return (
     <>
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
+        initial={overlayMotion.initial}
+        animate={overlayMotion.animate}
+        exit={overlayMotion.exit}
+        transition={overlayMotion.transition}
         onClick={onClose}
         style={{
           position: 'fixed',
@@ -138,10 +140,10 @@ function SuccessModalContent({
       />
 
       <motion.div
-        initial={{ opacity: 0, y: 16, scale: 0.96 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 8, scale: 0.97 }}
-        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+        initial={modalMotion.initial}
+        animate={modalMotion.animate}
+        exit={modalMotion.exit}
+        transition={modalMotion.transition}
         style={{
           position: 'fixed',
           inset: 0,

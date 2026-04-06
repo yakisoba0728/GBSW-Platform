@@ -4,6 +4,8 @@ import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, Trash2, Info, CircleCheck, CircleX, AlertTriangle } from 'lucide-react'
+import { getModalMotion, getOverlayMotion, useMotionPreference } from './motion'
+import { acquireBodyScrollLock } from './scroll-lock'
 
 // ─── Modal ────────────────────────────────────────────────────────────────────
 // AnimatePresence 기반 범용 모달.
@@ -32,6 +34,10 @@ export function Modal({
   size?: ModalSize
   hideHeader?: boolean
 }) {
+  const prefersReducedMotion = useMotionPreference()
+  const overlayMotion = getOverlayMotion(prefersReducedMotion)
+  const modalMotion = getModalMotion(prefersReducedMotion)
+
   // Escape 키로 닫기
   useEffect(() => {
     if (!open) return
@@ -44,14 +50,8 @@ export function Modal({
 
   // body 스크롤 잠금
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-    }
+    if (!open) return
+    return acquireBodyScrollLock()
   }, [open])
 
   const maxWidth = SIZE_MAP[size]
@@ -63,10 +63,10 @@ export function Modal({
           {/* Overlay */}
           <motion.div
             key="modal-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            initial={overlayMotion.initial}
+            animate={overlayMotion.animate}
+            exit={overlayMotion.exit}
+            transition={overlayMotion.transition}
             onClick={onClose}
             style={{
               position: 'fixed',
@@ -80,10 +80,10 @@ export function Modal({
           {/* Panel wrapper — pointer-events none so clicks pass through to overlay */}
           <motion.div
             key="modal-panel"
-            initial={{ opacity: 0, y: 16, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.97 }}
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            initial={modalMotion.initial}
+            animate={modalMotion.animate}
+            exit={modalMotion.exit}
+            transition={modalMotion.transition}
             style={{
               position: 'fixed',
               inset: 0,

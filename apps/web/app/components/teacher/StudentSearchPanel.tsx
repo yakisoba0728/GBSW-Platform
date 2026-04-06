@@ -6,7 +6,7 @@ import {
   SCHOOL_OPTIONS,
   SectionHeader,
   inputStyle,
-} from './teacher-shared'
+} from '../mileage/shared'
 import { Button } from '../ui/button'
 import type { SchoolCode } from './school-mileage-types'
 

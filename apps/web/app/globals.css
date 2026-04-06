@@ -106,8 +106,8 @@
   }
 
   body {
-    height: 100svh;
-    overflow: hidden;
+    min-height: 100svh;
+    overflow-x: hidden;
     background-color: var(--bg);
     color: var(--fg);
     font-family: var(--font-space-grotesk), var(--font-noto-sans-kr), 'Apple SD Gothic Neo', sans-serif;
@@ -315,6 +315,30 @@ html.no-transitions *::before,
 html.no-transitions *::after {
   transition: none !important;
   animation-duration: 0ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-slide-down,
+  .animate-slide-up,
+  .animate-fade-in,
+  .animate-fade-out,
+  .animate-fade-in-up,
+  .animate-scale-in,
+  .animate-scale-out,
+  .animate-shimmer,
+  .animate-overlay-enter,
+  .animate-overlay-exit {
+    animation: none !important;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
 }
 
 /* ─── Print styles ──────────────────────────────────────────── */

@@ -9,7 +9,7 @@ import { UserPlusIcon } from '../ui/icons'
 import RuleSelectionModal from './RuleSelectionModal'
 import StudentSelectionModal from './StudentSelectionModal'
 import GrantRowCard, { type GrantRow } from './GrantRowCard'
-import { Card, NoticeBox } from './teacher-shared'
+import { Card, NoticeBox } from '../mileage/shared'
 import type {
   CreateSchoolMileageEntriesPayload,
   SchoolMileageRuleSummary,
@@ -274,7 +274,7 @@ export default function SchoolMileageGrant({
                 <span style={{ width: 32 }} />
               </div>
 
-              <div className="flex-1 min-h-0 overflow-y-auto space-y-2">
+              <div className="flex-1 min-h-0 space-y-2">
                 {rows.map((row, index) => (
                   <GrantRowCard
                     key={row.localId}

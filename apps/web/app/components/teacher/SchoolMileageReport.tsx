@@ -2,21 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Printer } from 'lucide-react'
 import {
-  Card,
-  NoticeBox,
   SCHOOL_OPTIONS,
-  SectionTitle,
   formatAwardedAt,
   formatSignedScore,
   getSchoolLabel,
-} from './teacher-shared'
+} from '../mileage/shared'
 import SuccessModal from '../ui/success-modal'
-import { Button } from '../ui/button'
-import { EmptyStatePane, ListSkeleton } from '../ui/list'
-import { FileIcon } from '../ui/icons'
-import { RefetchWrapper } from '../ui/primitives'
 import { exportToExcel } from '@/lib/export-utils'
 import type {
   ClassMileageAnalyticsResponse,
@@ -26,10 +18,8 @@ import type {
   SchoolMileageStudentOption,
   StudentMileageAnalyticsResponse,
 } from './school-mileage-types'
-import AllEntriesReportTable from './AllEntriesReportTable'
-import ClassReportTable from './ClassReportTable'
 import ReportFilters from './ReportFilters'
-import StudentReportTable from './StudentReportTable'
+import SchoolMileageReportPreview from './SchoolMileageReportPreview'
 import StudentSelectionModal from './StudentSelectionModal'
 import {
   getPositiveQueryNumber,
@@ -162,6 +152,10 @@ export default function SchoolMileageReport() {
           )
           const data = await res.json().catch(() => null)
 
+          if (abortRef.current !== ctrl || ctrl.signal.aborted) {
+            return
+          }
+
           if (!res.ok) {
             setPreviewError(data?.message ?? '데이터를 불러오지 못했습니다.')
             setShowPreviewErrorModal(true)
@@ -186,6 +180,10 @@ export default function SchoolMileageReport() {
           )
         }
 
+        if (abortRef.current !== ctrl || ctrl.signal.aborted) {
+          return
+        }
+
         setAllEntriesReport({
           items: allItems,
           page,
@@ -205,6 +203,10 @@ export default function SchoolMileageReport() {
         cache: 'no-store',
       })
       const data = await res.json().catch(() => null)
+
+      if (abortRef.current !== ctrl || ctrl.signal.aborted) {
+        return
+      }
 
       if (!res.ok) {
         setPreviewError(data?.message ?? '데이터를 불러오지 못했습니다.')
@@ -394,8 +396,6 @@ export default function SchoolMileageReport() {
 
   const showInitialLoading = isLoading && !hasPreviewData
   const showRefetchOverlay = isLoading && hasPreviewData
-  const showErrorBanner =
-    showPreviewErrorModal && !!previewError && hasPreviewData
 
   return (
     <div className="flex flex-col h-full gap-4">
@@ -446,163 +446,37 @@ export default function SchoolMileageReport() {
       />
 
       <SuccessModal
-        open={showErrorBanner}
+        open={showPreviewErrorModal && !!previewError && hasPreviewData}
         onClose={() => setShowPreviewErrorModal(false)}
         type="error"
         title="리포트 조회 실패"
         description={previewError ?? ''}
       />
-      {previewError && hasPreviewData && (
-        <NoticeBox type="error" message={previewError} />
-      )}
-
-      <div className="print-area flex flex-col flex-1 min-h-0">
-        {showInitialLoading ? (
-          <Card className="min-h-[320px]">
-            <ListSkeleton count={5} rowHeight="h-12" />
-          </Card>
-        ) : !hasPreviewData && previewError ? (
-          <Card className="flex flex-1 min-h-0 flex-col">
-            <EmptyStatePane
-              icon={<FileIcon style={{ color: 'var(--admin-accent)' }} />}
-              title="미리보기를 불러오지 못했습니다"
-              description={previewError}
-              className="min-h-[320px]"
-            />
-          </Card>
-        ) : !hasPreviewData ? (
-          <Card className="flex flex-1 min-h-0 flex-col">
-            <EmptyStatePane
-              icon={<FileIcon style={{ color: 'var(--admin-accent)' }} />}
-              title="데이터가 없습니다"
-              description="다른 조건으로 다시 조회해 보세요."
-              className="min-h-[320px]"
-            />
-          </Card>
-        ) : (
-          <RefetchWrapper
-            isFetching={showRefetchOverlay}
-            isInitialLoad={false}
-            className="flex flex-col flex-1 min-h-0"
-          >
-            <Card className="overflow-hidden p-0 flex flex-col flex-1 min-h-0">
-              <div
-                className="flex-shrink-0 flex items-start justify-between px-5 py-4"
-                style={{ borderBottom: '1px solid var(--admin-border)' }}
-              >
-                <div>
-                  <SectionTitle>{reportTitle}</SectionTitle>
-                  <p
-                    className="text-xs"
-                    style={{
-                      fontFamily: 'var(--font-space-grotesk)',
-                      color: 'var(--admin-text-muted)',
-                    }}
-                  >
-                    총 {totalCount}건
-                    {reportType === 'all' && allEntriesReport.totalCount > pageSize && (
-                      <span className="ml-2">
-                        (페이지 {allEntriesCurrentPage} / {allEntriesPageCount})
-                      </span>
-                    )}
-                  </p>
-                </div>
-                <Button className="no-print" variant="ghost" size="sm" icon={<Printer size={12} aria-hidden="true" />} onClick={handlePrint}>인쇄</Button>
-              </div>
-
-              <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto">
-                {reportType === 'student' && (
-                  hasPreview ? (
-                    <StudentReportTable
-                      students={filteredStudents}
-                      startDate={startDate}
-                      endDate={endDate}
-                    />
-                  ) : (
-                    <EmptyStatePane
-                      icon={<FileIcon style={{ color: 'var(--admin-accent)' }} />}
-                      title="조회 결과가 없습니다"
-                      description="선택한 학생 조건을 다시 확인해 보세요."
-                      className="min-h-full"
-                    />
-                  )
-                )}
-                {reportType === 'class' && (
-                  hasPreview ? (
-                    <ClassReportTable classes={classReport.classes} />
-                  ) : (
-                    <EmptyStatePane
-                      icon={<FileIcon style={{ color: 'var(--admin-accent)' }} />}
-                      title="조회 결과가 없습니다"
-                      description="다른 조건으로 다시 조회해 보세요."
-                      className="min-h-full"
-                    />
-                  )
-                )}
-                {reportType === 'all' && (
-                  hasPreview ? (
-                    <>
-                      <div className="no-print">
-                        <AllEntriesReportTable entries={allEntriesPreviewItems} />
-                      </div>
-                      <div className="print-only">
-                        <AllEntriesReportTable entries={allEntriesReport.items} />
-                      </div>
-                    </>
-                  ) : (
-                    <EmptyStatePane
-                      icon={<FileIcon style={{ color: 'var(--admin-accent)' }} />}
-                      title="조회 결과가 없습니다"
-                      description="다른 조건으로 다시 조회해 보세요."
-                      className="min-h-full"
-                    />
-                  )
-                )}
-              </div>
-
-              {reportType === 'all' && allEntriesReport.totalCount > pageSize && (
-                <div className="no-print flex flex-shrink-0 items-center justify-end gap-2 px-5 py-4">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      updateSearchParams({
-                        page: Math.max(1, allEntriesCurrentPage - 1),
-                        pageSize,
-                      })
-                    }
-                    disabled={allEntriesCurrentPage <= 1}
-                  >
-                    이전
-                  </Button>
-                  <span
-                    className="text-xs"
-                    style={{
-                      fontFamily: 'var(--font-space-grotesk)',
-                      color: 'var(--admin-text-muted)',
-                    }}
-                  >
-                    {allEntriesCurrentPage} / {allEntriesPageCount}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      updateSearchParams({
-                        page: Math.min(allEntriesPageCount, allEntriesCurrentPage + 1),
-                        pageSize,
-                      })
-                    }
-                    disabled={allEntriesCurrentPage >= allEntriesPageCount}
-                  >
-                    다음
-                  </Button>
-                </div>
-              )}
-            </Card>
-          </RefetchWrapper>
-        )}
-      </div>
+      <SchoolMileageReportPreview
+        showInitialLoading={showInitialLoading}
+        hasPreviewData={hasPreviewData}
+        previewError={previewError}
+        showRefetchOverlay={showRefetchOverlay}
+        reportType={reportType}
+        reportTitle={reportTitle}
+        totalCount={totalCount}
+        pageSize={pageSize}
+        allEntriesCurrentPage={allEntriesCurrentPage}
+        allEntriesPageCount={allEntriesPageCount}
+        filteredStudents={filteredStudents}
+        classReport={classReport}
+        allEntriesReport={allEntriesReport}
+        allEntriesPreviewItems={allEntriesPreviewItems}
+        startDate={startDate}
+        endDate={endDate}
+        onPrint={handlePrint}
+        onPageChange={(nextPage) =>
+          updateSearchParams({
+            page: nextPage,
+            pageSize,
+          })
+        }
+      />
 
       <StudentSelectionModal
         isOpen={studentModalOpen}

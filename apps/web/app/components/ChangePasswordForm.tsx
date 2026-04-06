@@ -6,6 +6,8 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import LogoutButton from './LogoutButton'
+import { Button } from './ui/button'
+import { getSectionMotion, useMotionPreference } from './ui/motion'
 
 const ThemeToggle = dynamic(() => import('./ThemeToggle'), {
   ssr: false,
@@ -22,6 +24,8 @@ export default function ChangePasswordForm({
   role,
 }: ChangePasswordFormProps) {
   const router = useRouter()
+  const prefersReducedMotion = useMotionPreference()
+  const panelMotion = getSectionMotion(prefersReducedMotion)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showNewPassword, setShowNewPassword] = useState(false)
@@ -85,9 +89,9 @@ export default function ChangePasswordForm({
       {/* 폼 영역 */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 32px 40px' }}>
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, ease: 'easeOut' }}
+          initial={panelMotion.initial}
+          animate={panelMotion.animate}
+          transition={panelMotion.transition}
           style={{ width: '100%', maxWidth: 380 }}
         >
           {/* 헤딩 */}
@@ -167,42 +171,15 @@ export default function ChangePasswordForm({
             </AnimatePresence>
 
             {/* 제출 버튼 */}
-            <motion.button
+            <Button
               type="submit"
-              disabled={isSubmitting}
-              whileTap={isSubmitting ? undefined : { scale: 0.98 }}
-              style={{
-                width: '100%',
-                height: 42,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                borderRadius: 8,
-                border: 'none',
-                cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                fontSize: 14,
-                fontWeight: 600,
-                color: 'white',
-                backgroundColor: 'var(--accent)',
-                opacity: isSubmitting ? 0.7 : 1,
-                transition: 'opacity 0.15s ease, filter 0.15s ease',
-                marginTop: 4,
-              }}
-              onMouseEnter={(e) => { if (!isSubmitting) e.currentTarget.style.filter = 'brightness(0.92)' }}
-              onMouseLeave={(e) => { e.currentTarget.style.filter = 'none' }}
+              size="lg"
+              fullWidth
+              loading={isSubmitting}
+              className="mt-1"
             >
-              {isSubmitting && (
-                <motion.svg
-                  width="16" height="16" viewBox="0 0 16 16" fill="none"
-                  animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 0.7, ease: 'linear' }}
-                >
-                  <circle cx="8" cy="8" r="6" stroke="white" strokeWidth="2" strokeDasharray="28 8" fill="none" />
-                </motion.svg>
-              )}
-              {isSubmitting ? '변경 중...' : '비밀번호 변경'}
-            </motion.button>
+              비밀번호 변경
+            </Button>
           </form>
 
           {/* 로그아웃 */}

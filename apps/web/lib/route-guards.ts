@@ -6,13 +6,16 @@ import {
   type AuthSession,
   getDefaultRedirectPathForRole,
   getRedirectPathForSession,
-  readAuthSession,
+  readAuthSessionId,
+  resolveAuthSession,
 } from './auth-session'
 
 export async function getServerAuthSession() {
-  const token = (await cookies()).get(AUTH_SESSION_COOKIE)?.value
+  const sessionId = readAuthSessionId(
+    (await cookies()).get(AUTH_SESSION_COOKIE)?.value,
+  )
 
-  return readAuthSession(token)
+  return resolveAuthSession(sessionId)
 }
 
 export async function redirectAuthenticatedSession() {

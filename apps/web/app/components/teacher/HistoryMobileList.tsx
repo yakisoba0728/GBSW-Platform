@@ -1,6 +1,6 @@
 'use client'
 
-import { formatAwardedAt, getSchoolLabel } from './teacher-shared'
+import { formatAwardedAt, getSchoolLabel } from '../mileage/shared'
 import {
   AnimatedListItem,
   EmptyStatePane,
@@ -24,7 +24,7 @@ export default function HistoryMobileList({
   onDelete: (item: SchoolMileageHistoryItem) => void
   }) {
   return (
-    <div className="relative min-h-0 flex-1 overflow-y-auto pr-0.5 md:hidden">
+    <div className="relative min-h-0 flex-1 pr-0.5 md:hidden">
       {isLoading ? (
         <ListSkeleton count={6} rowHeight="h-24" />
       ) : items.length === 0 ? (

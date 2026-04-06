@@ -16,23 +16,39 @@ export class SchoolMileageService {
   getRules(
     actorTeacherId: string | undefined,
     actorSuperAdminId?: string,
+    actorSessionId?: string,
   ) {
-    return this.rulesService.getRules(actorTeacherId, actorSuperAdminId);
+    return this.rulesService.getRules(
+      actorTeacherId,
+      actorSuperAdminId,
+      actorSessionId,
+    );
   }
 
   createRule(
     actorSuperAdminId: string | undefined,
+    actorSessionId: string | undefined,
     body: Record<string, unknown>,
   ) {
-    return this.rulesService.createRule(actorSuperAdminId, body);
+    return this.rulesService.createRule(
+      actorSuperAdminId,
+      actorSessionId,
+      body,
+    );
   }
 
   updateRule(
     actorSuperAdminId: string | undefined,
+    actorSessionId: string | undefined,
     id: string,
     body: Record<string, unknown>,
   ) {
-    return this.rulesService.updateRule(actorSuperAdminId, id, body);
+    return this.rulesService.updateRule(
+      actorSuperAdminId,
+      actorSessionId,
+      id,
+      body,
+    );
   }
 
   getStudents(

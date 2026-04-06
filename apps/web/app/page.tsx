@@ -1,14 +1,16 @@
-import BrandPanel from './components/BrandPanel'
+import AuthShell from './components/auth/AuthShell'
 import LoginForm from './components/LoginForm'
+import RouteTransition from './components/ui/RouteTransition'
 import { redirectAuthenticatedSession } from '@/lib/route-guards'
 
 export default async function Home() {
   await redirectAuthenticatedSession()
 
   return (
-    <main className="flex min-h-screen w-full">
-      <BrandPanel />
-      <LoginForm />
-    </main>
+    <AuthShell>
+      <RouteTransition style={{ flex: 1, height: '100%' }}>
+        <LoginForm />
+      </RouteTransition>
+    </AuthShell>
   )
 }

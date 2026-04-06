@@ -18,10 +18,7 @@ COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY . .
 WORKDIR /app/apps/web
-RUN AUTH_SESSION_SECRET=build-time-session-secret \
-    SUPER_ADMIN_ID=build-admin \
-    SUPER_ADMIN_PASSWORD=build-admin-password \
-    INTERNAL_API_SECRET=build-internal-secret \
+RUN INTERNAL_API_SECRET=build-internal-secret \
     ./node_modules/.bin/next build
 
 FROM node:22-alpine AS runner

@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import {
   Card,
   NoticeBox,
-} from './teacher-shared'
+} from '../mileage/shared'
 import { ConfirmModal } from '../ui/modal'
 import SuccessModal from '../ui/success-modal'
 import { EmptyStatePane } from '../ui/list'
@@ -124,9 +124,8 @@ export default function SchoolMileageHistory({
   }, [filters, page, pageSize])
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => { void loadEntries() }, 200)
+    void loadEntries()
     return () => {
-      window.clearTimeout(timeoutId)
       fetchAbortControllerRef.current?.abort()
     }
   }, [loadEntries])

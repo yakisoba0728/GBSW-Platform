@@ -1,9 +1,4 @@
-const REQUIRED_RUNTIME_ENV_NAMES = [
-  'AUTH_SESSION_SECRET',
-  'SUPER_ADMIN_ID',
-  'SUPER_ADMIN_PASSWORD',
-  'INTERNAL_API_SECRET',
-] as const
+const REQUIRED_RUNTIME_ENV_NAMES = ['INTERNAL_API_SECRET'] as const
 
 type RequiredRuntimeEnvName = (typeof REQUIRED_RUNTIME_ENV_NAMES)[number]
 
@@ -31,21 +26,8 @@ export function getWebRuntimeEnv() {
   return runtimeEnv
 }
 
-export function getAuthSessionSecret() {
-  return getWebRuntimeEnv().AUTH_SESSION_SECRET
-}
-
 export function getInternalApiSecret() {
   return getWebRuntimeEnv().INTERNAL_API_SECRET
-}
-
-export function getSuperAdminCredentials() {
-  const { SUPER_ADMIN_ID, SUPER_ADMIN_PASSWORD } = getWebRuntimeEnv()
-
-  return {
-    id: SUPER_ADMIN_ID,
-    password: SUPER_ADMIN_PASSWORD,
-  }
 }
 
 function readRequiredEnv(name: RequiredRuntimeEnvName) {

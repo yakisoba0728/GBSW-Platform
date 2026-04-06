@@ -9,7 +9,7 @@ import {
   inputStyle,
   formatAwardedAtParts,
   formatAwardedAt,
-} from '@/app/components/teacher/teacher-shared'
+} from '@/app/components/mileage/shared'
 import SuccessModal from '@/app/components/ui/success-modal'
 import {
   AnimatedTableRow,
@@ -156,11 +156,8 @@ export default function StudentMileageHistory() {
   }, [filters, page, pageSize])
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      void loadEntries()
-    }, 200)
+    void loadEntries()
     return () => {
-      window.clearTimeout(timeoutId)
       fetchAbortControllerRef.current?.abort()
     }
   }, [loadEntries])
@@ -296,7 +293,7 @@ export default function StudentMileageHistory() {
       {/* ── 데이터 카드 ── */}
       <Card className="pb-3 flex flex-col flex-1 min-h-0 overflow-hidden">
         {/* 모바일 리스트 */}
-        <div className="relative min-h-0 flex-1 overflow-y-auto pr-0.5 md:hidden">
+        <div className="relative min-h-0 flex-1 pr-0.5 md:hidden">
           {isLoading ? (
             <ListSkeleton count={6} rowHeight="h-24" />
           ) : loadError ? (
@@ -395,7 +392,7 @@ export default function StudentMileageHistory() {
         </div>
 
         {/* 데스크탑 테이블 */}
-        <div className="relative hidden min-h-0 flex-1 overflow-x-auto overflow-y-auto md:block">
+        <div className="relative hidden min-h-0 flex-1 overflow-x-auto md:block">
           {isLoading ? (
             <table
               className="w-full min-w-[600px] table-fixed"

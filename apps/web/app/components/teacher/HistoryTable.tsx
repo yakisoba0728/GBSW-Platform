@@ -1,6 +1,6 @@
 'use client'
 
-import { formatAwardedAtParts, getSchoolLabel } from './teacher-shared'
+import { formatAwardedAtParts, getSchoolLabel } from '../mileage/shared'
 import {
   AnimatedTableRow,
   EmptyStatePane,

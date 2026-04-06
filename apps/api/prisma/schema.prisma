@@ -17,6 +17,12 @@ enum SchoolMileageType {
   PENALTY
 }
 
+enum AuthRole {
+  SUPER_ADMIN
+  STUDENT
+  TEACHER
+}
+
 model Student {
   studentId            String               @id @map("student_id")
   school               School
@@ -91,4 +97,30 @@ model SchoolMileageEntry {
   @@index([type, deletedAt, awardedAt])
   @@index([deletedAt, awardedAt])
   @@map("school_mileage_entries")
+}
+
+model AuthSession {
+  id                 String   @id @default(cuid())
+  accountId          String   @map("account_id")
+  role               AuthRole
+  mustChangePassword Boolean  @default(false) @map("must_change_password")
+  expiresAt          DateTime @map("expires_at")
+  revokedAt          DateTime? @map("revoked_at")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@index([accountId, role, revokedAt, expiresAt])
+  @@index([expiresAt, revokedAt])
+  @@map("auth_sessions")
+}
+
+model LoginThrottle {
+  key             String    @id
+  failedCount     Int       @default(0) @map("failed_count")
+  windowStartedAt DateTime  @map("window_started_at")
+  lockedUntil     DateTime? @map("locked_until")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("login_throttles")
 }

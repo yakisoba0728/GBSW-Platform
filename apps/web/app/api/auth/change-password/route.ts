@@ -3,16 +3,27 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getApiBaseUrl } from '@/lib/api-base-url'
 import {
   AUTH_SESSION_COOKIE,
-  createAuthSessionToken,
   getDefaultRedirectPathForRole,
   getSessionCookieMaxAge,
-  readAuthSession,
+  readAuthSessionId,
+  resolveAuthSession,
   shouldUseSecureCookie,
 } from '@/lib/auth-session'
 
 export async function POST(request: NextRequest) {
-  const token = (await cookies()).get(AUTH_SESSION_COOKIE)?.value
-  const session = readAuthSession(token)
+  const sessionId = readAuthSessionId(
+    (await cookies()).get(AUTH_SESSION_COOKIE)?.value,
+  )
+  let session: Awaited<ReturnType<typeof resolveAuthSession>>
+
+  try {
+    session = await resolveAuthSession(sessionId)
+  } catch {
+    return NextResponse.json(
+      { message: '세션 정보를 확인하지 못했습니다.' },
+      { status: 502 },
+    )
+  }
 
   if (!session) {
     return NextResponse.json(
@@ -35,20 +46,24 @@ export async function POST(request: NextRequest) {
     typeof body?.newPassword === 'string' ? body.newPassword : ''
 
   try {
-    const upstreamResponse = await fetch(`${getApiBaseUrl()}/auth/change-password`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const upstreamResponse = await fetch(
+      `${getApiBaseUrl()}/auth/change-password`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          accountId: session.accountId,
+          role: session.role,
+          currentPassword,
+          newPassword,
+          allowMissingCurrentPassword: session.mustChangePassword,
+          sessionId: session.id,
+        }),
+        cache: 'no-store',
       },
-      body: JSON.stringify({
-        accountId: session.accountId,
-        role: session.role,
-        currentPassword,
-        newPassword,
-        allowMissingCurrentPassword: session.mustChangePassword,
-      }),
-      cache: 'no-store',
-    })
+    )
 
     const payload = await upstreamResponse.json().catch(() => null)
 
@@ -59,23 +74,28 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const nextSession = parseAuthSession(payload?.session)
+
+    if (!nextSession) {
+      return NextResponse.json(
+        { message: '비밀번호 변경 응답이 올바르지 않습니다.' },
+        { status: 502 },
+      )
+    }
+
     const response = NextResponse.json({
       ok: true,
-      redirectTo: getDefaultRedirectPathForRole(session.role),
+      redirectTo: getDefaultRedirectPathForRole(nextSession.role),
     })
 
     response.cookies.set({
       name: AUTH_SESSION_COOKIE,
-      value: createAuthSessionToken({
-        accountId: session.accountId,
-        role: session.role,
-        mustChangePassword: false,
-      }),
+      value: nextSession.id,
       httpOnly: true,
       sameSite: 'lax',
       secure: shouldUseSecureCookie(request),
       path: '/',
-      maxAge: getSessionCookieMaxAge(),
+      maxAge: getSessionCookieMaxAge(nextSession.expiresAt),
     })
 
     return response
@@ -99,4 +119,44 @@ function getErrorMessage(payload: unknown, fallback: string) {
   }
 
   return fallback
+}
+
+function parseAuthSession(value: unknown): {
+  id: string
+  accountId: string
+  role: 'student' | 'teacher'
+  mustChangePassword: boolean
+  expiresAt: string
+} | null {
+  if (!value || typeof value !== 'object') {
+    return null
+  }
+
+  const session = value as Record<string, unknown>
+
+  if (
+    typeof session.id !== 'string' ||
+    session.id.trim().length === 0 ||
+    typeof session.accountId !== 'string' ||
+    session.accountId.trim().length === 0 ||
+    (session.role !== 'student' && session.role !== 'teacher') ||
+    typeof session.mustChangePassword !== 'boolean' ||
+    typeof session.expiresAt !== 'string'
+  ) {
+    return null
+  }
+
+  const expiresAtMs = Date.parse(session.expiresAt)
+
+  if (!Number.isFinite(expiresAtMs) || expiresAtMs <= Date.now()) {
+    return null
+  }
+
+  return {
+    id: session.id.trim(),
+    accountId: session.accountId.trim(),
+    role: session.role,
+    mustChangePassword: session.mustChangePassword,
+    expiresAt: session.expiresAt,
+  }
 }

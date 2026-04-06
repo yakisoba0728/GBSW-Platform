@@ -5,6 +5,8 @@ import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
+import { Button } from './ui/button'
+import { getSectionMotion, useMotionPreference } from './ui/motion'
 
 const ThemeToggle = dynamic(() => import('./ThemeToggle'), {
   ssr: false,
@@ -39,12 +41,14 @@ function InputField({
   delay: number
 }) {
   const [focused, setFocused] = useState(false)
+  const prefersReducedMotion = useMotionPreference()
+  const motionProps = getSectionMotion(prefersReducedMotion, delay)
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay, ease: 'easeOut' }}
+      initial={motionProps.initial}
+      animate={motionProps.animate}
+      transition={motionProps.transition}
     >
       <label htmlFor={id} style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--fg)', marginBottom: 6 }}>
         {label}
@@ -93,6 +97,10 @@ function InputField({
 
 export default function LoginForm() {
   const router = useRouter()
+  const prefersReducedMotion = useMotionPreference()
+  const headingMotion = getSectionMotion(prefersReducedMotion)
+  const buttonMotion = getSectionMotion(prefersReducedMotion, 0.15)
+  const footerMotion = getSectionMotion(prefersReducedMotion, 0.25)
   const [showPw, setShowPw] = useState(false)
   const [id, setId] = useState('')
   const [pw, setPw] = useState('')
@@ -152,9 +160,9 @@ export default function LoginForm() {
         <div style={{ width: '100%', maxWidth: 360 }}>
           {/* 헤딩 */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            initial={headingMotion.initial}
+            animate={headingMotion.animate}
+            transition={headingMotion.transition}
             style={{ marginBottom: 32 }}
           >
             <h2 style={{ fontSize: 26, fontWeight: 700, color: 'var(--fg)', lineHeight: 1.2, letterSpacing: '-0.02em' }}>
@@ -244,54 +252,27 @@ export default function LoginForm() {
 
             {/* 제출 버튼 */}
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.15, ease: 'easeOut' }}
+              initial={buttonMotion.initial}
+              animate={buttonMotion.animate}
+              transition={buttonMotion.transition}
               style={{ paddingTop: 4 }}
             >
-              <motion.button
+              <Button
                 type="submit"
-                disabled={isSubmitting}
-                whileTap={isSubmitting ? undefined : { scale: 0.98 }}
-                style={{
-                  width: '100%',
-                  height: 42,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                  borderRadius: 8,
-                  border: 'none',
-                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: 'white',
-                  backgroundColor: 'var(--accent)',
-                  opacity: isSubmitting ? 0.7 : 1,
-                  transition: 'opacity 0.15s ease, filter 0.15s ease',
-                }}
-                onMouseEnter={(e) => { if (!isSubmitting) e.currentTarget.style.filter = 'brightness(0.92)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.filter = 'none' }}
+                size="lg"
+                fullWidth
+                loading={isSubmitting}
               >
-                {isSubmitting && (
-                  <motion.svg
-                    width="16" height="16" viewBox="0 0 16 16" fill="none"
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 0.7, ease: 'linear' }}
-                  >
-                    <circle cx="8" cy="8" r="6" stroke="white" strokeWidth="2" strokeDasharray="28 8" fill="none" />
-                  </motion.svg>
-                )}
-                {isSubmitting ? '로그인 중...' : '로그인'}
-              </motion.button>
+                로그인
+              </Button>
             </motion.div>
           </form>
 
           {/* 안내 문구 */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.25 }}
+            initial={footerMotion.initial}
+            animate={footerMotion.animate}
+            transition={footerMotion.transition}
             style={{ marginTop: 28, textAlign: 'center' }}
           >
             <p style={{ fontSize: 12, color: 'var(--fg-muted)' }}>
