@@ -3,7 +3,9 @@
 import type { Easing, TargetAndTransition, Transition } from 'framer-motion'
 import { useReducedMotion } from 'framer-motion'
 
-export const MOTION_EASE = [0.16, 1, 0.3, 1] as const
+type MotionEase = NonNullable<Transition['ease']>
+
+export const MOTION_EASE: MotionEase = [0.16, 1, 0.3, 1]
 export const MOTION_EASE_CSS = 'cubic-bezier(0.16, 1, 0.3, 1)'
 const LINEAR_EASE: Easing = 'linear'
 const LINEAR_EASE_CSS = 'linear'
@@ -76,7 +78,7 @@ function withTransition(
 function getTransition(
   duration: number,
   delay = 0,
-  ease: Easing | readonly number[] = MOTION_EASE,
+  ease: MotionEase = MOTION_EASE,
 ): Transition {
   return { duration, delay, ease }
 }
@@ -86,7 +88,7 @@ function getMotionTransition(
   normalDuration: number,
   reducedDuration: number,
   delay = 0,
-  ease: Easing | readonly number[] = MOTION_EASE,
+  ease: MotionEase = MOTION_EASE,
 ): Transition {
   return prefersReducedMotion
     ? getTransition(reducedDuration, delay, LINEAR_EASE)
