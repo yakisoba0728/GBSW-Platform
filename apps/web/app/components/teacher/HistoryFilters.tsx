@@ -64,7 +64,7 @@ export default function HistoryFilters({
         <select
           value={filters.school}
           onChange={(event) => onChange('school', event.target.value)}
-          className="rounded-lg border py-1.5 pl-2.5 pr-6 text-xs outline-none"
+          className="h-8 rounded-md border pl-2.5 pr-6 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
           style={activeInputStyle(!!filters.school)}
         >
           <option value="">전체 학교</option>
@@ -78,7 +78,7 @@ export default function HistoryFilters({
         <select
           value={filters.type}
           onChange={(event) => onChange('type', event.target.value)}
-          className="rounded-lg border py-1.5 pl-2.5 pr-6 text-xs outline-none"
+          className="h-8 rounded-md border pl-2.5 pr-6 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
           style={activeInputStyle(!!filters.type)}
         >
           <option value="">전체 구분</option>
@@ -89,7 +89,7 @@ export default function HistoryFilters({
         <select
           value={filters.year}
           onChange={(event) => onChange('year', event.target.value)}
-          className="rounded-lg border py-1.5 pl-2.5 pr-6 text-xs outline-none"
+          className="h-8 rounded-md border pl-2.5 pr-6 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
           style={activeInputStyle(!!filters.year)}
         >
           <option value="">전체 학년</option>
@@ -99,7 +99,7 @@ export default function HistoryFilters({
         </select>
 
         <div
-          className="flex items-center gap-1.5 rounded-lg border px-2.5"
+          className="flex h-8 items-center gap-1.5 rounded-md border px-2.5"
           style={activeInputStyle(!!(filters.startDate || filters.endDate))}
         >
           <input
@@ -142,7 +142,7 @@ export default function HistoryFilters({
           value={filters.studentName}
           onChange={(event) => onChange('studentName', event.target.value)}
           placeholder="학생 이름"
-          className="rounded-lg border px-2.5 py-1.5 text-xs outline-none"
+          className="h-8 rounded-md border px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
           style={{ ...activeInputStyle(!!filters.studentName), width: '100px' }}
         />
 

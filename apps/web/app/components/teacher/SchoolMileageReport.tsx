@@ -359,7 +359,7 @@ export default function SchoolMileageReport() {
               <button
                 type="button"
                 onClick={handlePrint}
-                className="no-print rounded-lg border px-3 py-1.5 text-xs transition-opacity hover:opacity-70"
+                className="no-print rounded-md border px-2.5 py-1.5 text-xs transition-opacity hover:opacity-70"
                 style={{
                   fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                   borderColor: 'var(--admin-border)',
@@ -400,7 +400,7 @@ export default function SchoolMileageReport() {
                     })
                   }
                   disabled={allEntriesCurrentPage <= 1}
-                  className="rounded-lg border px-3 py-1.5 text-xs transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-md border px-2.5 py-1.5 text-xs transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
                   style={{
                     fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                     borderColor: 'var(--admin-border)',
@@ -427,7 +427,7 @@ export default function SchoolMileageReport() {
                     })
                   }
                   disabled={allEntriesCurrentPage >= allEntriesPageCount}
-                  className="rounded-lg border px-3 py-1.5 text-xs transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-md border px-2.5 py-1.5 text-xs transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
                   style={{
                     fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                     borderColor: 'var(--admin-border)',

@@ -129,7 +129,7 @@ export default function LoginForm() {
                   onChange={(e) => setId(e.target.value)}
                   disabled={isSubmitting}
                   style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-                  className="w-full pl-9 pr-4 py-3 rounded-xl text-sm outline-none transition-all duration-200
+                  className="w-full pl-9 pr-4 py-2.5 rounded-md text-sm outline-none transition-all duration-200
                     bg-white dark:bg-white/[0.06]
                     border border-gray-200 dark:border-white/10
                     text-brand-navy dark:text-[#e2e1f0]
@@ -168,7 +168,7 @@ export default function LoginForm() {
                   onChange={(e) => setPw(e.target.value)}
                   disabled={isSubmitting}
                   style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-                  className="w-full pl-9 pr-10 py-3 rounded-xl text-sm outline-none transition-all duration-200
+                  className="w-full pl-9 pr-10 py-2.5 rounded-md text-sm outline-none transition-all duration-200
                     bg-white dark:bg-white/[0.06]
                     border border-gray-200 dark:border-white/10
                     text-brand-navy dark:text-[#e2e1f0]
@@ -209,10 +209,9 @@ export default function LoginForm() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="group relative w-full py-3 px-6 rounded-xl font-semibold text-sm text-white overflow-hidden
+                className="group relative w-full py-2.5 px-6 rounded-md font-semibold text-sm text-white overflow-hidden
                   bg-brand-accent hover:brightness-110 active:scale-[0.98]
-                  transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-70
-                  shadow-[0_2px_10px_rgba(67,56,202,0.16)] dark:shadow-[0_2px_12px_rgba(99,102,241,0.14)]"
+                  transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-70"
                 style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
               >
                 <span

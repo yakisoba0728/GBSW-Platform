@@ -23,23 +23,33 @@
   --panel-logo-brightness: 0.95;
   --panel-wordmark: rgba(26, 24, 48, 0.45);
 
-  /* Admin page */
+  /* Admin/Dashboard page */
   --admin-bg: #f7f6f3;
   --admin-sidebar-bg: #f0edf8;
-  --admin-header-bg: rgba(247, 246, 243, 0.88);
+  --admin-header-bg: rgba(247, 246, 243, 0.9);
   --admin-border: #e4e1ec;
   --admin-text: #1a1830;
   --admin-text-muted: #6b7280;
   --admin-accent: #3730a3;
   --admin-accent-bg: rgba(55, 48, 163, 0.06);
+
+  /* Mileage semantic colors */
+  --mileage-green: #15803d;
+  --mileage-green-bg: rgba(22, 163, 74, 0.1);
+  --mileage-green-border: rgba(22, 163, 74, 0.25);
+  --mileage-red: #b91c1c;
+  --mileage-red-bg: rgba(239, 68, 68, 0.1);
+  --mileage-red-border: rgba(239, 68, 68, 0.25);
+
+  /* Layout */
+  --sidebar-width: 220px;
+  --header-height: 48px;
 }
 
 .dark {
   --bg: #0e0e18;
   --fg: #e2e1f0;
 
-  /* 다크모드에서 우측 패널(#0e0e18 네이비)과 명확히 구분되도록
-     좌측 패널을 진한 인디고-퍼플 계열로 설정 */
   --panel-bg: linear-gradient(158deg, #201d38 0%, #18162c 55%, #211c3e 100%);
   --panel-dot: rgba(255, 255, 255, 0.065);
   --panel-glow-top: rgba(99, 102, 241, 0.28);
@@ -54,15 +64,23 @@
   --panel-logo-brightness: 1.08;
   --panel-wordmark: rgba(255, 255, 255, 0.35);
 
-  /* Admin page */
+  /* Admin/Dashboard page */
   --admin-bg: #0e0e18;
   --admin-sidebar-bg: #111118;
-  --admin-header-bg: rgba(14, 14, 24, 0.88);
+  --admin-header-bg: rgba(14, 14, 24, 0.9);
   --admin-border: rgba(255, 255, 255, 0.07);
   --admin-text: #e2e1f0;
   --admin-text-muted: rgba(255, 255, 255, 0.38);
   --admin-accent: #818cf8;
   --admin-accent-bg: rgba(129, 140, 248, 0.08);
+
+  /* Mileage semantic colors (dark) */
+  --mileage-green: #4ade80;
+  --mileage-green-bg: rgba(74, 222, 128, 0.08);
+  --mileage-green-border: rgba(74, 222, 128, 0.2);
+  --mileage-red: #f87171;
+  --mileage-red-bg: rgba(248, 113, 113, 0.08);
+  --mileage-red-border: rgba(248, 113, 113, 0.2);
 }
 
 /* ─── Base reset ─────────────────────────────────────────────── */
@@ -95,110 +113,155 @@
   }
 }
 
-/* ─── Keyframe animations ────────────────────────────────────── */
-/* fadeInUp, float, shimmer: tailwind.config.ts keyframes 에 정의되어 있어 여기서는 생략 */
+/* ─── Common component classes ──────────────────────────────── */
+@layer components {
+  /* 테이블 sticky 헤더 */
+  .table-header th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: var(--admin-sidebar-bg);
+    box-shadow: inset 0 -1px 0 var(--admin-border);
+    padding-bottom: 10px;
+    padding-right: 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--admin-text-muted);
+    font-family: var(--font-space-grotesk);
+  }
 
+  /* 페이지 섹션 구분선 */
+  .section-sep {
+    border: none;
+    border-top: 1px solid var(--admin-border);
+    margin: 0;
+  }
+
+  /* 상벌점 배지 — reward */
+  .badge-reward {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: var(--font-space-grotesk);
+    background-color: var(--mileage-green-bg);
+    color: var(--mileage-green);
+    border: 1px solid var(--mileage-green-border);
+  }
+
+  /* 상벌점 배지 — penalty */
+  .badge-penalty {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: var(--font-space-grotesk);
+    background-color: var(--mileage-red-bg);
+    color: var(--mileage-red);
+    border: 1px solid var(--mileage-red-border);
+  }
+
+  /* 아이콘 버튼 — 기본 */
+  .icon-btn {
+    display: flex;
+    height: 28px;
+    width: 28px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: 1px solid var(--admin-border);
+    color: var(--admin-text-muted);
+    transition: opacity 150ms ease, background-color 150ms ease;
+    flex-shrink: 0;
+  }
+
+  .icon-btn:hover {
+    opacity: 0.7;
+    background-color: rgba(0,0,0,0.04);
+  }
+
+  .dark .icon-btn:hover {
+    background-color: rgba(255,255,255,0.06);
+  }
+
+  /* 아이콘 버튼 — 위험 (삭제) */
+  .icon-btn-danger {
+    display: flex;
+    height: 28px;
+    width: 28px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: 1px solid var(--mileage-red-border);
+    color: var(--mileage-red);
+    transition: opacity 150ms ease;
+    flex-shrink: 0;
+  }
+
+  .icon-btn-danger:hover {
+    opacity: 0.7;
+  }
+}
+
+/* ─── Keyframe animations ────────────────────────────────────── */
 @keyframes spin-slow {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
 
-/* ─── Dashboard UI Animations ───────────────────────────────── */
-
-/* [1] slideDown — 서브메뉴/드롭다운 펼침: animate-slide-down */
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* [2] slideUp — 서브메뉴/드롭다운 닫힘: animate-slide-up */
 @keyframes slideUp {
   from { opacity: 1; transform: translateY(0); }
   to   { opacity: 0; transform: translateY(-6px); }
 }
 
-/* [3] fadeIn — 페이지·컴포넌트 등장: animate-fade-in */
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
-/* [4] fadeOut — 컴포넌트 사라짐: animate-fade-out */
 @keyframes fadeOut {
   from { opacity: 1; }
   to   { opacity: 0; }
 }
 
-/* [5] scaleIn — 팝업·모달 등장: animate-scale-in */
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.94); }
+  from { opacity: 0; transform: scale(0.96); }
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* [6] scaleOut — 팝업·모달 닫힘: animate-scale-out */
 @keyframes scaleOut {
   from { opacity: 1; transform: scale(1); }
-  to   { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 0; transform: scale(0.96); }
 }
 
-/* [7] slideInLeft — 좌측에서 사이드패널 등장: animate-slide-in-left */
-@keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-16px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-/* [8] slideInRight — 우측에서 패널 등장: animate-slide-in-right */
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(16px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-/* [9] bounceSubtle — 알림 배지·강조 요소: animate-bounce-subtle */
-@keyframes bounceSubtle {
-  0%, 100% { transform: translateY(0); }
-  40%       { transform: translateY(-4px); }
-  60%       { transform: translateY(-2px); }
-}
-
-/* [10] pulseSoft — 로딩 스켈레톤·대기 상태: animate-pulse-soft */
-@keyframes pulseSoft {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.45; }
-}
-
-/* [10-1] shimmer — 스켈레톤 슬라이드 광택 효과: animate-shimmer */
 @keyframes shimmer {
   from { transform: translateX(-100%); }
   to   { transform: translateX(100%); }
 }
 
-/* ─── Mobile Drawer Animations ──────────────────────────────── */
-
-/* [11] drawerEnter — 모바일 드로어 슬라이드인: animate-drawer-enter */
-@keyframes drawerEnter {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(0); }
-}
-
-/* [12] drawerExit — 모바일 드로어 슬라이드아웃: animate-drawer-exit */
-@keyframes drawerExit {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-100%); }
-}
-
-/* [13] overlayEnter — 백드롭 오버레이 페이드인: animate-overlay-enter */
 @keyframes overlayEnter {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
-/* [14] overlayExit — 백드롭 오버레이 페이드아웃: animate-overlay-exit */
 @keyframes overlayExit {
   from { opacity: 1; }
   to   { opacity: 0; }
 }
 
-/* ─── Staggered animation delays ────────────────────────────── */
+/* ─── Animation utilities ────────────────────────────────────── */
 @layer utilities {
   .anim-delay-0   { animation-delay: 0ms; }
   .anim-delay-80  { animation-delay: 80ms; }
@@ -209,29 +272,18 @@
 
   .opacity-init-0 { opacity: 0; }
 
-  /* Dashboard animation utilities */
-  .animate-slide-down     { animation: slideDown     200ms ease both; }
-  .animate-slide-up       { animation: slideUp       150ms ease both; }
-  .animate-fade-in        { animation: fadeIn        180ms ease both; }
-  .animate-fade-out       { animation: fadeOut       150ms ease both; }
-  .animate-scale-in       { animation: scaleIn       200ms cubic-bezier(0.16,1,0.3,1) both; }
-  .animate-scale-out      { animation: scaleOut      150ms ease both; }
-  .animate-slide-in-left  { animation: slideInLeft   220ms cubic-bezier(0.16,1,0.3,1) both; }
-  .animate-slide-in-right { animation: slideInRight  220ms cubic-bezier(0.16,1,0.3,1) both; }
-  .animate-bounce-subtle  { animation: bounceSubtle  600ms ease infinite; }
-  .animate-pulse-soft     { animation: pulseSoft     1.8s ease-in-out infinite; }
-  .animate-shimmer        { animation: shimmer       1.6s ease-in-out infinite; }
-
-  /* Mobile drawer */
-  .animate-drawer-enter  { animation: drawerEnter  280ms cubic-bezier(0.32,0.72,0,1) both; }
-  .animate-drawer-exit   { animation: drawerExit   220ms ease-in both; }
+  .animate-slide-down  { animation: slideDown  200ms ease both; }
+  .animate-slide-up    { animation: slideUp    150ms ease both; }
+  .animate-fade-in     { animation: fadeIn     180ms ease both; }
+  .animate-fade-out    { animation: fadeOut    150ms ease both; }
+  .animate-scale-in    { animation: scaleIn    200ms cubic-bezier(0.16,1,0.3,1) both; }
+  .animate-scale-out   { animation: scaleOut   150ms ease both; }
+  .animate-shimmer     { animation: shimmer    1.6s ease-in-out infinite; }
   .animate-overlay-enter { animation: overlayEnter 280ms ease both; }
   .animate-overlay-exit  { animation: overlayExit  220ms ease both; }
 }
 
 /* ─── Theme switch transition ────────────────────────────────── */
-
-/* View Transitions API (Chrome 111+, Safari 18+): 전체 화면 크로스페이드 */
 ::view-transition-old(root) {
   animation: 200ms ease both theme-fade-out;
 }
@@ -249,14 +301,7 @@
   to   { opacity: 1; }
 }
 
-/* [15] progressShrink — AlertModal 자동 닫힘 진행 바 */
-@keyframes progressShrink {
-  from { width: 100%; }
-  to   { width: 0%; }
-}
-
-/* View Transition 진행 중 element-level 트랜지션 억제
-   — 스냅샷 캡처 시 transition 중간 상태가 찍혀 경계선이 보이는 문제 방지 */
+/* View Transition 중 element-level 트랜지션 억제 */
 html.no-transitions *,
 html.no-transitions *::before,
 html.no-transitions *::after {

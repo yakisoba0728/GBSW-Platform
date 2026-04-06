@@ -20,65 +20,10 @@ export const inputStyle: CSSProperties = {
   fontSize: '0.8rem',
 }
 
-export function Card({
-  children,
-  className = '',
-}: {
-  children: ReactNode
-  className?: string
-}) {
-  return (
-    <div
-      className={`rounded-xl border p-5 ${className}`}
-      style={{
-        backgroundColor: 'var(--admin-sidebar-bg)',
-        borderColor: 'var(--admin-border)',
-      }}
-    >
-      {children}
-    </div>
-  )
-}
-
-export function SectionTitle({ children }: { children: ReactNode }) {
-  return (
-    <h2
-      className="text-sm font-semibold mb-4"
-      style={{
-        fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-        color: 'var(--admin-text)',
-      }}
-    >
-      {children}
-    </h2>
-  )
-}
-
-export function Badge({
-  type,
-  children,
-}: {
-  type: MileageType
-  children: ReactNode
-}) {
-  return (
-    <span
-      className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
-      style={{
-        backgroundColor:
-          type === 'reward' ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)',
-        color: type === 'reward' ? '#16a34a' : '#dc2626',
-      }}
-    >
-      {children}
-    </span>
-  )
-}
+// ─── 유틸 함수 ────────────────────────────────────────────────────────────────
 
 export function getSchoolLabel(school: SchoolCode) {
-  return (
-    SCHOOL_OPTIONS.find((option) => option.value === school)?.label ?? school
-  )
+  return SCHOOL_OPTIONS.find((option) => option.value === school)?.label ?? school
 }
 
 export function getRuleLabel(rule: SchoolMileageRuleSummary) {
@@ -91,11 +36,7 @@ export function formatSignedScore(type: MileageType, score: number) {
 
 export function formatAwardedAt(value: string) {
   const date = new Date(value)
-
-  if (Number.isNaN(date.getTime())) {
-    return value
-  }
-
+  if (Number.isNaN(date.getTime())) return value
   return new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',
     month: '2-digit',
@@ -116,14 +57,45 @@ export function formatAwardedAtParts(value: string): { date: string; time: strin
 
 export function toDateTimeLocalValue(value: string) {
   const date = new Date(value)
-
-  if (Number.isNaN(date.getTime())) {
-    return ''
-  }
-
+  if (Number.isNaN(date.getTime())) return ''
   const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-
   return localDate.toISOString().slice(0, 16)
+}
+
+// ─── Card ─────────────────────────────────────────────────────────────────────
+
+export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return (
+    <div
+      className={`rounded-lg border p-4 ${className}`}
+      style={{ backgroundColor: 'var(--admin-sidebar-bg)', borderColor: 'var(--admin-border)' }}
+    >
+      {children}
+    </div>
+  )
+}
+
+// ─── SectionTitle ─────────────────────────────────────────────────────────────
+
+export function SectionTitle({ children }: { children: ReactNode }) {
+  return (
+    <h2
+      className="mb-3 text-[13px] font-semibold"
+      style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text)' }}
+    >
+      {children}
+    </h2>
+  )
+}
+
+// ─── Badge ────────────────────────────────────────────────────────────────────
+
+export function Badge({ type, children }: { type: MileageType; children: ReactNode }) {
+  return (
+    <span className={type === 'reward' ? 'badge-reward' : 'badge-penalty'}>
+      {children}
+    </span>
+  )
 }
 
 // ─── StatCard ─────────────────────────────────────────────────────────────────
@@ -141,41 +113,32 @@ export function StatCard({
 }) {
   const valueColor =
     colorToken === 'green'
-      ? '#16a34a'
+      ? 'var(--mileage-green)'
       : colorToken === 'red'
-        ? '#dc2626'
+        ? 'var(--mileage-red)'
         : 'var(--admin-text)'
 
   return (
     <div
-      className="rounded-xl border p-4"
-      style={{
-        backgroundColor: 'var(--admin-sidebar-bg)',
-        borderColor: 'var(--admin-border)',
-      }}
+      className="rounded-lg border p-4"
+      style={{ backgroundColor: 'var(--admin-sidebar-bg)', borderColor: 'var(--admin-border)' }}
     >
       <p
-        className="text-xs"
-        style={{
-          fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-          color: 'var(--admin-text-muted)',
-        }}
+        className="text-[11px] uppercase tracking-wider"
+        style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--admin-text-muted)' }}
       >
         {label}
       </p>
       <p
-        className="mt-1.5 text-2xl font-semibold"
+        className="mt-2 text-2xl font-semibold leading-none"
         style={{ fontFamily: 'var(--font-space-grotesk)', color: valueColor }}
       >
         {value}
       </p>
       {subValue && (
         <p
-          className="mt-0.5 text-xs"
-          style={{
-            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            color: 'var(--admin-text-muted)',
-          }}
+          className="mt-1.5 text-xs"
+          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}
         >
           {subValue}
         </p>
@@ -188,6 +151,38 @@ export function StatCard({
 
 export function FilterRow({ children }: { children: ReactNode }) {
   return <div className="flex flex-wrap items-center gap-2">{children}</div>
+}
+
+// ─── FilterSelect ─────────────────────────────────────────────────────────────
+
+export function FilterSelect({
+  value,
+  onChange,
+  options,
+  placeholder,
+  className = '',
+}: {
+  value: string
+  onChange: (value: string) => void
+  options: Array<{ value: string; label: string }>
+  placeholder?: string
+  className?: string
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className={`h-8 rounded-md border bg-transparent px-2.5 text-xs transition-colors focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] ${className}`}
+      style={inputStyle}
+    >
+      {placeholder && <option value="">{placeholder}</option>}
+      {options.map((opt) => (
+        <option key={opt.value} value={opt.value}>
+          {opt.label}
+        </option>
+      ))}
+    </select>
+  )
 }
 
 // ─── SectionHeader ────────────────────────────────────────────────────────────
@@ -205,21 +200,15 @@ export function SectionHeader({
     <div className="flex items-start justify-between gap-4">
       <div>
         <h2
-          className="text-sm font-semibold"
-          style={{
-            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            color: 'var(--admin-text)',
-          }}
+          className="text-[13px] font-semibold"
+          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text)' }}
         >
           {title}
         </h2>
         {subtitle && (
           <p
             className="mt-0.5 text-xs leading-5"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              color: 'var(--admin-text-muted)',
-            }}
+            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}
           >
             {subtitle}
           </p>
@@ -232,13 +221,7 @@ export function SectionHeader({
 
 // ─── ScoreSummaryBar ──────────────────────────────────────────────────────────
 
-export function ScoreSummaryBar({
-  reward,
-  penalty,
-}: {
-  reward: number
-  penalty: number
-}) {
+export function ScoreSummaryBar({ reward, penalty }: { reward: number; penalty: number }) {
   const [mounted, setMounted] = useState(false)
   useEffect(() => {
     const t = requestAnimationFrame(() => {
@@ -255,29 +238,35 @@ export function ScoreSummaryBar({
 
   return (
     <div className="space-y-1.5">
-      <div className="flex justify-between text-[11px]" style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
-        <span style={{ color: '#16a34a' }}>상점 {rewardPct}%</span>
-        <span style={{ color: '#dc2626' }}>벌점 {penaltyPct}%</span>
+      <div
+        className="flex justify-between text-[11px]"
+        style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
+      >
+        <span style={{ color: 'var(--mileage-green)' }}>상점 {rewardPct}%</span>
+        <span style={{ color: 'var(--mileage-red)' }}>벌점 {penaltyPct}%</span>
       </div>
-      <div className="flex h-2 overflow-hidden rounded-full" style={{ backgroundColor: 'var(--admin-border)' }}>
+      <div className="flex h-1.5 overflow-hidden rounded-full" style={{ backgroundColor: 'var(--admin-border)' }}>
         <div
-          className="h-full rounded-l-full"
+          className="h-full"
           style={{
             width: mounted ? `${rewardPct}%` : '0%',
-            backgroundColor: '#16a34a',
+            backgroundColor: 'var(--mileage-green)',
             transition: 'width 600ms cubic-bezier(0.16,1,0.3,1)',
           }}
         />
         <div
-          className="h-full rounded-r-full"
+          className="h-full"
           style={{
             width: mounted ? `${penaltyPct}%` : '0%',
-            backgroundColor: '#dc2626',
+            backgroundColor: 'var(--mileage-red)',
             transition: 'width 600ms cubic-bezier(0.16,1,0.3,1)',
           }}
         />
       </div>
-      <div className="flex justify-between text-[11px]" style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-space-grotesk)' }}>
+      <div
+        className="flex justify-between text-[11px]"
+        style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-space-grotesk)' }}
+      >
         <span>+{reward}점</span>
         <span>-{penalty}점</span>
       </div>

@@ -66,7 +66,7 @@ export default function ReportFilters({
             {(['student', 'class', 'all'] as ReportType[]).map((type) => (
               <label
                 key={type}
-                className="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-xs transition-colors"
+                className="flex cursor-pointer items-center gap-2 rounded-md border px-2.5 py-1.5 text-xs transition-colors"
                 style={{
                   fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                   borderColor:
@@ -111,7 +111,7 @@ export default function ReportFilters({
             <select
               value={filterSchool}
               onChange={(event) => onSchoolChange(event.target.value)}
-              className="rounded-lg border px-3 py-2 text-xs outline-none"
+              className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               style={inputStyle}
             >
               <option value="">전체 학교</option>
@@ -125,7 +125,7 @@ export default function ReportFilters({
             <select
               value={filterGrade}
               onChange={(event) => onGradeChange(event.target.value)}
-              className="rounded-lg border px-3 py-2 text-xs outline-none"
+              className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               style={inputStyle}
             >
               <option value="">전체 학년</option>
@@ -138,7 +138,7 @@ export default function ReportFilters({
               type="date"
               value={startDate}
               onChange={(event) => onStartDateChange(event.target.value)}
-              className="rounded-lg border px-3 py-2 text-xs outline-none"
+              className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               style={inputStyle}
             />
             <span className="text-xs" style={{ color: 'var(--admin-text-muted)' }}>
@@ -148,7 +148,7 @@ export default function ReportFilters({
               type="date"
               value={endDate}
               onChange={(event) => onEndDateChange(event.target.value)}
-              className="rounded-lg border px-3 py-2 text-xs outline-none"
+              className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               style={inputStyle}
             />
           </FilterRow>
@@ -159,7 +159,7 @@ export default function ReportFilters({
             type="button"
             onClick={onReload}
             disabled={isLoading}
-            className="flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
             style={{
               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
               backgroundColor: 'var(--admin-accent)',
@@ -172,7 +172,7 @@ export default function ReportFilters({
             type="button"
             onClick={onPrint}
             disabled={!canPrint}
-            className="flex items-center gap-1.5 rounded-lg border px-4 py-2 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
             style={{
               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
               borderColor: 'var(--admin-border)',

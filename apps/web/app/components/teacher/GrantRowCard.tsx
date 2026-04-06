@@ -52,7 +52,7 @@ export default function GrantRowCard({
       type="button"
       onClick={onOpenRuleModal}
       disabled={disabled}
-      className="flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-sm text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+      className="flex w-full items-center gap-2 rounded-md border px-3 py-2 text-sm text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60"
       style={{
         ...inputStyle,
         minHeight: 38,
@@ -117,7 +117,7 @@ export default function GrantRowCard({
   return (
     <AnimatedListItem
       index={index}
-      className="rounded-xl border px-3 py-3"
+      className="rounded-lg border px-3 py-3"
       style={{
         borderColor: 'var(--admin-border)',
         borderLeft: `3px solid ${leftBorderColor}`,
@@ -176,7 +176,7 @@ export default function GrantRowCard({
           value={row.reason}
           onChange={(event) => onReasonChange(event.target.value)}
           disabled={disabled}
-          className="w-full rounded-lg border px-3 py-2 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-md border px-3 py-2 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-60"
           style={inputStyle}
           placeholder="사유 입력 (선택)"
         />
@@ -226,7 +226,7 @@ export default function GrantRowCard({
             value={row.reason}
             onChange={(event) => onReasonChange(event.target.value)}
             disabled={disabled}
-            className="w-full rounded-lg border px-3 py-2 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-md border px-3 py-2 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-60"
             style={inputStyle}
             placeholder="사유 입력 (선택)"
           />

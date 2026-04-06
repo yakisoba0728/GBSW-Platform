@@ -51,42 +51,27 @@ function StudentRow({
   rank: number
   colorToken: 'green' | 'red'
 }) {
+  const color = colorToken === 'green' ? 'var(--mileage-green)' : 'var(--mileage-red)'
+  const bg = colorToken === 'green' ? 'var(--mileage-green-bg)' : 'var(--mileage-red-bg)'
   return (
-    <div
-      className="flex items-center gap-2 rounded-lg px-3 py-2"
-      style={{ backgroundColor: 'var(--admin-bg)' }}
-    >
+    <div className="flex items-center gap-2 rounded-md px-2.5 py-1.5" style={{ backgroundColor: 'var(--admin-bg)' }}>
       <span
         className="h-5 w-5 flex-shrink-0 rounded-full text-center text-[10px] font-bold leading-5"
-        style={{
-          backgroundColor:
-            colorToken === 'green'
-              ? 'rgba(34,197,94,0.15)'
-              : 'rgba(239,68,68,0.15)',
-          color: colorToken === 'green' ? '#16a34a' : '#dc2626',
-          fontFamily: 'var(--font-space-grotesk)',
-        }}
+        style={{ backgroundColor: bg, color, fontFamily: 'var(--font-space-grotesk)' }}
       >
         {rank}
       </span>
       <span
         className="min-w-0 flex-1 truncate text-xs font-medium"
-        style={{
-          fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-          color: 'var(--admin-text)',
-        }}
+        style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text)' }}
       >
         {student.name}
       </span>
       <span
         className="flex-shrink-0 text-xs font-semibold"
-        style={{
-          fontFamily: 'var(--font-space-grotesk)',
-          color: colorToken === 'green' ? '#16a34a' : '#dc2626',
-        }}
+        style={{ fontFamily: 'var(--font-space-grotesk)', color }}
       >
-        {student.netScore >= 0 ? '+' : ''}
-        {student.netScore}점
+        {student.netScore >= 0 ? '+' : ''}{student.netScore}점
       </span>
     </div>
   )
@@ -139,110 +124,24 @@ function ClassCard({
           </div>
 
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <div
-              className="rounded-lg px-3 py-2"
-              style={{
-                backgroundColor: 'rgba(34,197,94,0.06)',
-                border: '1px solid rgba(34,197,94,0.2)',
-              }}
-            >
-              <p
-                className="text-[10px]"
-                style={{
-                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                  color: '#16a34a',
-                }}
-              >
-                상점 합계
-              </p>
-              <p
-                className="mt-0.5 text-lg font-semibold"
-                style={{
-                  fontFamily: 'var(--font-space-grotesk)',
-                  color: '#16a34a',
-                }}
-              >
-                +{summary.rewardTotal}
+            <div className="rounded-md px-3 py-2" style={{ backgroundColor: 'var(--mileage-green-bg)', border: '1px solid var(--mileage-green-border)' }}>
+              <p className="text-[10px] uppercase tracking-wider" style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--mileage-green)' }}>상점 합계</p>
+              <p className="mt-0.5 text-base font-semibold" style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--mileage-green)' }}>+{summary.rewardTotal}</p>
+            </div>
+            <div className="rounded-md px-3 py-2" style={{ backgroundColor: 'var(--mileage-red-bg)', border: '1px solid var(--mileage-red-border)' }}>
+              <p className="text-[10px] uppercase tracking-wider" style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--mileage-red)' }}>벌점 합계</p>
+              <p className="mt-0.5 text-base font-semibold" style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--mileage-red)' }}>-{summary.penaltyTotal}</p>
+            </div>
+            <div className="rounded-md px-3 py-2" style={{ backgroundColor: 'var(--admin-bg)', border: '1px solid var(--admin-border)' }}>
+              <p className="text-[10px] uppercase tracking-wider" style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--admin-text-muted)' }}>순점수 합</p>
+              <p className="mt-0.5 text-base font-semibold" style={{ fontFamily: 'var(--font-space-grotesk)', color: summary.netScore >= 0 ? 'var(--mileage-green)' : 'var(--mileage-red)' }}>
+                {summary.netScore >= 0 ? '+' : ''}{summary.netScore}
               </p>
             </div>
-            <div
-              className="rounded-lg px-3 py-2"
-              style={{
-                backgroundColor: 'rgba(239,68,68,0.06)',
-                border: '1px solid rgba(239,68,68,0.2)',
-              }}
-            >
-              <p
-                className="text-[10px]"
-                style={{
-                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                  color: '#dc2626',
-                }}
-              >
-                벌점 합계
-              </p>
-              <p
-                className="mt-0.5 text-lg font-semibold"
-                style={{
-                  fontFamily: 'var(--font-space-grotesk)',
-                  color: '#dc2626',
-                }}
-              >
-                -{summary.penaltyTotal}
-              </p>
-            </div>
-            <div
-              className="rounded-lg px-3 py-2"
-              style={{
-                backgroundColor: 'var(--admin-bg)',
-                border: '1px solid var(--admin-border)',
-              }}
-            >
-              <p
-                className="text-[10px]"
-                style={{
-                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                  color: 'var(--admin-text-muted)',
-                }}
-              >
-                순점수 합
-              </p>
-              <p
-                className="mt-0.5 text-lg font-semibold"
-                style={{
-                  fontFamily: 'var(--font-space-grotesk)',
-                  color: summary.netScore >= 0 ? '#16a34a' : '#dc2626',
-                }}
-              >
-                {summary.netScore >= 0 ? '+' : ''}
-                {summary.netScore}
-              </p>
-            </div>
-            <div
-              className="rounded-lg px-3 py-2"
-              style={{
-                backgroundColor: 'var(--admin-bg)',
-                border: '1px solid var(--admin-border)',
-              }}
-            >
-              <p
-                className="text-[10px]"
-                style={{
-                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                  color: 'var(--admin-text-muted)',
-                }}
-              >
-                1인 평균
-              </p>
-              <p
-                className="mt-0.5 text-lg font-semibold"
-                style={{
-                  fontFamily: 'var(--font-space-grotesk)',
-                  color: summary.avgNetScore >= 0 ? '#16a34a' : '#dc2626',
-                }}
-              >
-                {summary.avgNetScore >= 0 ? '+' : ''}
-                {summary.avgNetScore}
+            <div className="rounded-md px-3 py-2" style={{ backgroundColor: 'var(--admin-bg)', border: '1px solid var(--admin-border)' }}>
+              <p className="text-[10px] uppercase tracking-wider" style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--admin-text-muted)' }}>1인 평균</p>
+              <p className="mt-0.5 text-base font-semibold" style={{ fontFamily: 'var(--font-space-grotesk)', color: summary.avgNetScore >= 0 ? 'var(--mileage-green)' : 'var(--mileage-red)' }}>
+                {summary.avgNetScore >= 0 ? '+' : ''}{summary.avgNetScore}
               </p>
             </div>
           </div>
@@ -255,62 +154,29 @@ function ClassCard({
           >
             {summary.topStudents.length > 0 && (
               <div className="mt-3">
-                <p
-                  className="mb-2 text-[11px] font-semibold"
-                  style={{
-                    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                    color: '#16a34a',
-                  }}
-                >
-                  상위 학생
-                </p>
+                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider" style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--mileage-green)' }}>상위 학생</p>
                 <div className="space-y-1">
                   {summary.topStudents.map((student, index) => (
-                    <StudentRow
-                      key={student.studentId}
-                      student={student}
-                      rank={index + 1}
-                      colorToken="green"
-                    />
+                    <StudentRow key={student.studentId} student={student} rank={index + 1} colorToken="green" />
                   ))}
                 </div>
               </div>
             )}
             {summary.bottomStudents.length > 0 && (
               <div className="mt-3">
-                <p
-                  className="mb-2 text-[11px] font-semibold"
-                  style={{
-                    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                    color: '#dc2626',
-                  }}
-                >
-                  주의 학생
-                </p>
+                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider" style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--mileage-red)' }}>주의 학생</p>
                 <div className="space-y-1">
                   {summary.bottomStudents.map((student, index) => (
-                    <StudentRow
-                      key={student.studentId}
-                      student={student}
-                      rank={index + 1}
-                      colorToken="red"
-                    />
+                    <StudentRow key={student.studentId} student={student} rank={index + 1} colorToken="red" />
                   ))}
                 </div>
               </div>
             )}
-            {summary.topStudents.length === 0 &&
-              summary.bottomStudents.length === 0 && (
-                <p
-                  className="mt-3 py-2 text-center text-xs"
-                  style={{
-                    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                    color: 'var(--admin-text-muted)',
-                  }}
-                >
-                  이 반에 상벌점 내역이 없습니다.
-                </p>
-              )}
+            {summary.topStudents.length === 0 && summary.bottomStudents.length === 0 && (
+              <p className="mt-3 py-2 text-center text-xs" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}>
+                이 반에 상벌점 내역이 없습니다.
+              </p>
+            )}
           </div>
         )}
       </Card>
@@ -421,26 +287,20 @@ export default function SchoolMileageClass() {
           <FilterRow>
             <select
               value={filterSchool}
-              onChange={(event) =>
-                updateSearchParams({ school: event.target.value, year: filterGrade })
-              }
-              className="rounded-lg border px-3 py-2 text-xs outline-none"
+              onChange={(event) => updateSearchParams({ school: event.target.value, year: filterGrade })}
+              className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               style={inputStyle}
             >
               <option value="">학교 선택</option>
               {SCHOOL_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
+                <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
 
             <select
               value={filterGrade}
-              onChange={(event) =>
-                updateSearchParams({ year: event.target.value })
-              }
-              className="rounded-lg border px-3 py-2 text-xs outline-none"
+              onChange={(event) => updateSearchParams({ year: event.target.value })}
+              className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               style={inputStyle}
             >
               <option value="">전체 학년</option>
@@ -451,16 +311,10 @@ export default function SchoolMileageClass() {
 
             <button
               type="button"
-              onClick={() => {
-                void loadClassData()
-              }}
+              onClick={() => void loadClassData()}
               disabled={isLoading || !filterSchool}
-              className="rounded-lg px-4 py-2 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
-              style={{
-                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                backgroundColor: 'var(--admin-accent)',
-                color: '#fff',
-              }}
+              className="h-8 rounded-md px-3 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', backgroundColor: 'var(--admin-accent)', color: '#fff' }}
             >
               {isLoading ? '조회 중...' : '새로고침'}
             </button>

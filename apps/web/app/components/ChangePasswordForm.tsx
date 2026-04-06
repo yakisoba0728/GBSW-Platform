@@ -114,7 +114,7 @@ export default function ChangePasswordForm({
               설정한 뒤 계속 진행할 수 있습니다.
             </p>
             <div
-              className="mt-4 rounded-xl border border-brand-accent/15 bg-brand-accent/5 px-4 py-3 text-xs text-brand-muted dark:border-brand-accent-dark/20 dark:bg-brand-accent-dark/10"
+              className="mt-3 rounded-md border border-brand-accent/15 bg-brand-accent/5 px-3.5 py-2.5 text-xs text-brand-muted dark:border-brand-accent-dark/20 dark:bg-brand-accent-dark/10"
               style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
             >
               임시 비밀번호 변경 상태에서만 현재 비밀번호 입력이 생략됩니다.
@@ -152,7 +152,7 @@ export default function ChangePasswordForm({
 
             {errorMessage ? (
               <p
-                className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200"
+                className="rounded-md border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-600 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200"
                 style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
               >
                 {errorMessage}
@@ -162,7 +162,7 @@ export default function ChangePasswordForm({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="group relative w-full overflow-hidden rounded-xl bg-brand-accent px-6 py-3 text-sm font-semibold text-white shadow-[0_2px_10px_rgba(67,56,202,0.16)] transition-all duration-200 hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 dark:shadow-[0_2px_12px_rgba(99,102,241,0.14)]"
+              className="group relative w-full overflow-hidden rounded-md bg-brand-accent px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
               style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
             >
               <span
@@ -249,7 +249,7 @@ function PasswordField({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           disabled={disabled}
-          className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-9 pr-10 text-sm text-brand-navy outline-none transition-all duration-200 placeholder:text-gray-400 focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/15 dark:border-white/10 dark:bg-white/[0.06] dark:text-[#e2e1f0] dark:placeholder:text-white/20 dark:focus:border-brand-accent-dark dark:focus:ring-brand-accent-dark/15"
+          className="w-full rounded-md border border-gray-200 bg-white py-2.5 pl-9 pr-10 text-sm text-brand-navy outline-none transition-all duration-200 placeholder:text-gray-400 focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/15 dark:border-white/10 dark:bg-white/[0.06] dark:text-[#e2e1f0] dark:placeholder:text-white/20 dark:focus:border-brand-accent-dark dark:focus:ring-brand-accent-dark/15"
           style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
         />
         <button

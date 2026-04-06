@@ -1,5 +1,5 @@
 export const inputBase = `
-  w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none transition-all duration-150
+  w-full rounded-md border px-3.5 py-2 text-sm outline-none transition-all duration-150
   bg-white dark:bg-white/[0.05]
   border-gray-200 dark:border-white/[0.08]
   text-brand-navy dark:text-[#e2e1f0]
@@ -189,7 +189,7 @@ export function Divider() {
 export function InfoBox({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className="rounded-xl border px-4 py-3 text-sm"
+      className="rounded-md border px-3.5 py-3 text-sm"
       style={{
         fontFamily: 'var(--font-noto-sans-kr), sans-serif',
         color: 'var(--admin-text-muted)',
@@ -205,7 +205,7 @@ export function InfoBox({ children }: { children: React.ReactNode }) {
 export function PasswordRuleBox({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className="rounded-xl border px-4 py-3 text-sm"
+      className="rounded-md border px-3.5 py-3 text-sm"
       style={{
         fontFamily: 'var(--font-noto-sans-kr), sans-serif',
         color: 'var(--admin-text-muted)',
@@ -221,7 +221,7 @@ export function PasswordRuleBox({ children }: { children: React.ReactNode }) {
 export function IdPreview({ studentId }: { studentId: string | null }) {
   return (
     <div
-      className="flex items-center gap-3 rounded-xl border px-4 py-3 transition-all duration-200"
+      className="flex items-center gap-3 rounded-md border px-3.5 py-3 transition-all duration-200"
       style={{
         borderColor: studentId ? 'var(--admin-accent)' : 'var(--admin-border)',
         backgroundColor: studentId ? 'var(--admin-accent-bg)' : 'transparent',
@@ -295,7 +295,7 @@ export function FormActions({
       <button
         type="submit"
         disabled={isSubmitting}
-        className="flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium text-white transition-all duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
+        className="flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium text-white transition-all duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
         style={{
           fontFamily: 'var(--font-noto-sans-kr), sans-serif',
           backgroundColor: 'var(--admin-accent)',
@@ -323,7 +323,7 @@ export function FormActions({
         type="button"
         onClick={onReset}
         disabled={isSubmitting}
-        className="rounded-xl border px-4 py-2.5 text-sm transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60"
+        className="rounded-md border px-4 py-2.5 text-sm transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60"
         style={{
           fontFamily: 'var(--font-noto-sans-kr), sans-serif',
           color: 'var(--admin-text-muted)',
@@ -346,7 +346,7 @@ export function FormNotice({ notice }: { notice: Notice }) {
       className="mt-4 whitespace-pre-line text-sm"
       style={{
         fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-        color: notice.type === 'success' ? '#15803d' : '#dc2626',
+        color: notice.type === 'success' ? 'var(--mileage-green)' : 'var(--mileage-red)',
       }}
     >
       {notice.text}

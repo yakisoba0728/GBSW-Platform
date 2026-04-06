@@ -59,7 +59,7 @@ export default function SchoolMileageRules({
             <button
               type="button"
               onClick={() => setAlertOpen(true)}
-              className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-70"
+              className="flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-opacity hover:opacity-70"
               style={{
                 fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                 backgroundColor: 'var(--admin-accent-bg)',
@@ -90,7 +90,7 @@ export default function SchoolMileageRules({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="항목명 또는 카테고리 검색"
-              className="w-full rounded-lg border py-2 pl-8 pr-3 text-xs outline-none"
+              className="h-8 w-full rounded-md border pl-8 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               style={inputStyle}
             />
           </div>
@@ -98,7 +98,7 @@ export default function SchoolMileageRules({
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value as '' | MileageType)}
-            className="rounded-lg border px-3 py-2 text-xs outline-none"
+            className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
             style={inputStyle}
           >
             <option value="">전체 유형</option>
@@ -109,7 +109,7 @@ export default function SchoolMileageRules({
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="rounded-lg border px-3 py-2 text-xs outline-none"
+            className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
             style={inputStyle}
           >
             <option value="">전체 카테고리</option>
@@ -122,39 +122,25 @@ export default function SchoolMileageRules({
             <button
               type="button"
               onClick={() => { setSearch(''); setTypeFilter(''); setCategoryFilter('') }}
-              className="rounded-lg border px-3 py-2 text-xs transition-opacity hover:opacity-70"
-              style={{
-                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                borderColor: 'var(--admin-border)',
-                color: 'var(--admin-text-muted)',
-              }}
+              className="h-8 rounded-md border px-2.5 text-xs transition-opacity hover:opacity-70"
+              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--admin-border)', color: 'var(--admin-text-muted)' }}
             >
               초기화
             </button>
           )}
-
-          <span
-            className="ml-auto text-xs"
-            style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-space-grotesk)' }}
-          >
+          <span className="ml-auto text-xs" style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-space-grotesk)' }}>
             {filteredRules.length}건
           </span>
         </FilterRow>
       </Card>
 
-      <Card className="overflow-hidden p-0 flex flex-col flex-1 min-h-0">
-        <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto">
+      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
+        <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto">
           <table className="w-full text-xs">
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--admin-border)', backgroundColor: 'var(--admin-bg)' }}>
+            <thead className="table-header">
+              <tr>
                 {['ID', '유형', '카테고리', '항목명', '기본점수', '순서', '상태', ''].map((h) => (
-                  <th
-                    key={h}
-                    className="px-3 py-3 text-left font-semibold"
-                    style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}
-                  >
-                    {h}
-                  </th>
+                  <th key={h} className="px-3">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -191,39 +177,36 @@ export default function SchoolMileageRules({
                     onMouseEnter={() => setHoveredRowId(rule.id)}
                     onMouseLeave={() => setHoveredRowId(null)}
                   >
-                    <td className="px-3 py-3" style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-space-grotesk)' }}>
+                    <td className="px-3 py-2" style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-space-grotesk)' }}>
                       {rule.id}
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="px-3 py-2">
                       <Badge type={rule.type}>{rule.type === 'reward' ? '상점' : '벌점'}</Badge>
                     </td>
-                    <td className="px-3 py-3" style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
+                    <td className="px-3 py-2" style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
                       {rule.category}
                     </td>
                     <td className="px-3 py-3 font-medium" style={{ color: 'var(--admin-text)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
                       {rule.name}
                     </td>
-                    <td className="px-3 py-3 font-semibold" style={{
-                      fontFamily: 'var(--font-space-grotesk)',
-                      color: rule.type === 'reward' ? '#16a34a' : '#dc2626',
-                    }}>
+                    <td className="px-3 py-2 font-semibold" style={{ fontFamily: 'var(--font-space-grotesk)', color: rule.type === 'reward' ? 'var(--mileage-green)' : 'var(--mileage-red)' }}>
                       {rule.type === 'reward' ? '+' : '-'}{rule.defaultScore}점
                     </td>
-                    <td className="px-3 py-3" style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-space-grotesk)' }}>
+                    <td className="px-3 py-2" style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-space-grotesk)' }}>
                       {rule.displayOrder}
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="px-3 py-2">
                       <span
-                        className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium"
+                        className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium"
                         style={{
-                          backgroundColor: rule.isActive ? 'rgba(34,197,94,0.1)' : 'rgba(156,163,175,0.15)',
-                          color: rule.isActive ? '#16a34a' : '#6b7280',
+                          backgroundColor: rule.isActive ? 'var(--mileage-green-bg)' : 'rgba(156,163,175,0.15)',
+                          color: rule.isActive ? 'var(--mileage-green)' : 'var(--admin-text-muted)',
                         }}
                       >
                         {rule.isActive ? '활성' : '비활성'}
                       </span>
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="px-3 py-2">
                       <div
                         className="flex items-center gap-1.5 transition-opacity"
                         style={{ opacity: hoveredRowId === rule.id ? 1 : 0 }}
@@ -231,24 +214,16 @@ export default function SchoolMileageRules({
                         <button
                           type="button"
                           onClick={() => setAlertOpen(true)}
-                          className="flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] transition-opacity hover:opacity-70"
-                          style={{
-                            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                            borderColor: 'var(--admin-border)',
-                            color: 'var(--admin-text-muted)',
-                          }}
+                          className="flex items-center gap-1 rounded border px-2 py-1 text-[11px] transition-opacity hover:opacity-70"
+                          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--admin-border)', color: 'var(--admin-text-muted)' }}
                         >
                           <EditIcon />수정
                         </button>
                         <button
                           type="button"
                           onClick={() => setAlertOpen(true)}
-                          className="flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] transition-opacity hover:opacity-70"
-                          style={{
-                            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                            borderColor: 'rgba(239,68,68,0.3)',
-                            color: '#dc2626',
-                          }}
+                          className="flex items-center gap-1 rounded border px-2 py-1 text-[11px] transition-opacity hover:opacity-70"
+                          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--mileage-red-border)', color: 'var(--mileage-red)' }}
                         >
                           <SlashIcon />비활성화
                         </button>

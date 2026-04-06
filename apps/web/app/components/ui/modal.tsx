@@ -166,7 +166,7 @@ export function ConfirmModal({
   return (
     <ModalBase isOpen={isOpen} onClose={onClose} maxWidth="max-w-sm">
       <div
-        className="overflow-hidden rounded-2xl border"
+        className="overflow-hidden rounded-xl border"
         style={{ backgroundColor: 'var(--admin-sidebar-bg)', borderColor: 'var(--admin-border)' }}
       >
         <div className="px-6 pb-5 pt-6">
@@ -300,7 +300,7 @@ export function AlertModal({
   return (
     <ModalBase isOpen={isOpen} onClose={onClose} maxWidth="max-w-sm">
       <div
-        className="overflow-hidden rounded-2xl border"
+        className="overflow-hidden rounded-xl border"
         style={{ backgroundColor: 'var(--admin-sidebar-bg)', borderColor: 'var(--admin-border)' }}
       >
         <div className="flex items-start gap-4 px-6 py-5">
