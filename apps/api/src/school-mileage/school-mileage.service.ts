@@ -97,4 +97,19 @@ export class SchoolMileageService {
   ) {
     return this.analyticsService.getClassAnalytics(actorTeacherId, query);
   }
+
+  getMyMileageSummary(actorStudentId: string | undefined) {
+    return this.studentsService.getMyMileageSummary(actorStudentId);
+  }
+
+  getMyEntries(
+    actorStudentId: string | undefined,
+    query: Record<string, unknown>,
+  ) {
+    return this.entriesService.getMyEntries(actorStudentId, query);
+  }
+
+  getMyActiveRules(actorStudentId: string | undefined) {
+    return this.rulesService.getActiveRules(actorStudentId);
+  }
 }

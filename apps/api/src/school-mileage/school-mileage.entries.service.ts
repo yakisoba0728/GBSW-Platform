@@ -1,8 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { assertTeacherExists } from './school-mileage.access';
+import {
+  assertStudentExists,
+  assertTeacherExists,
+} from './school-mileage.access';
 import {
   mapHistoryEntry,
+  mapStudentHistoryEntry,
   schoolMileageEntrySelect,
   toPrismaMileageType,
 } from './school-mileage.mappers';
@@ -273,6 +277,52 @@ export class SchoolMileageEntriesService {
     return {
       ok: true,
       message: '상벌점 내역이 삭제되었습니다.',
+    };
+  }
+  async getMyEntries(
+    actorStudentId: string | undefined,
+    query: Record<string, unknown>,
+  ) {
+    const student = await assertStudentExists(this.prisma, actorStudentId);
+
+    const filters = parseEntryFilters({
+      ...query,
+      studentId: student.studentId,
+    });
+    const { page, pageSize } = filters;
+    const offset = (page - 1) * pageSize;
+
+    const entryWhere = {
+      deletedAt: null,
+      studentId: student.studentId,
+      type: filters.type ? toPrismaMileageType(filters.type) : undefined,
+      awardedAt:
+        filters.startDate || filters.endDate
+          ? {
+              gte: filters.startDate ?? undefined,
+              lte: filters.endDate ?? undefined,
+            }
+          : undefined,
+    };
+
+    const [totalCount, entries] = await Promise.all([
+      this.prisma.schoolMileageEntry.count({
+        where: entryWhere,
+      }),
+      this.prisma.schoolMileageEntry.findMany({
+        where: entryWhere,
+        orderBy: [{ awardedAt: 'desc' }, { createdAt: 'desc' }],
+        skip: offset,
+        take: pageSize,
+        select: schoolMileageEntrySelect,
+      }),
+    ]);
+
+    return {
+      items: entries.map(mapStudentHistoryEntry),
+      page,
+      pageSize,
+      totalCount,
     };
   }
 }

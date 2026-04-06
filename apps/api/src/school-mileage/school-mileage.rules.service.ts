@@ -5,7 +5,10 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { assertTeacherExists } from './school-mileage.access';
+import {
+  assertStudentExists,
+  assertTeacherExists,
+} from './school-mileage.access';
 import {
   toApiMileageType,
   toPrismaMileageType,
@@ -134,6 +137,22 @@ export class SchoolMileageRulesService {
     return {
       ok: true,
       message: '규칙이 수정되었습니다.',
+    };
+  }
+
+  async getActiveRules(actorStudentId: string | undefined) {
+    await assertStudentExists(this.prisma, actorStudentId);
+
+    const rules = await this.prisma.schoolMileageRule.findMany({
+      where: { isActive: true },
+      orderBy: {
+        displayOrder: 'asc',
+      },
+      select: ruleSummarySelect,
+    });
+
+    return {
+      rules: rules.map((rule) => mapRuleSummary(rule)),
     };
   }
 

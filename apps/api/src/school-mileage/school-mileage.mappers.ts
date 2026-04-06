@@ -114,6 +114,34 @@ export function mapHistoryEntry(entry: HistoryEntryRecord) {
   };
 }
 
+export function mapStudentHistoryEntry(entry: HistoryEntryRecord) {
+  const studentGrade = calculateStudentGrade(
+    entry.student.studentId,
+    entry.student.currentYear,
+  );
+
+  return {
+    id: entry.id,
+    type: toApiMileageType(entry.type),
+    score: entry.score,
+    reason: entry.reason,
+    awardedAt: entry.awardedAt.toISOString(),
+    createdAt: entry.createdAt.toISOString(),
+    updatedAt: entry.updatedAt.toISOString(),
+    ruleId: entry.rule.id,
+    ruleCategory: entry.rule.category,
+    ruleName: entry.rule.name,
+    ruleDefaultScore: entry.rule.defaultScore,
+    studentId: entry.student.studentId,
+    studentName: entry.student.name,
+    school: entry.student.school,
+    grade: studentGrade,
+    classNumber: entry.student.currentClass,
+    studentNumber: entry.student.currentNumber,
+    teacherName: entry.createdByTeacher.name,
+  };
+}
+
 export function buildStudentMileageSummary(
   student: StudentSummary,
   entries: Array<{ type: SchoolMileageType; score: number }>,

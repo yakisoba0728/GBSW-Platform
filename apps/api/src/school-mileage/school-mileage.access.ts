@@ -26,3 +26,32 @@ export async function assertTeacherExists(
 
   return teacher;
 }
+
+export async function assertStudentExists(
+  prisma: PrismaService,
+  actorStudentId: string | undefined,
+) {
+  const studentId = parseRequiredTextInput(
+    actorStudentId,
+    '학생 계정 정보가 올바르지 않습니다.',
+  );
+  const student = await prisma.student.findUnique({
+    where: {
+      studentId,
+    },
+    select: {
+      studentId: true,
+      name: true,
+      school: true,
+      currentYear: true,
+      currentClass: true,
+      currentNumber: true,
+    },
+  });
+
+  if (!student) {
+    throw new UnauthorizedException('유효한 학생 계정이 아닙니다.');
+  }
+
+  return student;
+}

@@ -1,7 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { assertTeacherExists } from './school-mileage.access';
-import { buildStudentMileageSummary } from './school-mileage.mappers';
+import {
+  assertStudentExists,
+  assertTeacherExists,
+} from './school-mileage.access';
+import {
+  buildStudentMileageSummary,
+  mapStudentSummary,
+} from './school-mileage.mappers';
 import {
   parseAnalyticsFilters,
   parseStudentFilters,
@@ -55,6 +61,25 @@ export class SchoolMileageStudentsService {
 
     return {
       summary: buildStudentMileageSummary(student, entries),
+    };
+  }
+
+  async getMyMileageSummary(actorStudentId: string | undefined) {
+    const student = await assertStudentExists(this.prisma, actorStudentId);
+
+    const entries = await this.prisma.schoolMileageEntry.findMany({
+      where: {
+        deletedAt: null,
+        studentId: student.studentId,
+      },
+      select: {
+        type: true,
+        score: true,
+      },
+    });
+
+    return {
+      summary: buildStudentMileageSummary(mapStudentSummary(student), entries),
     };
   }
 }

@@ -156,4 +156,35 @@ export class SchoolMileageController {
 
     return this.schoolMileageService.deleteEntry(actorTeacherId, id);
   }
+
+  @Get('my/summary')
+  getMyMileageSummary(
+    @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
+    @Headers('x-actor-student-id') actorStudentId: string | undefined,
+  ) {
+    assertInternalApiRequest(internalApiSecret);
+
+    return this.schoolMileageService.getMyMileageSummary(actorStudentId);
+  }
+
+  @Get('my/entries')
+  getMyEntries(
+    @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
+    @Headers('x-actor-student-id') actorStudentId: string | undefined,
+    @Query() query: Record<string, unknown>,
+  ) {
+    assertInternalApiRequest(internalApiSecret);
+
+    return this.schoolMileageService.getMyEntries(actorStudentId, query);
+  }
+
+  @Get('my/rules')
+  getMyActiveRules(
+    @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
+    @Headers('x-actor-student-id') actorStudentId: string | undefined,
+  ) {
+    assertInternalApiRequest(internalApiSecret);
+
+    return this.schoolMileageService.getMyActiveRules(actorStudentId);
+  }
 }
