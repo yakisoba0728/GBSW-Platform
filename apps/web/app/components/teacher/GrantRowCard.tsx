@@ -2,6 +2,7 @@
 
 import { AnimatedListItem } from '../ui/list'
 import { XIcon } from '../ui/icons'
+import Tooltip from '../ui/tooltip'
 import { getSchoolLabel, inputStyle } from './teacher-shared'
 import type {
   SchoolMileageRuleSummary,
@@ -82,15 +83,17 @@ export default function GrantRowCard({
             {selectedRule.type === 'reward' ? '+' : '-'}
             {displayScore}점
           </span>
-          <span
-            className="min-w-0 flex-1 truncate"
-            style={{
-              color: 'var(--admin-text)',
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            }}
-          >
-            {selectedRule.name}
-          </span>
+          <Tooltip content={`${selectedRule.name} — ${selectedRule.category}`}>
+            <span
+              className="min-w-0 flex-1 truncate"
+              style={{
+                color: 'var(--admin-text)',
+                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+              }}
+            >
+              {selectedRule.name}
+            </span>
+          </Tooltip>
           <span
             className="flex-shrink-0 text-[11px]"
             style={{

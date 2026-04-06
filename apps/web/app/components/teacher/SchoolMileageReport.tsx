@@ -2,15 +2,19 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { Printer } from 'lucide-react'
 import {
   Card,
   NoticeBox,
   SCHOOL_OPTIONS,
   SectionTitle,
+  formatAwardedAt,
+  formatSignedScore,
   getSchoolLabel,
 } from './teacher-shared'
 import { ListEmptyState, LoadingSpinner } from '../ui/list'
 import { FileIcon } from '../ui/icons'
+import { exportToExcel } from '@/lib/export-utils'
 import type {
   ClassMileageAnalyticsResponse,
   PaginatedSchoolMileageHistoryResponse,
@@ -239,6 +243,64 @@ export default function SchoolMileageReport() {
     window.print()
   }, [])
 
+  const handleExport = useCallback(() => {
+    const now = new Date()
+    const dateStr = [
+      now.getFullYear(),
+      `${now.getMonth() + 1}`.padStart(2, '0'),
+      `${now.getDate()}`.padStart(2, '0'),
+    ].join('-')
+    const filename = `상벌점_${REPORT_TYPE_LABELS[reportType]}_${dateStr}`
+
+    if (reportType === 'student') {
+      exportToExcel({
+        data: studentReport.students,
+        columns: [
+          { header: '학교', accessor: (s) => getSchoolLabel(s.school) },
+          { header: '학년', accessor: (s) => s.grade ?? '' },
+          { header: '반', accessor: (s) => s.classNumber ?? '' },
+          { header: '번호', accessor: (s) => s.studentNumber ?? '' },
+          { header: '이름', accessor: (s) => s.name },
+          { header: '상점 합계', accessor: (s) => s.rewardTotal },
+          { header: '벌점 합계', accessor: (s) => s.penaltyTotal },
+          { header: '순점수', accessor: (s) => s.netScore },
+          { header: '건수', accessor: (s) => s.entryCount },
+        ],
+        filename,
+        sheetName: '학생별',
+      })
+    } else if (reportType === 'class') {
+      exportToExcel({
+        data: classReport.classes,
+        columns: [
+          { header: '학급', accessor: (c) => `${c.classNumber}반` },
+          { header: '상점 합계', accessor: (c) => c.rewardTotal },
+          { header: '벌점 합계', accessor: (c) => c.penaltyTotal },
+          { header: '순점수', accessor: (c) => c.netScore },
+        ],
+        filename,
+        sheetName: '학급별',
+      })
+    } else {
+      exportToExcel({
+        data: allEntriesReport.items,
+        columns: [
+          { header: '부여 일시', accessor: (e) => formatAwardedAt(e.awardedAt) },
+          { header: '학생', accessor: (e) => e.studentName },
+          { header: '학년/반/번호', accessor: (e) => `${e.grade ?? ''}학년 ${e.classNumber}반 ${e.studentNumber}번` },
+          { header: '유형', accessor: (e) => (e.type === 'reward' ? '상점' : '벌점') },
+          { header: '점수', accessor: (e) => formatSignedScore(e.type, e.score) },
+          { header: '규정 항목', accessor: (e) => e.ruleName },
+          { header: '카테고리', accessor: (e) => e.ruleCategory },
+          { header: '사유', accessor: (e) => e.reason ?? '' },
+          { header: '부여 교사', accessor: (e) => e.teacherName },
+        ],
+        filename,
+        sheetName: '전체내역',
+      })
+    }
+  }, [allEntriesReport.items, classReport.classes, reportType, studentReport.students])
+
   const reportTitle = useMemo(() => {
     const parts: string[] = []
     if (filterSchool) parts.push(getSchoolLabel(filterSchool))
@@ -309,7 +371,9 @@ export default function SchoolMileageReport() {
           void loadReport()
         }}
         onPrint={handlePrint}
+        onExport={handleExport}
         canPrint={!isLoading && hasPreview}
+        canExport={!isLoading && hasPreview}
         isLoading={isLoading}
         schoolOptions={SCHOOL_OPTIONS}
       />
@@ -359,13 +423,14 @@ export default function SchoolMileageReport() {
               <button
                 type="button"
                 onClick={handlePrint}
-                className="no-print rounded-md border px-2.5 py-1.5 text-xs transition-opacity hover:opacity-70"
+                className="no-print flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs transition-opacity hover:opacity-70"
                 style={{
                   fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                   borderColor: 'var(--admin-border)',
                   color: 'var(--admin-text-muted)',
                 }}
               >
+                <Printer size={12} aria-hidden="true" />
                 인쇄
               </button>
             </div>

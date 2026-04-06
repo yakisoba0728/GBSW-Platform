@@ -9,11 +9,13 @@ import {
   parseRequiredTextInput,
 } from '../common/parsers';
 import type {
+  CreateRuleInput,
   CreateEntryInput,
   EntryFilterOptions,
   PaginatedEntryFilterOptions,
   SchoolMileageApiType,
   StudentFilterOptions,
+  UpdateRuleInput,
   UpdateEntryInput,
 } from './school-mileage.types';
 
@@ -124,8 +126,58 @@ export function parseUpdateEntryInput(body: Record<string, unknown>) {
   } satisfies UpdateEntryInput;
 }
 
+export function parseCreateRuleInput(body: Record<string, unknown>) {
+  return {
+    type: parseRequiredMileageType(body.type),
+    category: parseRequiredTextInput(body.category, '카테고리를 입력해주세요.'),
+    name: parseRequiredTextInput(body.name, '항목명을 입력해주세요.'),
+    defaultScore: parseRequiredPositiveIntInput(
+      body.defaultScore,
+      '기본점수',
+      1,
+      1000000000,
+    ),
+    displayOrder: parseOptionalDisplayOrderInput(body.displayOrder),
+  } satisfies CreateRuleInput;
+}
+
+export function parseUpdateRuleInput(body: Record<string, unknown>) {
+  const hasCategory = body.category !== undefined;
+  const hasName = body.name !== undefined;
+  const hasDefaultScore = body.defaultScore !== undefined;
+  const hasDisplayOrder = body.displayOrder !== undefined;
+
+  if (!hasCategory && !hasName && !hasDefaultScore && !hasDisplayOrder) {
+    throw new BadRequestException('수정할 항목이 없습니다.');
+  }
+
+  return {
+    category: hasCategory
+      ? parseRequiredTextInput(body.category, '카테고리를 입력해주세요.')
+      : undefined,
+    name: hasName
+      ? parseRequiredTextInput(body.name, '항목명을 입력해주세요.')
+      : undefined,
+    defaultScore: hasDefaultScore
+      ? parseRequiredPositiveIntInput(
+          body.defaultScore,
+          '기본점수',
+          1,
+          1000000000,
+        )
+      : undefined,
+    displayOrder: hasDisplayOrder
+      ? parseRequiredDisplayOrderInput(body.displayOrder)
+      : undefined,
+  } satisfies UpdateRuleInput;
+}
+
 export function parseEntryId(value: unknown) {
   return parseRequiredPositiveIntInput(value, '상벌점 내역 ID', 1, 1000000000);
+}
+
+export function parseRuleId(value: unknown) {
+  return parseRequiredPositiveIntInput(value, '상벌점 항목 ID', 1, 1000000000);
 }
 
 function parseOptionalSchool(value: unknown) {
@@ -154,6 +206,40 @@ function parseOptionalMileageType(
   }
 
   throw new BadRequestException('상벌점 구분이 올바르지 않습니다.');
+}
+
+function parseRequiredMileageType(value: unknown): SchoolMileageApiType {
+  const type = parseOptionalMileageType(value);
+
+  if (!type) {
+    throw new BadRequestException('상벌점 구분이 올바르지 않습니다.');
+  }
+
+  return type;
+}
+
+function parseOptionalDisplayOrderInput(value: unknown) {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+
+  return parseRequiredDisplayOrderInput(value);
+}
+
+function parseRequiredDisplayOrderInput(value: unknown) {
+  const text = parseRequiredTextInput(value, '표시순서 값을 입력해주세요.');
+
+  if (!/^\d+$/.test(text)) {
+    throw new BadRequestException('표시순서 값이 올바르지 않습니다.');
+  }
+
+  const parsed = Number.parseInt(text, 10);
+
+  if (Number.isNaN(parsed) || parsed < 0 || parsed > 1000000000) {
+    throw new BadRequestException('표시순서 값이 올바르지 않습니다.');
+  }
+
+  return parsed;
 }
 
 function validateDateRange(startDate?: Date, endDate?: Date) {

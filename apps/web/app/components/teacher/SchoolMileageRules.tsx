@@ -9,9 +9,10 @@ import {
   SectionHeader,
   inputStyle,
 } from './teacher-shared'
-import { AlertModal } from '../ui/modal'
+import SuccessModal from '../ui/success-modal'
 import { AnimatedTableRow, ListEmptyState, TableRowSkeleton } from '../ui/list'
-import { EditIcon, FileIcon, PlusIcon, SearchIcon, SlashIcon } from '../ui/icons'
+import { EditIcon, FileIcon, PlusIcon, SearchIcon } from '../ui/icons'
+import RuleFormModal from './RuleFormModal'
 import type { MileageType, SchoolMileageRuleSummary } from './school-mileage-types'
 import { koreanIncludes } from '@/lib/korean-search'
 
@@ -19,16 +20,27 @@ export default function SchoolMileageRules({
   rules,
   isRulesLoading,
   rulesError,
+  loadRules,
 }: {
   rules: SchoolMileageRuleSummary[]
   isRulesLoading: boolean
   rulesError: string | null
+  loadRules: () => Promise<void>
 }) {
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<'' | MileageType>('')
   const [categoryFilter, setCategoryFilter] = useState('')
   const [hoveredRowId, setHoveredRowId] = useState<number | null>(null)
-  const [alertOpen, setAlertOpen] = useState(false)
+
+  const [formModalOpen, setFormModalOpen] = useState(false)
+  const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
+  const [editingRule, setEditingRule] = useState<SchoolMileageRuleSummary | null>(null)
+  const [successMessage, setSuccessMessage] = useState<{
+    open: boolean
+    title: string
+    description?: string
+    type: 'success' | 'error'
+  }>({ open: false, title: '', type: 'success' })
 
   const categories = useMemo(
     () => [...new Set(rules.map((r) => r.category))].sort(),
@@ -49,16 +61,59 @@ export default function SchoolMileageRules({
     })
   }, [rules, typeFilter, categoryFilter, search])
 
+  function handleCreate() {
+    setFormMode('create')
+    setEditingRule(null)
+    setFormModalOpen(true)
+  }
+
+  function handleEdit(rule: SchoolMileageRuleSummary) {
+    setFormMode('edit')
+    setEditingRule(rule)
+    setFormModalOpen(true)
+  }
+
+  async function handleFormSuccess() {
+    await loadRules()
+    setSuccessMessage({
+      open: true,
+      title: formMode === 'create' ? '항목 추가 완료' : '항목 수정 완료',
+      description:
+        formMode === 'create'
+          ? '새 상벌점 항목이 추가되었습니다.'
+          : '상벌점 항목이 수정되었습니다.',
+      type: 'success',
+    })
+  }
+
   return (
     <div className="flex flex-col h-full gap-4">
+      <RuleFormModal
+        open={formModalOpen}
+        onClose={() => setFormModalOpen(false)}
+        mode={formMode}
+        rule={editingRule}
+        categories={categories}
+        existingRules={rules}
+        onSuccess={handleFormSuccess}
+      />
+
+      <SuccessModal
+        open={successMessage.open}
+        onClose={() => setSuccessMessage({ open: false, title: '', type: 'success' })}
+        type={successMessage.type}
+        title={successMessage.title}
+        description={successMessage.description}
+      />
+
       <Card>
         <SectionHeader
           title="상벌점 항목 관리"
-          subtitle="현재 등록된 상벌점 규칙을 확인합니다. 항목 추가·수정·비활성화 기능은 준비 중입니다."
+          subtitle="현재 등록된 상벌점 규칙을 관리합니다."
           action={
             <button
               type="button"
-              onClick={() => setAlertOpen(true)}
+              onClick={handleCreate}
               className="flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-opacity hover:opacity-70"
               style={{
                 fontFamily: 'var(--font-noto-sans-kr), sans-serif',
@@ -139,17 +194,17 @@ export default function SchoolMileageRules({
           <table className="w-full text-xs">
             <thead className="table-header">
               <tr>
-                {['ID', '유형', '카테고리', '항목명', '기본점수', '순서', '상태', ''].map((h) => (
+                {['ID', '유형', '카테고리', '항목명', '기본점수', '순서', ''].map((h) => (
                   <th key={h} className="px-3">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {isRulesLoading ? (
-                <TableRowSkeleton columns={8} count={6} />
+                <TableRowSkeleton columns={7} count={6} />
               ) : filteredRules.length === 0 ? (
                 <tr>
-                  <td colSpan={8}>
+                  <td colSpan={7}>
                     <ListEmptyState
                       icon={
                         <FileIcon
@@ -196,36 +251,17 @@ export default function SchoolMileageRules({
                       {rule.displayOrder}
                     </td>
                     <td className="px-3 py-2">
-                      <span
-                        className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium"
-                        style={{
-                          backgroundColor: rule.isActive ? 'var(--reward-subtle)' : 'rgba(156,163,175,0.15)',
-                          color: rule.isActive ? 'var(--reward)' : 'var(--fg-muted)',
-                        }}
-                      >
-                        {rule.isActive ? '활성' : '비활성'}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2">
                       <div
                         className="flex items-center gap-1.5 transition-opacity"
                         style={{ opacity: hoveredRowId === rule.id ? 1 : 0 }}
                       >
                         <button
                           type="button"
-                          onClick={() => setAlertOpen(true)}
+                          onClick={() => handleEdit(rule)}
                           className="flex items-center gap-1 rounded border px-2 py-1 text-[11px] transition-opacity hover:opacity-70"
                           style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--border)', color: 'var(--fg-muted)' }}
                         >
                           <EditIcon />수정
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setAlertOpen(true)}
-                          className="flex items-center gap-1 rounded border px-2 py-1 text-[11px] transition-opacity hover:opacity-70"
-                          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', borderColor: 'var(--penalty-border)', color: 'var(--penalty)' }}
-                        >
-                          <SlashIcon />비활성화
                         </button>
                       </div>
                     </td>
@@ -236,14 +272,6 @@ export default function SchoolMileageRules({
           </table>
         </div>
       </Card>
-
-      <AlertModal
-        isOpen={alertOpen}
-        type="info"
-        title="준비 중입니다"
-        message="이 기능은 아직 구현되지 않았습니다. 이후 업데이트에서 추가될 예정입니다."
-        onClose={() => setAlertOpen(false)}
-      />
     </div>
   )
 }

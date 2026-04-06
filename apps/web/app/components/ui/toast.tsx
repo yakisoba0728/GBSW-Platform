@@ -7,8 +7,9 @@ import {
   useEffect,
   useState,
 } from 'react'
-import type { JSX, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { CircleCheck, CircleX, Info, X } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -22,72 +23,10 @@ interface ToastItem {
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
-function SuccessIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="var(--reward)"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      style={{ flexShrink: 0 }}
-    >
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="9 12 11 14 15 10" />
-    </svg>
-  )
-}
-
-function ErrorIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="var(--penalty)"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      style={{ flexShrink: 0 }}
-    >
-      <circle cx="12" cy="12" r="10" />
-      <line x1="15" y1="9" x2="9" y2="15" />
-      <line x1="9" y1="9" x2="15" y2="15" />
-    </svg>
-  )
-}
-
-function InfoIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="var(--accent)"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      style={{ flexShrink: 0 }}
-    >
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="16" x2="12" y2="12" />
-      <line x1="12" y1="8" x2="12.01" y2="8" />
-    </svg>
-  )
-}
-
-const ICON_MAP: Record<ToastType, () => JSX.Element> = {
-  success: SuccessIcon,
-  error: ErrorIcon,
-  info: InfoIcon,
+const ICON_MAP: Record<ToastType, ReactNode> = {
+  success: <CircleCheck size={20} color="var(--reward)" strokeWidth={2.2} aria-hidden="true" style={{ flexShrink: 0 }} />,
+  error: <CircleX size={20} color="var(--penalty)" strokeWidth={2.2} aria-hidden="true" style={{ flexShrink: 0 }} />,
+  info: <Info size={20} color="var(--accent)" strokeWidth={2.2} aria-hidden="true" style={{ flexShrink: 0 }} />,
 }
 
 // Border color per type uses CSS custom properties defined in the spec.
@@ -108,8 +47,6 @@ function ToastItemComponent({
   toast: ToastItem
   onClose: () => void
 }) {
-  const Icon = ICON_MAP[t.type]
-
   return (
     <motion.div
       layout
@@ -130,10 +67,8 @@ function ToastItemComponent({
         gap: 10,
       }}
     >
-      {/* Type icon */}
-      <Icon />
+      {ICON_MAP[t.type]}
 
-      {/* Message */}
       <span
         style={{
           flex: 1,
@@ -145,7 +80,6 @@ function ToastItemComponent({
         {t.message}
       </span>
 
-      {/* Close button */}
       <button
         onClick={onClose}
         aria-label="닫기"
@@ -161,20 +95,7 @@ function ToastItemComponent({
           flexShrink: 0,
         }}
       >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 14 14"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M3 3l8 8M11 3l-8 8"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
+        <X size={14} strokeWidth={1.5} aria-hidden="true" />
       </button>
     </motion.div>
   )

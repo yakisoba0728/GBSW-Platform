@@ -17,6 +17,21 @@ export class SchoolMileageService {
     return this.rulesService.getRules(actorTeacherId);
   }
 
+  createRule(
+    actorTeacherId: string | undefined,
+    body: Record<string, unknown>,
+  ) {
+    return this.rulesService.createRule(actorTeacherId, body);
+  }
+
+  updateRule(
+    actorTeacherId: string | undefined,
+    id: string,
+    body: Record<string, unknown>,
+  ) {
+    return this.rulesService.updateRule(actorTeacherId, id, body);
+  }
+
   getStudents(
     actorTeacherId: string | undefined,
     query: Record<string, unknown>,

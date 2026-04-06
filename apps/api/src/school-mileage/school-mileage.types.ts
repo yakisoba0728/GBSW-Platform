@@ -89,6 +89,21 @@ export type UpdateEntryInput = {
   awardedAt?: Date;
 };
 
+export type CreateRuleInput = {
+  type: SchoolMileageApiType;
+  category: string;
+  name: string;
+  defaultScore: number;
+  displayOrder?: number;
+};
+
+export type UpdateRuleInput = {
+  category?: string;
+  name?: string;
+  defaultScore?: number;
+  displayOrder?: number;
+};
+
 export type HistoryEntryRecord = {
   id: number;
   type: SchoolMileageType;

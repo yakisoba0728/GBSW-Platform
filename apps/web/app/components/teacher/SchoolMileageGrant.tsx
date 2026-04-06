@@ -2,7 +2,10 @@
 
 import { useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
+import { Loader2 } from 'lucide-react'
 import { ListSkeleton } from '../ui/list'
+import SuccessModal from '../ui/success-modal'
+import { UserPlusIcon } from '../ui/icons'
 import RuleSelectionModal from './RuleSelectionModal'
 import StudentSelectionModal from './StudentSelectionModal'
 import GrantRowCard, { type GrantRow } from './GrantRowCard'
@@ -25,10 +28,11 @@ export default function SchoolMileageGrant({
   const [rows, setRows] = useState<GrantRow[]>([])
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false)
   const [ruleModalRowId, setRuleModalRowId] = useState<number | null>(null)
-  const [notice, setNotice] = useState<{
-    type: 'success' | 'error'
+  const [error, setError] = useState<string | null>(null)
+  const [successModal, setSuccessModal] = useState<{
+    open: boolean
     message: string
-  } | null>(null)
+  }>({ open: false, message: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const nextRowIdRef = useRef(1)
 
@@ -71,7 +75,7 @@ export default function SchoolMileageGrant({
         })),
       ]
     })
-    setNotice(null)
+    setError(null)
     setIsStudentModalOpen(false)
   }
 
@@ -129,7 +133,7 @@ export default function SchoolMileageGrant({
     }
 
     setIsSubmitting(true)
-    setNotice(null)
+    setError(null)
 
     const payload: CreateSchoolMileageEntriesPayload = {
       entries: rows.map((row) => ({
@@ -149,23 +153,17 @@ export default function SchoolMileageGrant({
       const result = await response.json().catch(() => null)
 
       if (!response.ok) {
-        setNotice({
-          type: 'error',
-          message: result?.message ?? '상벌점 부여에 실패했습니다.',
-        })
+        setError(result?.message ?? '상벌점 부여에 실패했습니다.')
         return
       }
 
       setRows([])
-      setNotice({
-        type: 'success',
+      setSuccessModal({
+        open: true,
         message: result?.message ?? '상벌점이 부여되었습니다.',
       })
     } catch {
-      setNotice({
-        type: 'error',
-        message: '상벌점 부여 요청 중 문제가 발생했습니다.',
-      })
+      setError('상벌점 부여 요청 중 문제가 발생했습니다.')
     } finally {
       setIsSubmitting(false)
     }
@@ -198,6 +196,14 @@ export default function SchoolMileageGrant({
         onClose={() => setRuleModalRowId(null)}
       />
 
+      <SuccessModal
+        open={successModal.open}
+        onClose={() => setSuccessModal({ open: false, message: '' })}
+        type="success"
+        title="부여 완료"
+        description={successModal.message}
+      />
+
       <div className="flex flex-col h-full gap-4">
         <div className="flex flex-shrink-0 flex-wrap items-center justify-end gap-2">
           {rows.length >= 2 && (
@@ -223,31 +229,16 @@ export default function SchoolMileageGrant({
             className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
             style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', backgroundColor: 'var(--accent)' }}
           >
-            <svg
-              width="13"
-              height="13"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <line x1="19" y1="8" x2="19" y2="14" />
-              <line x1="22" y1="11" x2="16" y2="11" />
-            </svg>
+            <UserPlusIcon size={13} strokeWidth={2.5} />
             학생 추가
           </button>
         </div>
 
-        {notice && (
+        {error && (
           <NoticeBox
-            type={notice.type}
-            message={notice.message}
-            onDismiss={() => setNotice(null)}
+            type="error"
+            message={error}
+            onDismiss={() => setError(null)}
           />
         )}
         {rulesError && <NoticeBox type="error" message={rulesError} />}
@@ -256,28 +247,12 @@ export default function SchoolMileageGrant({
           {isRulesLoading ? (
             <ListSkeleton count={3} rowHeight="h-14" />
           ) : rows.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+            <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
               <div
                 className="flex h-12 w-12 items-center justify-center rounded-lg"
                 style={{ backgroundColor: 'var(--accent-subtle)' }}
               >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{ color: 'var(--accent)' }}
-                  aria-hidden="true"
-                >
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <line x1="19" y1="8" x2="19" y2="14" />
-                  <line x1="22" y1="11" x2="16" y2="11" />
-                </svg>
+                <UserPlusIcon size={24} strokeWidth={1.7} style={{ color: 'var(--accent)' }} />
               </div>
               <div>
                 <p
@@ -343,17 +318,7 @@ export default function SchoolMileageGrant({
               >
                 {isSubmitting ? (
                   <>
-                    <motion.svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      animate={{ rotate: 360 }}
-                      transition={{ repeat: Infinity, duration: 0.7, ease: 'linear' }}
-                      aria-hidden="true"
-                    >
-                      <circle cx="8" cy="8" r="6" stroke="white" strokeWidth="2" strokeDasharray="28 8" fill="none" />
-                    </motion.svg>
+                    <Loader2 size={14} className="animate-spin" color="white" aria-hidden="true" />
                     부여 중...
                   </>
                 ) : (

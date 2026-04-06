@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { X, Trash2, Info, CircleCheck, CircleX, AlertTriangle } from 'lucide-react'
 
 // ─── Modal ────────────────────────────────────────────────────────────────────
 // AnimatePresence 기반 범용 모달.
@@ -141,14 +142,7 @@ export function Modal({
                       alignItems: 'center',
                     }}
                   >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                      <path
-                        d="M4 4l8 8M12 4l-8 8"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                    </svg>
+                    <X size={16} strokeWidth={1.5} aria-hidden="true" />
                   </button>
                 </div>
               )}
@@ -354,39 +348,9 @@ export function ConfirmModal({
             style={{ backgroundColor: isDanger ? 'rgba(239,68,68,0.1)' : 'var(--admin-accent-bg)' }}
           >
             {isDanger ? (
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#dc2626"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <polyline points="3 6 5 6 21 6" />
-                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                <path d="M10 11v6" />
-                <path d="M14 11v6" />
-                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-              </svg>
+              <Trash2 size={20} color="#dc2626" strokeWidth={2} aria-hidden="true" />
             ) : (
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="var(--admin-accent)"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
+              <Info size={20} color="var(--admin-accent)" strokeWidth={2} aria-hidden="true" />
             )}
           </div>
 
@@ -454,85 +418,22 @@ const ALERT_CONFIG: Record<AlertType, { color: string; bgColor: string; icon: Re
   success: {
     color: '#15803d',
     bgColor: 'rgba(34,197,94,0.1)',
-    icon: (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#15803d"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <polyline points="9 12 11 14 15 10" />
-      </svg>
-    ),
+    icon: <CircleCheck size={20} color="#15803d" strokeWidth={2.2} aria-hidden="true" />,
   },
   error: {
     color: '#b91c1c',
     bgColor: 'rgba(239,68,68,0.1)',
-    icon: (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#b91c1c"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <line x1="15" y1="9" x2="9" y2="15" />
-        <line x1="9" y1="9" x2="15" y2="15" />
-      </svg>
-    ),
+    icon: <CircleX size={20} color="#b91c1c" strokeWidth={2.2} aria-hidden="true" />,
   },
   info: {
     color: 'var(--admin-accent)',
     bgColor: 'var(--admin-accent-bg)',
-    icon: (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="var(--admin-accent)"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="16" x2="12" y2="12" />
-        <line x1="12" y1="8" x2="12.01" y2="8" />
-      </svg>
-    ),
+    icon: <Info size={20} color="var(--admin-accent)" strokeWidth={2.2} aria-hidden="true" />,
   },
   warning: {
     color: '#b45309',
     bgColor: 'rgba(245,158,11,0.1)',
-    icon: (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#b45309"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-        <line x1="12" y1="9" x2="12" y2="13" />
-        <line x1="12" y1="17" x2="12.01" y2="17" />
-      </svg>
-    ),
+    icon: <AlertTriangle size={20} color="#b45309" strokeWidth={2.2} aria-hidden="true" />,
   },
 }
 
@@ -601,19 +502,7 @@ export function AlertModal({
             style={{ color: 'var(--admin-text-muted)' }}
             aria-label="닫기"
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              aria-hidden="true"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <X size={14} strokeWidth={2.5} aria-hidden="true" />
           </button>
         </div>
 

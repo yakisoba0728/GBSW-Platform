@@ -1,5 +1,6 @@
 'use client'
 
+import { Filter } from 'lucide-react'
 import { Card, SCHOOL_OPTIONS, inputStyle } from './teacher-shared'
 
 type HistoryFilters = {
@@ -32,20 +33,7 @@ export default function HistoryFilters({
     <Card>
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex flex-shrink-0 items-center gap-1.5">
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            style={{ color: 'var(--fg-muted)' }}
-          >
-            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-          </svg>
+          <Filter size={12} strokeWidth={2} style={{ color: 'var(--fg-muted)' }} aria-hidden="true" />
           <span
             className="text-xs font-semibold"
             style={{

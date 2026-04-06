@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ModalBase } from '../ui/modal'
-import { XIcon } from '../ui/icons'
+import { SearchIcon, XIcon } from '../ui/icons'
 import type { SchoolMileageRuleSummary } from './school-mileage-types'
 import { inputStyle } from './teacher-shared'
 import { koreanIncludes } from '@/lib/korean-search'
@@ -113,21 +113,10 @@ export default function RuleSelectionModal({
           style={{ borderBottom: '1px solid var(--admin-border)' }}
         >
           <div className="relative">
-            <svg
+            <SearchIcon
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
-              width="13"
-              height="13"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
               style={{ color: 'var(--admin-text-muted)' }}
-              aria-hidden="true"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
+            />
             <input
               ref={searchRef}
               type="text"
@@ -143,20 +132,7 @@ export default function RuleSelectionModal({
         <div className="flex-1 overflow-y-auto px-4 py-3">
           {!hasResults ? (
             <div className="flex flex-col items-center gap-2 py-8 text-center">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                style={{ color: 'var(--admin-text-muted)' }}
-                aria-hidden="true"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
+              <SearchIcon size={24} strokeWidth={1.5} style={{ color: 'var(--admin-text-muted)' }} />
               <p
                 className="text-sm"
                 style={{

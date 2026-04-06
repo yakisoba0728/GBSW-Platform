@@ -1,8 +1,9 @@
 'use client'
 
-import { formatAwardedAtParts, formatSignedScore, getSchoolLabel } from './teacher-shared'
+import { formatAwardedAtParts, getSchoolLabel } from './teacher-shared'
 import { AnimatedTableRow, ListEmptyState, TableRowSkeleton } from '../ui/list'
-import { EditIcon, TrashIcon } from '../ui/icons'
+import { EditIcon, SearchIcon, TrashIcon } from '../ui/icons'
+import Tooltip from '../ui/tooltip'
 import { FetchingOverlay, IconButton, MileageBadge, Pagination } from '../ui/primitives'
 import type { SchoolMileageHistoryItem } from './school-mileage-types'
 
@@ -65,11 +66,7 @@ export default function HistoryTable({
               <tr>
                 <td colSpan={7} style={{ verticalAlign: 'middle', height: '220px' }}>
                   <ListEmptyState
-                    icon={
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--accent)' }} aria-hidden="true">
-                        <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-                      </svg>
-                    }
+                    icon={<SearchIcon size={20} style={{ color: 'var(--accent)' }} />}
                     title="조회 결과가 없습니다"
                     description="필터 조건을 변경해 보세요."
                   />
@@ -124,32 +121,22 @@ export default function HistoryTable({
 
                   {/* 규정 항목 */}
                   <td className="overflow-hidden py-2 pr-3">
-                    <p className="truncate text-[13px] font-medium" style={{ color: 'var(--fg)' }}>{item.ruleName}</p>
-                    <p className="mt-0.5 truncate text-[11px]" style={{ color: 'var(--fg-muted)' }}>{item.ruleCategory}</p>
+                    <Tooltip content={`${item.ruleName} — ${item.ruleCategory}`}>
+                      <div>
+                        <p className="truncate text-[13px] font-medium" style={{ color: 'var(--fg)' }}>{item.ruleName}</p>
+                        <p className="mt-0.5 truncate text-[11px]" style={{ color: 'var(--fg-muted)' }}>{item.ruleCategory}</p>
+                      </div>
+                    </Tooltip>
                   </td>
 
                   {/* 사유 */}
                   <td className="py-2 pr-3 text-[11px]">
                     {item.reason?.trim() ? (
-                      <div className="group relative">
-                        <div className="truncate" style={{ color: 'var(--fg-muted)' }}>
+                      <Tooltip content={item.reason.trim()}>
+                        <span className="block truncate" style={{ color: 'var(--fg-muted)' }}>
                           {item.reason.trim()}
-                        </div>
-                        <div
-                          className="pointer-events-none absolute bottom-full left-0 z-20 mb-1.5 hidden w-max max-w-[240px] rounded-md border px-2.5 py-2 text-xs shadow-sm group-hover:block"
-                          style={{
-                            backgroundColor: 'var(--bg-subtle)',
-                            borderColor: 'var(--border)',
-                            color: 'var(--fg)',
-                            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                            whiteSpace: 'normal',
-                            wordBreak: 'break-word',
-                            lineHeight: '1.5',
-                          }}
-                        >
-                          {item.reason.trim()}
-                        </div>
-                      </div>
+                        </span>
+                      </Tooltip>
                     ) : (
                       <span style={{ color: 'var(--fg-muted)', opacity: 0.4 }}>—</span>
                     )}

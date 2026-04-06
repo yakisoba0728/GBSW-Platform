@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ListSkeleton } from '../ui/list'
 import { ModalBase } from '../ui/modal'
-import { XIcon } from '../ui/icons'
+import { UsersIcon, XIcon } from '../ui/icons'
 import type { SchoolMileageStudentOption } from './school-mileage-types'
 import {
   NoticeBox,
@@ -270,21 +270,7 @@ export default function StudentSelectionModal({
             <ListSkeleton count={5} rowHeight="h-14" />
           ) : visibleStudents.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-8 text-center">
-              <svg
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                style={{ color: 'var(--admin-text-muted)' }}
-                aria-hidden="true"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
+              <UsersIcon size={28} strokeWidth={1.5} style={{ color: 'var(--admin-text-muted)' }} />
               <p
                 className="text-sm"
                 style={{

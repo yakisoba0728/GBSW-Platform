@@ -1,17 +1,10 @@
 'use client'
 
+import { CircleCheck, CircleX, X } from 'lucide-react'
+
 // ─── NoticeBox ────────────────────────────────────────────────────────────────
 // 인라인 성공·오류 공지 박스. animate-fade-in 등장 애니메이션.
 // 학생 탭, 교사 탭 등 모든 탭에서 공유 사용 가능.
-//
-// 사용 예:
-//   {notice && (
-//     <NoticeBox
-//       type={notice.type}
-//       message={notice.message}
-//       onDismiss={() => setNotice(null)}
-//     />
-//   )}
 
 export function NoticeBox({
   type,
@@ -36,23 +29,14 @@ export function NoticeBox({
       }}
     >
       <div className="flex items-start gap-2.5">
-        {/* 아이콘 */}
         <span className="mt-0.5 flex-shrink-0">
           {isSuccess ? (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="9 12 11 14 15 10" />
-            </svg>
+            <CircleCheck size={14} strokeWidth={2.5} aria-hidden="true" />
           ) : (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" />
-            </svg>
+            <CircleX size={14} strokeWidth={2.5} aria-hidden="true" />
           )}
         </span>
-        {/* 메시지 */}
         <p className="flex-1 whitespace-pre-line leading-relaxed">{message}</p>
-        {/* 닫기 버튼 */}
         {onDismiss && (
           <button
             type="button"
@@ -60,9 +44,7 @@ export function NoticeBox({
             className="flex-shrink-0 rounded p-0.5 opacity-60 transition-opacity hover:opacity-100"
             aria-label="닫기"
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <X size={13} strokeWidth={2.5} aria-hidden="true" />
           </button>
         )}
       </div>

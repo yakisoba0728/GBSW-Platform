@@ -3,6 +3,7 @@ import { proxyApiRequest } from './api-proxy'
 
 type TeacherPath =
   | '/school-mileage/rules'
+  | `/school-mileage/rules/${string}`
   | '/school-mileage/students'
   | `/school-mileage/students/${string}/summary`
   | '/school-mileage/entries'

@@ -2,7 +2,7 @@
 
 import { formatAwardedAt, getSchoolLabel } from './teacher-shared'
 import { AnimatedListItem, ListEmptyState, ListSkeleton } from '../ui/list'
-import { EditIcon, TrashIcon } from '../ui/icons'
+import { EditIcon, SearchIcon, TrashIcon } from '../ui/icons'
 import { FetchingOverlay, IconButton, MileageBadge } from '../ui/primitives'
 import type { SchoolMileageHistoryItem } from './school-mileage-types'
 
@@ -32,9 +32,7 @@ export default function HistoryMobileList({
         >
           <ListEmptyState
             icon={
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--admin-accent)' }} aria-hidden="true">
-                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
+              <SearchIcon size={20} strokeWidth={1.5} style={{ color: 'var(--admin-accent)' }} />
             }
             title="조회 결과가 없습니다"
             description="필터 조건을 변경해 보세요."

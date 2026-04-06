@@ -1,5 +1,6 @@
 'use client'
 
+import { RefreshCw, Printer, Download } from 'lucide-react'
 import { Card, FilterRow, SectionHeader, inputStyle } from './teacher-shared'
 import type { SchoolCode } from './school-mileage-types'
 
@@ -24,7 +25,9 @@ export default function ReportFilters({
   onEndDateChange,
   onReload,
   onPrint,
+  onExport,
   canPrint,
+  canExport,
   isLoading,
   schoolOptions,
 }: {
@@ -40,7 +43,9 @@ export default function ReportFilters({
   onEndDateChange: (value: string) => void
   onReload: () => void
   onPrint: () => void
+  onExport: () => void
   canPrint: boolean
+  canExport: boolean
   isLoading: boolean
   schoolOptions: Array<{ value: SchoolCode; label: string }>
 }) {
@@ -166,6 +171,7 @@ export default function ReportFilters({
               color: '#fff',
             }}
           >
+            <RefreshCw size={12} aria-hidden="true" />
             {isLoading ? '불러오는 중...' : '새로고침'}
           </button>
           <button
@@ -180,7 +186,23 @@ export default function ReportFilters({
               backgroundColor: 'var(--bg-subtle)',
             }}
           >
+            <Printer size={12} aria-hidden="true" />
             인쇄
+          </button>
+          <button
+            type="button"
+            onClick={onExport}
+            disabled={!canExport}
+            className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+            style={{
+              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+              borderColor: 'var(--border)',
+              color: 'var(--fg)',
+              backgroundColor: 'var(--bg-subtle)',
+            }}
+          >
+            <Download size={12} aria-hidden="true" />
+            엑셀 내보내기
           </button>
         </div>
       </div>
