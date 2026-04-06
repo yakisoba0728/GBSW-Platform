@@ -64,7 +64,7 @@ export function getSectionMotion(
     : {
         initial: { opacity: 0, y: 10 },
         animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.28, delay, ease: MOTION_EASE },
+        transition: { duration: 0.3, delay, ease: MOTION_EASE },
       }
 }
 
