@@ -24,22 +24,11 @@ const composeArgs = [
   '-f',
   'docker-compose.production.yml',
 ];
-const composeParallelArgs = [
-  'compose',
-  '--parallel',
-  '2',
-  '--env-file',
-  path.relative(rootDir, envFilePath),
-  '-f',
-  'docker-compose.production.yml',
-];
-const applicationServices = ['api', 'web'];
 
 try {
   await run('docker', [...composeArgs, 'up', '-d', 'db']);
 
   const dbContainerId = await capture('docker', [...composeArgs, 'ps', '-q', 'db']);
-  const pullResultsPromise = attemptImagePulls();
   await waitForHealthyContainer(dbContainerId, 'db');
 
   const sql = `ALTER ROLE ${quoteIdentifier(postgresUser)} WITH PASSWORD ${quoteLiteral(postgresPassword)};`;
@@ -62,15 +51,7 @@ try {
     sql,
   ]);
 
-  const pullResults = await pullResultsPromise;
-  const servicesToBuild = applicationServices.filter((service) => !pullResults[service]);
-
-  if (servicesToBuild.length > 0) {
-    console.warn(`Falling back to local image builds for: ${servicesToBuild.join(', ')}.`);
-    await run('docker', [...composeParallelArgs, 'build', ...servicesToBuild]);
-  }
-
-  await run('docker', [...composeArgs, 'up', '-d', '--no-build', ...applicationServices]);
+  await run('docker', [...composeArgs, 'up', '-d', '--build', 'api', 'web']);
 
   const apiContainerId = await capture('docker', [...composeArgs, 'ps', '-q', 'api']);
   const webContainerId = await capture('docker', [...composeArgs, 'ps', '-q', 'web']);
@@ -140,21 +121,6 @@ function getErrorMessage(error) {
   }
 
   return 'Production deployment failed.';
-}
-
-async function attemptImagePulls() {
-  const results = Object.fromEntries(applicationServices.map((service) => [service, false]));
-
-  for (const service of applicationServices) {
-    try {
-      await run('docker', [...composeArgs, 'pull', service]);
-      results[service] = true;
-    } catch (error) {
-      console.warn(`Image pull skipped for ${service}: ${getErrorMessage(error)}`);
-    }
-  }
-
-  return results;
 }
 
 function run(command, args, options = {}) {

@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1.7
 FROM node:22-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -9,17 +8,17 @@ FROM base AS deps
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json apps/web/package.json
-RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
-    pnpm install --store-dir /pnpm/store --frozen-lockfile --filter @gbsw/web...
+COPY apps/api/package.json apps/api/package.json
+RUN pnpm install --frozen-lockfile
 
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
-COPY apps/web ./apps/web
+COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
+COPY . .
 WORKDIR /app/apps/web
-RUN --mount=type=cache,id=next-cache,target=/app/apps/web/.next/cache \
-    INTERNAL_API_SECRET=build-internal-secret \
+RUN INTERNAL_API_SECRET=build-internal-secret \
     ./node_modules/.bin/next build
 
 FROM node:22-alpine AS runner
