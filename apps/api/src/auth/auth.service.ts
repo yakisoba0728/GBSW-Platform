@@ -125,7 +125,9 @@ export class AuthService {
           );
 
     if (!actorSession.mustChangePassword) {
-      await this.clearFailedLoginAttempts(`change-pwd:${actorSession.accountId}`);
+      await this.clearFailedLoginAttempts(
+        `change-pwd:${actorSession.accountId}`,
+      );
     }
 
     await this.revokeAllSessionsForAccount(user.accountId, user.role);

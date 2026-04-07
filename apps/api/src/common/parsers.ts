@@ -28,7 +28,9 @@ export function parseRequiredTextInput(
   }
 
   if (maxLength !== undefined && text.length > maxLength) {
-    throw new BadRequestException(`최대 ${maxLength}자까지 입력할 수 있습니다.`);
+    throw new BadRequestException(
+      `최대 ${maxLength}자까지 입력할 수 있습니다.`,
+    );
   }
 
   return text;
@@ -42,7 +44,9 @@ export function parseOptionalTextInput(value: unknown, maxLength?: number) {
   }
 
   if (maxLength !== undefined && text.length > maxLength) {
-    throw new BadRequestException(`최대 ${maxLength}자까지 입력할 수 있습니다.`);
+    throw new BadRequestException(
+      `최대 ${maxLength}자까지 입력할 수 있습니다.`,
+    );
   }
 
   return text;

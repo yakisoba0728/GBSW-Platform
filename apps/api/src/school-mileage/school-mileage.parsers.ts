@@ -129,7 +129,11 @@ export function parseUpdateEntryInput(body: Record<string, unknown>) {
 export function parseCreateRuleInput(body: Record<string, unknown>) {
   return {
     type: parseRequiredMileageType(body.type),
-    category: parseRequiredTextInput(body.category, '카테고리를 입력해주세요.', 50),
+    category: parseRequiredTextInput(
+      body.category,
+      '카테고리를 입력해주세요.',
+      50,
+    ),
     name: parseRequiredTextInput(body.name, '항목명을 입력해주세요.', 100),
     defaultScore: parseRequiredPositiveIntInput(
       body.defaultScore,

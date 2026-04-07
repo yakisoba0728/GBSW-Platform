@@ -45,13 +45,12 @@ export function parseRequiredText(
   label: string,
   maxLength = 100,
 ) {
-  const text = parseRequiredTextInput(
-    value,
-    `${label}을 입력해주세요.`,
-  );
+  const text = parseRequiredTextInput(value, `${label}을 입력해주세요.`);
 
   if (text.length > maxLength) {
-    throw new BadRequestException(`${label}은(는) ${maxLength}자 이하여야 합니다.`);
+    throw new BadRequestException(
+      `${label}은(는) ${maxLength}자 이하여야 합니다.`,
+    );
   }
 
   return text;

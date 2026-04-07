@@ -377,7 +377,6 @@ export class AdminService {
       throw error;
     }
   }
-
 }
 
 const studentSummarySelect = {

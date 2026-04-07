@@ -10,10 +10,8 @@ import {
 import { parseAnalyticsFilters } from './school-mileage.parsers';
 import { findStudentsByFilters } from './school-mileage.students.data';
 import type {
-  CategoryStat,
   OverviewSummary,
   StudentMileageSummary,
-  TopRuleStat,
 } from './school-mileage.types';
 
 type OverviewAggregateRow = {
@@ -55,9 +53,7 @@ function buildOverviewWhereSql(
   }
 
   if (studentIds && studentIds.length > 0) {
-    conditions.push(
-      Prisma.sql`e.student_id IN (${Prisma.join(studentIds)})`,
-    );
+    conditions.push(Prisma.sql`e.student_id IN (${Prisma.join(studentIds)})`);
   }
 
   return Prisma.sql`WHERE ${Prisma.join(conditions, ' AND ')}`;
