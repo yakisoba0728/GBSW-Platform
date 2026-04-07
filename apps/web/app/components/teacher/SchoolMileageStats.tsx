@@ -15,7 +15,8 @@ import {
 } from '../mileage/shared'
 import SuccessModal from '../ui/success-modal'
 import { Button } from '../ui/button'
-import { AnimatedListItem, ListEmptyState, ListSkeleton, StatCardSkeleton } from '../ui/list'
+import { AnimatedListItem, ListEmptyState, LoadingSpinner } from '../ui/list'
+import { motion } from 'framer-motion'
 import type {
   CategoryStat,
   MileageType,
@@ -298,7 +299,7 @@ export default function SchoolMileageStats() {
         </div>
       </Card>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 flex-1 min-h-0">
       <SuccessModal
         open={showQueryErrorModal && !!queryError}
         onClose={() => setShowQueryErrorModal(false)}
@@ -314,21 +315,18 @@ export default function SchoolMileageStats() {
         />
       )}
 
-      {isLoading && response.summary.totalCount === 0 && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-            <StatCardSkeleton />
-            <StatCardSkeleton />
-            <StatCardSkeleton />
-            <StatCardSkeleton />
-            <StatCardSkeleton />
-          </div>
-          <ListSkeleton count={3} rowHeight="h-16" />
+      {isLoading ? (
+        <div className="flex h-full min-h-[120px] items-center justify-center">
+          <LoadingSpinner />
         </div>
-      )}
-
+      ) : (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+        >
       {!isLoading && response.summary.totalCount === 0 && !queryError && (
-        <Card className="flex flex-1 flex-col">
+        <Card className="flex flex-1 flex-col min-h-0">
           <ListEmptyState
             fill
             icon={<BarChartIcon />}
@@ -487,6 +485,8 @@ export default function SchoolMileageStats() {
             </Card>
           )}
         </>
+      )}
+        </motion.div>
       )}
       </div>
     </div>
