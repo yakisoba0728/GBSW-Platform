@@ -54,8 +54,8 @@ export function getInitialOpenMenus(
   navItems: DashboardNavItem[],
 ) {
   return navItems.reduce<Record<string, boolean>>((acc, item) => {
-    if (hasActiveChild(pathname, item)) {
-      acc[item.id] = true
+    if (item.children?.length) {
+      acc[item.id] = hasActiveChild(pathname, item)
     }
 
     return acc
@@ -202,7 +202,9 @@ export function NavSidebar({
           const isActive = item.href ? matchesPath(pathname, item.href, item.match) : false
           const isChildActive = hasActiveChild(pathname, item)
           const hasChildren = Boolean(item.children?.length)
-          const isOpen = hasChildren ? Boolean(openMenus[item.id] || isChildActive) : false
+          const isOpen = hasChildren
+            ? (item.id in openMenus ? Boolean(openMenus[item.id]) : isChildActive)
+            : false
 
           return (
             <div key={item.id}>
