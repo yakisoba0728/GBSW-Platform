@@ -1,10 +1,5 @@
-import LoadingState from '../components/ui/LoadingState'
-import { StudentHomeRouteSkeleton } from '../components/ui/route-loading'
+import LoadingState from '@/app/components/ui/LoadingState'
 
-export default function StudentLoading() {
-  return (
-    <LoadingState>
-      <StudentHomeRouteSkeleton />
-    </LoadingState>
-  )
+export default function Loading() {
+  return <LoadingState />
 }

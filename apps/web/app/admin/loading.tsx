@@ -1,10 +1,5 @@
-import LoadingState from '../components/ui/LoadingState'
-import { RulesRouteSkeleton } from '../components/ui/route-loading'
+import LoadingState from '@/app/components/ui/LoadingState'
 
-export default function AdminLoading() {
-  return (
-    <LoadingState>
-      <RulesRouteSkeleton />
-    </LoadingState>
-  )
+export default function Loading() {
+  return <LoadingState />
 }

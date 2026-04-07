@@ -6,7 +6,7 @@ import { dispatchAppNavigationStart } from '@/lib/url-state'
 export default function LoadingState({
   children,
 }: {
-  children: ReactNode
+  children?: ReactNode
 }) {
   useEffect(() => {
     dispatchAppNavigationStart()

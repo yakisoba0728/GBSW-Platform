@@ -1,13 +1,5 @@
-import AuthShell from './components/auth/AuthShell'
-import LoadingState from './components/ui/LoadingState'
-import { PageSkeleton } from './components/ui/page-skeletons'
+import LoadingState from '@/app/components/ui/LoadingState'
 
-export default function RootLoading() {
-  return (
-    <LoadingState>
-      <AuthShell>
-        <PageSkeleton variant="auth" />
-      </AuthShell>
-    </LoadingState>
-  )
+export default function Loading() {
+  return <LoadingState />
 }
