@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { motion } from 'framer-motion'
 import { Card, FilterRow, NoticeBox, SectionHeader, inputStyle } from '../mileage/shared'
 import SuccessModal from '../ui/success-modal'
 import {
   AnimatedListItem,
   ListEmptyState,
-  ListSkeleton,
+  LoadingSpinner,
 } from '../ui/list'
 import { ChevronRightIcon, UserIcon } from '../ui/icons'
 import { Button } from '../ui/button'
@@ -300,7 +301,7 @@ export default function DormMileageStudentView() {
                   pageSize: null,
                 })
               }
-              className="rounded-lg border px-3 py-2 text-xs outline-none"
+              className="h-9 rounded-lg border px-3 text-xs outline-none"
               style={inputStyle}
             >
               <option value="">전체 학년</option>
@@ -319,7 +320,7 @@ export default function DormMileageStudentView() {
                   pageSize: null,
                 })
               }
-              className="rounded-lg border px-3 py-2 text-xs outline-none"
+              className="h-9 rounded-lg border px-3 text-xs outline-none"
               style={inputStyle}
             >
               <option value="">전체 반</option>
@@ -342,7 +343,7 @@ export default function DormMileageStudentView() {
                 })
               }
               placeholder="학생 이름 검색"
-              className="rounded-lg border px-3 py-2 text-xs outline-none"
+              className="h-9 rounded-lg border px-3 text-xs outline-none"
               style={{ ...inputStyle, minWidth: '120px' }}
             />
 
@@ -399,94 +400,104 @@ export default function DormMileageStudentView() {
           </div>
           <div className="flex-1 min-h-0 p-3">
             {isStudentsLoading ? (
-              <ListSkeleton count={8} rowHeight="h-14" />
-            ) : studentsError ? (
-              <div className="flex h-full items-center justify-center">
-                <ListEmptyState
-                  fill
-                  icon={<UserIcon style={{ color: 'var(--accent)' }} />}
-                  title="학생 목록을 불러오지 못했습니다"
-                  description={studentsError}
-                />
-              </div>
-            ) : students.length === 0 ? (
-              <div className="flex h-full items-center justify-center">
-                <ListEmptyState
-                  fill
-                  icon={<UserIcon style={{ color: 'var(--accent)' }} />}
-                  title="학생이 없습니다"
-                  description="검색 조건을 변경해 보세요."
-                />
+              <div className="flex h-full min-h-[120px] items-center justify-center">
+                <LoadingSpinner />
               </div>
             ) : (
-              <div className="space-y-1.5">
-                {students.map((student, index) => {
-                  const isSelected = selectedStudentId === student.studentId
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+              >
+                {studentsError ? (
+                  <div className="flex h-full items-center justify-center">
+                    <ListEmptyState
+                      fill
+                      icon={<UserIcon style={{ color: 'var(--accent)' }} />}
+                      title="학생 목록을 불러오지 못했습니다"
+                      description={studentsError}
+                    />
+                  </div>
+                ) : students.length === 0 ? (
+                  <div className="flex h-full items-center justify-center">
+                    <ListEmptyState
+                      fill
+                      icon={<UserIcon style={{ color: 'var(--accent)' }} />}
+                      title="학생이 없습니다"
+                      description="검색 조건을 변경해 보세요."
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    {students.map((student, index) => {
+                      const isSelected = selectedStudentId === student.studentId
 
-                  return (
-                    <AnimatedListItem key={student.studentId} index={index}>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          updateSearchParams({
-                            studentId: student.studentId,
-                            page: 1,
-                            pageSize: 20,
-                          })
-                        }
-                        className="flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-colors"
-                        style={{
-                          borderColor: isSelected
-                            ? 'var(--accent)'
-                            : 'var(--border)',
-                          backgroundColor: isSelected
-                            ? 'var(--accent-subtle)'
-                            : 'transparent',
-                        }}
-                      >
-                        <div
-                          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-                          style={{
-                            backgroundColor: isSelected
-                              ? 'var(--accent)'
-                              : 'var(--border)',
-                            color: isSelected ? '#fff' : 'var(--fg-muted)',
-                            fontFamily: 'var(--font-space-grotesk)',
-                          }}
-                        >
-                          {student.studentNumber}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p
-                            className="truncate text-sm font-medium"
+                      return (
+                        <AnimatedListItem key={student.studentId} index={index}>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              updateSearchParams({
+                                studentId: student.studentId,
+                                page: 1,
+                                pageSize: 20,
+                              })
+                            }
+                            className="flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-colors"
                             style={{
-                              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                              color: 'var(--fg)',
+                              borderColor: isSelected
+                                ? 'var(--accent)'
+                                : 'var(--border)',
+                              backgroundColor: isSelected
+                                ? 'var(--accent-subtle)'
+                                : 'transparent',
                             }}
                           >
-                            {student.name}
-                          </p>
-                          <p
-                            className="text-[11px]"
-                            style={{
-                              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                              color: 'var(--fg-muted)',
-                            }}
-                          >
-                            {student.grade !== null ? `${student.grade}학년 ` : ''}
-                            {student.classNumber}반
-                          </p>
-                        </div>
-                        {isSelected && (
-                          <div style={{ color: 'var(--accent)' }}>
-                            <ChevronRightIcon />
-                          </div>
-                        )}
-                      </button>
-                    </AnimatedListItem>
-                  )
-                })}
-              </div>
+                            <div
+                              className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+                              style={{
+                                backgroundColor: isSelected
+                                  ? 'var(--accent)'
+                                  : 'var(--border)',
+                                color: isSelected ? '#fff' : 'var(--fg-muted)',
+                                fontFamily: 'var(--font-space-grotesk)',
+                              }}
+                            >
+                              {student.studentNumber}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p
+                                className="truncate text-sm font-medium"
+                                style={{
+                                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                                  color: 'var(--fg)',
+                                }}
+                              >
+                                {student.name}
+                              </p>
+                              <p
+                                className="text-[11px]"
+                                style={{
+                                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                                  color: 'var(--fg-muted)',
+                                }}
+                              >
+                                {student.grade !== null ? `${student.grade}학년 ` : ''}
+                                {student.classNumber}반
+                              </p>
+                            </div>
+                            {isSelected && (
+                              <div style={{ color: 'var(--accent)' }}>
+                                <ChevronRightIcon />
+                              </div>
+                            )}
+                          </button>
+                        </AnimatedListItem>
+                      )
+                    })}
+                  </div>
+                )}
+              </motion.div>
             )}
           </div>
         </Card>
