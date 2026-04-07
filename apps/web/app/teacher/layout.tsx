@@ -1,5 +1,6 @@
 import TeacherShell from './_components/TeacherShell'
 import { RulesProvider } from '@/app/components/mileage/rules-context'
+import { DormRulesProvider } from '@/app/components/dorm-mileage/dorm-rules-context'
 import { requireRoleSession } from '@/lib/route-guards'
 
 export default async function TeacherLayout({
@@ -11,7 +12,9 @@ export default async function TeacherLayout({
 
   return (
     <RulesProvider>
-      <TeacherShell>{children}</TeacherShell>
+      <DormRulesProvider>
+        <TeacherShell>{children}</TeacherShell>
+      </DormRulesProvider>
     </RulesProvider>
   )
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, Post } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Param, Patch, Post } from '@nestjs/common';
 import { assertInternalApiRequest } from '../common/internal-api-auth';
 import { AdminService } from './admin.service';
 
@@ -33,5 +33,25 @@ export class AdminController {
     assertInternalApiRequest(internalApiSecret);
 
     return this.adminService.createTeacher(body);
+  }
+
+  @Get('teachers')
+  getTeachers(
+    @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
+  ) {
+    assertInternalApiRequest(internalApiSecret);
+
+    return this.adminService.getTeachers();
+  }
+
+  @Patch('teachers/:id')
+  updateTeacherDormAccess(
+    @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
+    @Param('id') id: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    assertInternalApiRequest(internalApiSecret);
+
+    return this.adminService.updateTeacherDormAccess(id, body);
   }
 }

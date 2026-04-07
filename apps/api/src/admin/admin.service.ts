@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { hashPassword } from '../auth/password';
 import {
@@ -102,6 +102,39 @@ export class AdminService {
 
       throw error;
     }
+  }
+
+  async getTeachers() {
+    const teachers = await this.prisma.teacher.findMany({
+      select: {
+        teacherId: true,
+        name: true,
+        isDormTeacher: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    return { teachers };
+  }
+
+  async updateTeacherDormAccess(id: string, body: Record<string, unknown>) {
+    const isDormTeacher = parseBoolean(body.isDormTeacher);
+
+    const teacher = await this.prisma.teacher.findUnique({
+      where: { teacherId: id },
+      select: { teacherId: true },
+    });
+
+    if (!teacher) {
+      throw new NotFoundException('교사를 찾을 수 없습니다.');
+    }
+
+    await this.prisma.teacher.update({
+      where: { teacherId: id },
+      data: { isDormTeacher },
+    });
+
+    return { ok: true, message: '설정이 변경되었습니다.', isDormTeacher };
   }
 
   async createTeacher(body: Record<string, unknown>) {

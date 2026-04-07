@@ -1,5 +1,6 @@
 import type { DashboardNavItem } from '@/app/components/dashboard-nav'
 import {
+  BuildingIcon,
   ShieldCheckIcon,
   UserPlusIcon,
 } from '@/app/components/ui/icons'
@@ -22,6 +23,16 @@ export const ADMIN_NAV_ITEMS: DashboardNavItem[] = [
     icon: <ShieldCheckIcon />,
     children: [
       { href: '/admin/mileage/rules', label: '상벌점 항목' },
+    ],
+  },
+  {
+    id: 'admin-dorm-mileage',
+    label: '기숙사 상벌점',
+    section: '마일리지 관리',
+    icon: <BuildingIcon size={15} />,
+    children: [
+      { href: '/admin/dorm-mileage/rules', label: '상벌점 항목' },
+      { href: '/admin/dorm-mileage/teachers', label: '사감 교사 관리' },
     ],
   },
 ]

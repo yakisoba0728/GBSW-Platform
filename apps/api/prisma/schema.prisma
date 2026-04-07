@@ -17,6 +17,11 @@ enum SchoolMileageType {
   PENALTY
 }
 
+enum DormMileageType {
+  REWARD
+  PENALTY
+}
+
 enum AuthRole {
   SUPER_ADMIN
   STUDENT
@@ -37,6 +42,7 @@ model Student {
   createdAt            DateTime             @default(now()) @map("created_at")
   updatedAt            DateTime             @updatedAt @map("updated_at")
   schoolMileageEntries SchoolMileageEntry[]
+  dormMileageEntries   DormMileageEntry[]
 
   @@map("students")
 }
@@ -47,11 +53,15 @@ model Teacher {
   phone                       String
   passwordHash                String               @map("password_hash")
   mustChangePassword          Boolean              @default(true) @map("must_change_password")
+  isDormTeacher               Boolean              @default(false) @map("is_dorm_teacher")
   createdAt                   DateTime             @default(now()) @map("created_at")
   updatedAt                   DateTime             @updatedAt @map("updated_at")
   createdSchoolMileageEntries SchoolMileageEntry[] @relation("SchoolMileageCreatedBy")
   updatedSchoolMileageEntries SchoolMileageEntry[] @relation("SchoolMileageUpdatedBy")
   deletedSchoolMileageEntries SchoolMileageEntry[] @relation("SchoolMileageDeletedBy")
+  dormMileageEntries          DormMileageEntry[]   @relation("DormEntryCreatedBy")
+  dormMileageEntriesUpdated   DormMileageEntry[]   @relation("DormEntryUpdatedBy")
+  dormMileageEntriesDeleted   DormMileageEntry[]   @relation("DormEntryDeletedBy")
 
   @@map("teachers")
 }
@@ -123,4 +133,51 @@ model LoginThrottle {
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
   @@map("login_throttles")
+}
+
+model DormMileageRule {
+  id           Int             @id @default(autoincrement())
+  type         DormMileageType
+  category     String
+  name         String
+  defaultScore Int             @map("default_score")
+  minScore     Int?            @map("min_score")
+  maxScore     Int?            @map("max_score")
+  displayOrder Int             @map("display_order")
+  isActive     Boolean         @default(true) @map("is_active")
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+
+  entries DormMileageEntry[]
+
+  @@unique([type, category, name])
+  @@index([isActive, displayOrder])
+  @@map("dorm_mileage_rules")
+}
+
+model DormMileageEntry {
+  id                 Int             @id @default(autoincrement())
+  studentId          String          @map("student_id")
+  ruleId             Int             @map("rule_id")
+  type               DormMileageType
+  score              Int
+  reason             String?
+  awardedAt          DateTime        @map("awarded_at")
+  createdByTeacherId String          @map("created_by_teacher_id")
+  updatedByTeacherId String?         @map("updated_by_teacher_id")
+  deletedByTeacherId String?         @map("deleted_by_teacher_id")
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+  deletedAt          DateTime?       @map("deleted_at")
+
+  student          Student         @relation(fields: [studentId], references: [studentId])
+  rule             DormMileageRule @relation(fields: [ruleId], references: [id])
+  createdByTeacher Teacher         @relation("DormEntryCreatedBy", fields: [createdByTeacherId], references: [teacherId])
+  updatedByTeacher Teacher?        @relation("DormEntryUpdatedBy", fields: [updatedByTeacherId], references: [teacherId])
+  deletedByTeacher Teacher?        @relation("DormEntryDeletedBy", fields: [deletedByTeacherId], references: [teacherId])
+
+  @@index([studentId, deletedAt, awardedAt])
+  @@index([type, deletedAt, awardedAt])
+  @@index([deletedAt, awardedAt])
+  @@map("dorm_mileage_entries")
 }

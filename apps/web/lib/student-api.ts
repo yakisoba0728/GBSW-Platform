@@ -5,6 +5,9 @@ type StudentPath =
   | '/school-mileage/my/summary'
   | '/school-mileage/my/entries'
   | '/school-mileage/my/rules'
+  | '/dorm-mileage/my/summary'
+  | '/dorm-mileage/my/entries'
+  | '/dorm-mileage/my/rules'
 
 export async function proxyStudentGetRequest(
   request: NextRequest,

@@ -4,7 +4,6 @@ import { RefreshCw, Printer, Download } from 'lucide-react'
 import { Button } from '../ui/button'
 import { UsersIcon } from '../ui/icons'
 import { Card, FilterRow, SectionHeader, inputStyle } from '../mileage/shared'
-import type { SchoolCode } from './school-mileage-types'
 
 type ReportType = 'student' | 'class' | 'all'
 
@@ -35,9 +34,10 @@ export default function ReportFilters({
   canExport,
   isLoading,
   schoolOptions,
+  showSchoolFilter = true,
 }: {
   reportType: ReportType
-  filterSchool: SchoolCode | ''
+  filterSchool: string
   filterGrade: string
   startDate: string
   endDate: string
@@ -55,7 +55,8 @@ export default function ReportFilters({
   canPrint: boolean
   canExport: boolean
   isLoading: boolean
-  schoolOptions: Array<{ value: SchoolCode; label: string }>
+  schoolOptions?: Array<{ value: string; label: string }>
+  showSchoolFilter?: boolean
 }) {
   return (
     <Card className="no-print">
@@ -121,19 +122,21 @@ export default function ReportFilters({
             조회 조건
           </p>
           <FilterRow>
-            <select
-              value={filterSchool}
-              onChange={(event) => onSchoolChange(event.target.value)}
-              className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-              style={inputStyle}
-            >
-              <option value="">전체 학교</option>
-              {schoolOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            {showSchoolFilter && (schoolOptions?.length ?? 0) > 0 && (
+              <select
+                value={filterSchool}
+                onChange={(event) => onSchoolChange(event.target.value)}
+                className="h-8 rounded-md border bg-transparent px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                style={inputStyle}
+              >
+                <option value="">전체 학교</option>
+                {schoolOptions?.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            )}
 
             <select
               value={filterGrade}

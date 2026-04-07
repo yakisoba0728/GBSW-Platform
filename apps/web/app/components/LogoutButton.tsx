@@ -44,7 +44,7 @@ export default function LogoutButton({
       className={className}
       style={{ position: 'relative', ...style }}
     >
-      <span style={{ visibility: isLoggingOut ? 'hidden' : 'visible' }}>
+      <span style={{ visibility: isLoggingOut ? 'hidden' : 'visible', display: 'flex', alignItems: 'center', gap: 'inherit' }}>
         {children ?? '로그아웃'}
       </span>
       {isLoggingOut && (

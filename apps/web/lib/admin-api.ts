@@ -6,11 +6,13 @@ type AdminPath =
   | '/admin/teachers'
   | '/admin/students/major-subjects'
 
-type AdminMileageGetPath = '/school-mileage/rules'
+type AdminMileageGetPath = '/school-mileage/rules' | '/dorm-mileage/rules'
 
 type AdminMileageWritePath =
   | '/school-mileage/rules'
   | `/school-mileage/rules/${string}`
+  | '/dorm-mileage/rules'
+  | `/dorm-mileage/rules/${string}`
 
 export async function proxyAdminCreateRequest(
   request: NextRequest,
@@ -19,11 +21,21 @@ export async function proxyAdminCreateRequest(
   return proxyAdminRequest(request, pathname, 'POST')
 }
 
+type AdminWritePath = `/admin/teachers/${string}`
+
 export async function proxyAdminGetRequest(
   request: NextRequest,
-  pathname: '/admin/students/major-subjects',
+  pathname: '/admin/students/major-subjects' | '/admin/teachers',
 ) {
   return proxyAdminRequest(request, pathname, 'GET')
+}
+
+export async function proxyAdminWriteRequest(
+  request: NextRequest,
+  pathname: AdminWritePath,
+  method: 'PATCH',
+) {
+  return proxyAdminRequest(request, pathname, method)
 }
 
 export async function proxyAdminMileageGetRequest(
@@ -43,8 +55,8 @@ export async function proxyAdminMileageWriteRequest(
 
 async function proxyAdminRequest(
   request: NextRequest,
-  pathname: AdminPath,
-  method: 'GET' | 'POST',
+  pathname: AdminPath | AdminWritePath,
+  method: 'GET' | 'POST' | 'PATCH',
 ) {
   return proxyApiRequest(request, {
     pathname,

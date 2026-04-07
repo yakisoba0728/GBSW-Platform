@@ -20,8 +20,8 @@ export default function HistoryMobileList({
   items: SchoolMileageHistoryItem[]
   isLoading: boolean
   isFetching: boolean
-  onEdit: (item: SchoolMileageHistoryItem) => void
-  onDelete: (item: SchoolMileageHistoryItem) => void
+  onEdit?: (item: SchoolMileageHistoryItem) => void
+  onDelete?: (item: SchoolMileageHistoryItem) => void
   }) {
   return (
     <div className="relative min-h-0 flex-1 pr-0.5 md:hidden">
@@ -74,10 +74,12 @@ export default function HistoryMobileList({
                       {getSchoolLabel(item.school)} · {item.studentId}
                     </p>
                   </div>
-                  <div className="flex flex-shrink-0 items-center gap-1">
-                    <IconButton icon={<EditIcon />} label="편집" onClick={() => onEdit(item)} />
-                    <IconButton icon={<TrashIcon />} label="삭제" variant="danger" onClick={() => onDelete(item)} />
-                  </div>
+                  {(onEdit || onDelete) && (
+                    <div className="flex flex-shrink-0 items-center gap-1">
+                      {onEdit && <IconButton icon={<EditIcon />} label="편집" onClick={() => onEdit(item)} />}
+                      {onDelete && <IconButton icon={<TrashIcon />} label="삭제" variant="danger" onClick={() => onDelete(item)} />}
+                    </div>
+                  )}
                 </div>
 
                 {/* 점수 + 규정 */}

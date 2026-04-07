@@ -1,11 +1,18 @@
 'use client'
 
-import type { ClassMileageSummary } from './school-mileage-types'
+type SharedClassSummary = {
+  classNumber: number
+  studentCount: number
+  rewardTotal: number
+  penaltyTotal: number
+  netScore: number
+  avgNetScore: number
+}
 
 export default function ClassReportTable({
   classes,
 }: {
-  classes: ClassMileageSummary[]
+  classes: SharedClassSummary[]
 }) {
   return (
     <table className="w-full text-xs">

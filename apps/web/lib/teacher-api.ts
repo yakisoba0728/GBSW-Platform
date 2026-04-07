@@ -9,10 +9,20 @@ type TeacherGetPath =
   | '/school-mileage/analytics/overview'
   | '/school-mileage/analytics/students'
   | '/school-mileage/analytics/classes'
+  | '/dorm-mileage/rules'
+  | '/dorm-mileage/students'
+  | `/dorm-mileage/students/${string}/summary`
+  | '/dorm-mileage/entries'
+  | '/dorm-mileage/analytics/overview'
+  | '/dorm-mileage/analytics/students'
+  | '/dorm-mileage/analytics/classes'
+  | '/dorm-mileage/my/access'
 
 type TeacherWritePath =
   | '/school-mileage/entries/batch'
   | `/school-mileage/entries/${string}`
+  | '/dorm-mileage/entries/batch'
+  | `/dorm-mileage/entries/${string}`
 
 export async function proxyTeacherGetRequest(
   request: NextRequest,
@@ -39,7 +49,7 @@ async function proxyTeacherRequest(
     method,
     allowedRole: 'teacher',
     unauthorizedMessage: '교사 로그인이 필요합니다.',
-    proxyFailureMessage: '학교 상벌점 요청을 처리하지 못했습니다.',
+    proxyFailureMessage: '상벌점 요청을 처리하지 못했습니다.',
     actorHeaders: (session) => ({
       'x-actor-teacher-id': session.accountId,
     }),

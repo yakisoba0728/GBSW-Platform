@@ -8,7 +8,7 @@ export async function PATCH(
   const { id } = await params
   return proxyAdminMileageWriteRequest(
     request,
-    `/school-mileage/rules/${id}`,
+    `/school-mileage/rules/${encodeURIComponent(id)}`,
     'PATCH',
   )
 }

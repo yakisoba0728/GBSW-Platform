@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { Card } from '@/app/components/mileage/shared'
 import { ListSkeleton, StatCardSkeleton } from '@/app/components/ui/list'
 import {
@@ -8,10 +9,15 @@ import {
   QuickLinksSkeleton,
   SummaryBarSkeleton,
 } from '@/app/components/ui/page-skeletons'
+import { MileageBadge } from '@/app/components/ui/primitives'
 import type {
   SchoolMileageHistoryItem,
   StudentMileageSummary,
 } from '@/app/components/student/student-mileage-types'
+import type {
+  StudentDormMileageHistoryItem,
+  StudentDormMileageSummary,
+} from '@/app/components/student/student-dorm-mileage-types'
 import {
   StudentHomeHeaderSection,
   StudentHomeQuickLinksSection,
@@ -23,6 +29,8 @@ import {
 export default function StudentHome() {
   const [summary, setSummary] = useState<StudentMileageSummary | null>(null)
   const [entries, setEntries] = useState<SchoolMileageHistoryItem[]>([])
+  const [dormSummary, setDormSummary] = useState<StudentDormMileageSummary | null>(null)
+  const [dormEntries, setDormEntries] = useState<StudentDormMileageHistoryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [retryKey, setRetryKey] = useState(0)
@@ -35,7 +43,7 @@ export default function StudentHome() {
       setError(null)
 
       try {
-        const [summaryRes, entriesRes] = await Promise.all([
+        const [summaryRes, entriesRes, dormSummaryRes, dormEntriesRes] = await Promise.all([
           fetch('/api/student/school-mileage/summary', {
             cache: 'no-store',
             signal: controller.signal,
@@ -56,11 +64,27 @@ export default function StudentHome() {
 
             return response.json()
           }),
+          fetch('/api/student/dorm-mileage/summary', {
+            cache: 'no-store',
+            signal: controller.signal,
+          })
+            .then((response) => (response.ok ? response.json() : null))
+            .catch(() => null),
+          fetch('/api/student/dorm-mileage/entries?pageSize=5', {
+            cache: 'no-store',
+            signal: controller.signal,
+          })
+            .then((response) => (response.ok ? response.json() : null))
+            .catch(() => null),
         ])
 
         if (!controller.signal.aborted) {
           setSummary(summaryRes.summary ?? null)
           setEntries(Array.isArray(entriesRes.items) ? entriesRes.items : [])
+          setDormSummary(dormSummaryRes?.summary ?? null)
+          setDormEntries(
+            Array.isArray(dormEntriesRes?.items) ? dormEntriesRes.items : [],
+          )
         }
       } catch (err: unknown) {
         if (controller.signal.aborted) {
@@ -183,6 +207,284 @@ export default function StudentHome() {
       />
       <StudentHomeRecentEntriesSection entries={entries} />
       <StudentHomeQuickLinksSection />
+
+      {dormSummary && (
+        <>
+          <div
+            style={{
+              borderRadius: 12,
+              border: '1px solid var(--border)',
+              backgroundColor: 'var(--bg-subtle)',
+              padding: '20px',
+            }}
+          >
+            <p
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: 'var(--accent)',
+                marginBottom: 8,
+                fontFamily: 'var(--font-space-grotesk)',
+              }}
+            >
+              Dormitory
+            </p>
+            <h2
+              style={{
+                fontSize: 17,
+                fontWeight: 700,
+                color: 'var(--fg)',
+                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                lineHeight: 1.3,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              기숙사 상벌점
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            {[
+              {
+                label: '상점 합계',
+                value: `+${dormSummary.rewardTotal}`,
+                subValue: '기숙사 상점',
+                colorToken: 'green' as const,
+              },
+              {
+                label: '벌점 합계',
+                value: `-${dormSummary.penaltyTotal}`,
+                subValue: '기숙사 벌점',
+                colorToken: 'red' as const,
+              },
+              {
+                label: '순점수',
+                value: dormSummary.netScore,
+                subValue: '상점 - 벌점',
+                colorToken: 'default' as const,
+              },
+            ].map((card) => (
+              <div
+                key={card.label}
+                style={{
+                  borderRadius: 12,
+                  border: '1px solid var(--border)',
+                  backgroundColor: 'var(--bg-subtle)',
+                  padding: '16px 20px',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 500,
+                    color: 'var(--fg-muted)',
+                    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                    marginBottom: 6,
+                  }}
+                >
+                  {card.label}
+                </p>
+                <p
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 700,
+                    fontFamily: 'var(--font-space-grotesk)',
+                    color:
+                      card.colorToken === 'green'
+                        ? 'var(--reward)'
+                        : card.colorToken === 'red'
+                          ? 'var(--penalty)'
+                          : 'var(--fg)',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {card.value}
+                </p>
+                <p
+                  style={{
+                    fontSize: 11,
+                    color: 'var(--fg-muted)',
+                    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                    marginTop: 4,
+                  }}
+                >
+                  {card.subValue}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {dormEntries.length > 0 && (
+            <Card>
+              <div className="mb-4 flex items-center justify-between">
+                <h2
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: 'var(--fg)',
+                    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                  }}
+                >
+                  최근 기숙사 상벌점 내역
+                </h2>
+                <Link
+                  href="/student/dorm-mileage/history"
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 500,
+                    color: 'var(--accent)',
+                    textDecoration: 'none',
+                    fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                  }}
+                >
+                  전체 보기 &rarr;
+                </Link>
+              </div>
+
+              <div className="hidden md:block">
+                <table className="w-full" style={{ borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                      {['일자', '구분', '규정', '분류', '점수'].map((h) => (
+                        <th
+                          key={h}
+                          className="pb-2 text-left text-[11px] font-medium uppercase tracking-wider"
+                          style={{
+                            color: 'var(--fg-muted)',
+                            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                          }}
+                        >
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dormEntries.map((entry) => {
+                      const date = new Date(entry.awardedAt).toLocaleDateString('ko-KR', {
+                        year: '2-digit',
+                        month: '2-digit',
+                        day: '2-digit',
+                      })
+                      return (
+                        <tr
+                          key={entry.id}
+                          style={{ borderBottom: '1px solid var(--border)' }}
+                          className="transition-colors hover:bg-black/[0.02]"
+                        >
+                          <td
+                            className="py-2.5 text-xs"
+                            style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--fg-muted)' }}
+                          >
+                            {date}
+                          </td>
+                          <td className="py-2.5">
+                            <MileageBadge type={entry.type} score={entry.score} />
+                          </td>
+                          <td
+                            className="py-2.5 text-xs"
+                            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg)' }}
+                          >
+                            {entry.ruleName}
+                          </td>
+                          <td
+                            className="py-2.5 text-xs"
+                            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg-muted)' }}
+                          >
+                            {entry.ruleCategory}
+                          </td>
+                          <td
+                            className="py-2.5 text-xs font-medium"
+                            style={{
+                              fontFamily: 'var(--font-space-grotesk)',
+                              color: entry.type === 'reward' ? 'var(--reward)' : 'var(--penalty)',
+                            }}
+                          >
+                            {entry.type === 'reward' ? '+' : '-'}
+                            {entry.score}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="flex flex-col gap-2 md:hidden">
+                {dormEntries.map((entry) => {
+                  const date = new Date(entry.awardedAt).toLocaleDateString('ko-KR', {
+                    year: '2-digit',
+                    month: '2-digit',
+                    day: '2-digit',
+                  })
+                  const borderColor =
+                    entry.type === 'reward' ? 'var(--reward)' : 'var(--penalty)'
+
+                  return (
+                    <div
+                      key={entry.id}
+                      style={{
+                        borderRadius: 10,
+                        border: '1px solid var(--border)',
+                        borderLeft: `3px solid ${borderColor}`,
+                        padding: '12px 14px',
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span
+                          style={{
+                            fontSize: 11,
+                            color: 'var(--fg-muted)',
+                            fontFamily: 'var(--font-space-grotesk)',
+                          }}
+                        >
+                          {date}
+                        </span>
+                        <MileageBadge type={entry.type} score={entry.score} />
+                      </div>
+                      <p
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 500,
+                          color: 'var(--fg)',
+                          fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                          marginTop: 6,
+                        }}
+                      >
+                        {entry.ruleName}
+                      </p>
+                      <div className="mt-1 flex items-center gap-2">
+                        <span
+                          style={{
+                            fontSize: 11,
+                            color: 'var(--fg-muted)',
+                            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                          }}
+                        >
+                          {entry.ruleCategory}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 600,
+                            fontFamily: 'var(--font-space-grotesk)',
+                            color: entry.type === 'reward' ? 'var(--reward)' : 'var(--penalty)',
+                          }}
+                        >
+                          {entry.type === 'reward' ? '+' : '-'}
+                          {entry.score}
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </Card>
+          )}
+        </>
+      )}
     </div>
   )
 }

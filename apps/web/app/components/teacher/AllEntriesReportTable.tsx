@@ -1,11 +1,22 @@
 'use client'
 
-import type { SchoolMileageHistoryItem } from './school-mileage-types'
+type SharedHistoryItem = {
+  id: number
+  type: 'reward' | 'penalty'
+  score: number
+  awardedAt: string
+  ruleCategory: string
+  ruleName: string
+  studentName: string
+  classNumber: number
+  studentNumber: number
+  teacherName: string
+}
 
 export default function AllEntriesReportTable({
   entries,
 }: {
-  entries: SchoolMileageHistoryItem[]
+  entries: SharedHistoryItem[]
 }) {
   return (
     <table className="w-full text-xs">

@@ -28,8 +28,8 @@ export default function HistoryTable({
   page: number
   pageCount: number
   totalCount: number
-  onEdit: (item: SchoolMileageHistoryItem) => void
-  onDelete: (item: SchoolMileageHistoryItem) => void
+  onEdit?: (item: SchoolMileageHistoryItem) => void
+  onDelete?: (item: SchoolMileageHistoryItem) => void
   onPageChange: (page: number) => void
   }) {
   return (
@@ -176,10 +176,12 @@ export default function HistoryTable({
 
                     {/* 액션 */}
                     <td className="py-2">
-                      <div className="flex items-center gap-1">
-                        <IconButton icon={<EditIcon />} label="편집" onClick={() => onEdit(item)} />
-                        <IconButton icon={<TrashIcon />} label="삭제" variant="danger" onClick={() => onDelete(item)} />
-                      </div>
+                      {(onEdit || onDelete) && (
+                        <div className="flex items-center gap-1">
+                          {onEdit && <IconButton icon={<EditIcon />} label="편집" onClick={() => onEdit(item)} />}
+                          {onDelete && <IconButton icon={<TrashIcon />} label="삭제" variant="danger" onClick={() => onDelete(item)} />}
+                        </div>
+                      )}
                     </td>
                   </AnimatedTableRow>
                 ))}
