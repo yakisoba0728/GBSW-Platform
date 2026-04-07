@@ -19,9 +19,7 @@ services:
       retries: 20
 
   api:
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile
+    image: ${API_IMAGE:-ghcr.io/yakisoba0728/gbsw-platform-api:latest}
     restart: unless-stopped
     depends_on:
       db:
@@ -47,9 +45,7 @@ services:
       start_period: 20s
 
   web:
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
+    image: ${WEB_IMAGE:-ghcr.io/yakisoba0728/gbsw-platform-web:latest}
     restart: unless-stopped
     depends_on:
       api:
