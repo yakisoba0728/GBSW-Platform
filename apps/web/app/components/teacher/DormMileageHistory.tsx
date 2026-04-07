@@ -19,6 +19,7 @@ import DormEditEntryModal from './DormEditEntryModal'
 import HistoryFilters from './DormHistoryFilters'
 import HistoryMobileList from './HistoryMobileList'
 import HistoryTable from './HistoryTable'
+import DormAccessDenied from './DormAccessDenied'
 import { SearchIcon } from '../ui/icons'
 import {
   getPositiveQueryNumber,
@@ -243,7 +244,9 @@ export default function DormMileageHistory({
 
         {/* -- 데이터 카드 -- */}
         <Card className="pb-3 flex flex-col flex-1 min-h-0 overflow-hidden">
-          {entriesError && !isLoading ? (
+          {isDormTeacher === false ? (
+            <DormAccessDenied message="사감 교사만 기숙사 상벌점 내역을 관리할 수 있습니다." />
+          ) : entriesError && !isLoading ? (
             <EmptyStatePane
               className="h-full"
               icon={<SearchIcon size={20} style={{ color: 'var(--accent)' }} />}

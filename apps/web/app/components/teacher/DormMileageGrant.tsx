@@ -10,6 +10,7 @@ import DormRuleSelectionModal from './DormRuleSelectionModal'
 import DormStudentSelectionModal from './DormStudentSelectionModal'
 import DormGrantRowCard, { type DormGrantRow } from './DormGrantRowCard'
 import { Card, NoticeBox } from '../mileage/shared'
+import DormAccessDenied from './DormAccessDenied'
 import { useDormRulesContext } from '../dorm-mileage/dorm-rules-context'
 import type {
   CreateDormMileageEntriesPayload,
@@ -234,32 +235,32 @@ export default function DormMileageGrant({
       <div className="flex flex-col h-full gap-4">
         {rulesError && <NoticeBox type="error" message={rulesError} />}
 
-        {!isDormTeacher && (
-          <NoticeBox type="error" message="사감 교사만 기숙사 상벌점을 부여할 수 있습니다." />
+        {isDormTeacher && (
+          <div className="flex flex-shrink-0 flex-wrap items-center justify-end gap-2">
+            {rows.length >= 2 && (
+              <div className="flex items-center gap-2">
+                <AnimatedCheckbox
+                  checked={checkedRows.size === rows.length && rows.length > 0}
+                  onChange={toggleAll}
+                  disabled={isSubmitting || isReadOnly}
+                  size={18}
+                />
+                <span className="text-xs" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg-muted)' }}>
+                  전체 선택
+                </span>
+              </div>
+            )}
+            {rows.length >= 2 && (
+              <Button variant="accent" size="sm" onClick={applyFirstRowToSelected} disabled={!canApplyFirstRow || isSubmitting || isReadOnly}>선택 항목에 적용</Button>
+            )}
+            <Button variant="primary" size="sm" icon={<UserPlusIcon size={13} strokeWidth={2.5} />} onClick={() => { if (!isReadOnly) setIsStudentModalOpen(true) }} disabled={isSubmitting || isReadOnly}>학생 추가</Button>
+          </div>
         )}
 
-        <div className="flex flex-shrink-0 flex-wrap items-center justify-end gap-2">
-          {rows.length >= 2 && (
-            <div className="flex items-center gap-2">
-              <AnimatedCheckbox
-                checked={checkedRows.size === rows.length && rows.length > 0}
-                onChange={toggleAll}
-                disabled={isSubmitting || isReadOnly}
-                size={18}
-              />
-              <span className="text-xs" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg-muted)' }}>
-                전체 선택
-              </span>
-            </div>
-          )}
-          {rows.length >= 2 && (
-            <Button variant="accent" size="sm" onClick={applyFirstRowToSelected} disabled={!canApplyFirstRow || isSubmitting || isReadOnly}>선택 항목에 적용</Button>
-          )}
-          <Button variant="primary" size="sm" icon={<UserPlusIcon size={13} strokeWidth={2.5} />} onClick={() => { if (!isReadOnly) setIsStudentModalOpen(true) }} disabled={isSubmitting || isReadOnly}>학생 추가</Button>
-        </div>
-
         <Card className="flex flex-col flex-1 min-h-0 overflow-hidden">
-          {isRulesLoading ? (
+          {!isDormTeacher ? (
+            <DormAccessDenied message="사감 교사만 기숙사 상벌점을 부여할 수 있습니다." />
+          ) : isRulesLoading ? (
             <ListSkeleton count={3} rowHeight="h-14" />
           ) : rows.length === 0 ? (
             <ListEmptyState
