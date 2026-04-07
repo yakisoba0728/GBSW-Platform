@@ -49,11 +49,16 @@ export async function assertDormTeacherReadAccess(
     select: {
       teacherId: true,
       name: true,
+      isDormTeacher: true,
     },
   });
 
   if (!teacher) {
     throw new UnauthorizedException('유효한 교사 계정이 아닙니다.');
+  }
+
+  if (!teacher.isDormTeacher) {
+    throw new ForbiddenException('사감 교사만 기숙사 상벌점 데이터에 접근할 수 있습니다.');
   }
 
   return teacher;
