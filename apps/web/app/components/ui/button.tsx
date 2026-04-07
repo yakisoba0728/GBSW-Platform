@@ -20,9 +20,9 @@ interface ButtonProps {
 }
 
 const sizeStyles: Record<ButtonSize, React.CSSProperties> = {
-  sm: { height: '28px', padding: '0 10px', fontSize: '12px' },
-  md: { height: '36px', padding: '0 16px', fontSize: '14px' },
-  lg: { height: '42px', padding: '0 20px', fontSize: '15px' },
+  sm: { height: '32px', padding: '0 12px', fontSize: '12px' },
+  md: { height: '40px', padding: '0 18px', fontSize: '14px' },
+  lg: { height: '48px', padding: '0 24px', fontSize: '15px' },
 }
 
 function getVariantStyle(variant: ButtonVariant, hovered: boolean): React.CSSProperties {
