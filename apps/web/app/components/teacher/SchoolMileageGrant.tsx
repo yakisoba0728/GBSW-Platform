@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
-import { ListEmptyState, ListSkeleton } from '../ui/list'
+import { ListEmptyState, LoadingSpinner } from '../ui/list'
 import { Button } from '../ui/button'
 import SuccessModal from '../ui/success-modal'
 import AnimatedCheckbox from '../ui/animated-checkbox'
@@ -254,7 +254,9 @@ export default function SchoolMileageGrant({
 
         <Card className="flex flex-col flex-1 min-h-0 overflow-hidden">
           {isRulesLoading ? (
-            <ListSkeleton count={3} rowHeight="h-14" />
+            <div className="flex h-full min-h-[120px] items-center justify-center">
+              <LoadingSpinner />
+            </div>
           ) : rows.length === 0 ? (
             <ListEmptyState
               fill
