@@ -20,6 +20,9 @@ services:
 
   api:
     image: ${API_IMAGE:-ghcr.io/yakisoba0728/gbsw-platform-api:latest}
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
     restart: unless-stopped
     depends_on:
       db:
@@ -46,6 +49,9 @@ services:
 
   web:
     image: ${WEB_IMAGE:-ghcr.io/yakisoba0728/gbsw-platform-web:latest}
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
     restart: unless-stopped
     depends_on:
       api:

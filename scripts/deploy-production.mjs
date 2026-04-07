@@ -24,14 +24,21 @@ const composeArgs = [
   '-f',
   'docker-compose.production.yml',
 ];
+const composeParallelArgs = [
+  'compose',
+  '--parallel',
+  '2',
+  '--env-file',
+  path.relative(rootDir, envFilePath),
+  '-f',
+  'docker-compose.production.yml',
+];
 
 try {
   await run('docker', [...composeArgs, 'up', '-d', 'db']);
 
   const dbContainerId = await capture('docker', [...composeArgs, 'ps', '-q', 'db']);
-  const pullApplicationImagesPromise = run('docker', [...composeArgs, 'pull', 'api', 'web']).catch((error) => {
-    throw new Error(`Failed to pull application images: ${getErrorMessage(error)}`);
-  });
+  const pullApplicationImagesPromise = attemptImagePull();
   await waitForHealthyContainer(dbContainerId, 'db');
 
   const sql = `ALTER ROLE ${quoteIdentifier(postgresUser)} WITH PASSWORD ${quoteLiteral(postgresPassword)};`;
@@ -54,7 +61,13 @@ try {
     sql,
   ]);
 
-  await pullApplicationImagesPromise;
+  const pulledImages = await pullApplicationImagesPromise;
+
+  if (!pulledImages) {
+    console.warn('Falling back to local image builds for api and web.');
+    await run('docker', [...composeParallelArgs, 'build', 'api', 'web']);
+  }
+
   await run('docker', [...composeArgs, 'up', '-d', '--no-build', 'api', 'web']);
 
   const apiContainerId = await capture('docker', [...composeArgs, 'ps', '-q', 'api']);
@@ -125,6 +138,16 @@ function getErrorMessage(error) {
   }
 
   return 'Production deployment failed.';
+}
+
+async function attemptImagePull() {
+  try {
+    await run('docker', [...composeArgs, 'pull', 'api', 'web']);
+    return true;
+  } catch (error) {
+    console.warn(`Image pull skipped: ${getErrorMessage(error)}`);
+    return false;
+  }
 }
 
 function run(command, args, options = {}) {

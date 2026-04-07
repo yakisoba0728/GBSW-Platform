@@ -107,10 +107,13 @@ node scripts/deploy-production.mjs .env
 - `db` 컨테이너를 먼저 기동
 - `.env`의 `POSTGRES_PASSWORD`를 현재 DB 사용자 비밀번호로 동기화
 - `api`, `web` 최신 이미지를 먼저 pull
+- GHCR pull이 실패하면 서버에서 `api`, `web`을 병렬로 로컬 빌드
 - `api`, `web`을 `--no-build`로 재기동
 - healthcheck가 통과할 때까지 대기
 
 기존 PostgreSQL 볼륨이 남아 있어도 `.env`의 DB 비밀번호를 기준으로 다시 맞춰 주기 때문에, `P1000: Authentication failed` 같은 재배포 오류를 줄일 수 있습니다.
+
+즉, 평소에는 GHCR 이미지를 받아 더 빠르게 배포하고, GHCR 로그인이나 권한이 없는 서버에서도 기존처럼 로컬 빌드로 자동 복구됩니다.
 
 필요할 때만 pgAdmin을 띄우려면:
 
