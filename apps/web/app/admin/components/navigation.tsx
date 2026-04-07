@@ -34,6 +34,13 @@ export const ADMIN_NAV_ITEMS: DashboardNavItem[] = [
     icon: <ShieldCheckIcon />,
     children: [
       { href: '/admin/mileage/rules', label: '상벌점 항목' },
+    ],
+  },
+  {
+    id: 'admin-dorm-mileage',
+    label: '기숙사 상벌점',
+    icon: <ShieldCheckIcon />,
+    children: [
       { href: '/admin/dorm-mileage/rules', label: '기숙사 상벌점 항목' },
       { href: '/admin/dorm-mileage/teachers', label: '사감 교사 관리' },
     ],
