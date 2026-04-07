@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { motion } from 'framer-motion'
 import { Card, NoticeBox } from '../mileage/shared'
 import SuccessModal from '../ui/success-modal'
 import {
   AnimatedListItem,
   ListEmptyState,
-  ListSkeleton,
+  LoadingSpinner,
 } from '../ui/list'
 import { ChevronRightIcon, UserIcon } from '../ui/icons'
 import type {
@@ -360,7 +361,9 @@ export default function SchoolMileageStudentView() {
                 />
               </div>
             ) : isStudentsLoading ? (
-              <ListSkeleton count={8} rowHeight="h-14" />
+              <div className="flex h-full min-h-[120px] items-center justify-center">
+                <LoadingSpinner />
+              </div>
             ) : studentsError ? (
               <div className="flex h-full items-center justify-center">
                 <ListEmptyState
@@ -380,7 +383,12 @@ export default function SchoolMileageStudentView() {
                 />
               </div>
             ) : (
-              <div className="space-y-1.5">
+              <motion.div
+                className="space-y-1.5"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+              >
                 {students.map((student, index) => {
                   const isSelected = selectedStudentId === student.studentId
 
@@ -447,7 +455,7 @@ export default function SchoolMileageStudentView() {
                     </AnimatedListItem>
                   )
                 })}
-              </div>
+              </motion.div>
             )}
           </div>
         </Card>

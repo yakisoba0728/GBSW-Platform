@@ -1,8 +1,8 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import { Card, ScoreSummaryBar, StatCard } from '../mileage/shared'
-import { StatCardSkeleton } from '../ui/list'
-import { SummaryBarSkeleton } from '../ui/page-skeletons'
+import { LoadingSpinner } from '../ui/list'
 import type { StudentMileageSummary } from './school-mileage-types'
 
 export default function StudentSummaryCards({
@@ -14,14 +14,9 @@ export default function StudentSummaryCards({
 }) {
   if (isLoading) {
     return (
-      <>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <StatCardSkeleton key={index} />
-          ))}
-        </div>
-        <SummaryBarSkeleton />
-      </>
+      <div className="flex h-full min-h-[120px] items-center justify-center">
+        <LoadingSpinner />
+      </div>
     )
   }
 
@@ -30,7 +25,11 @@ export default function StudentSummaryCards({
   }
 
   return (
-    <>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+    >
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatCard
           label="상점 합계"
@@ -85,6 +84,6 @@ export default function StudentSummaryCards({
           penalty={summary.penaltyTotal}
         />
       </Card>
-    </>
+    </motion.div>
   )
 }
