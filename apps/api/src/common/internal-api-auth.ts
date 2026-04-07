@@ -1,22 +1,19 @@
 import { UnauthorizedException } from '@nestjs/common';
-import { timingSafeEqual } from 'node:crypto';
-import { getApiRuntimeEnv } from '../config/runtime-env';
+import { createHash, timingSafeEqual } from 'node:crypto';
+import { getInternalApiSecret } from '../config/runtime-env';
 
 export function assertInternalApiRequest(providedSecret?: string) {
-  const { INTERNAL_API_SECRET } = getApiRuntimeEnv();
+  const internalApiSecret = getInternalApiSecret();
 
-  if (!safeEqual(providedSecret ?? '', INTERNAL_API_SECRET)) {
+  if (!safeEqual(providedSecret ?? '', internalApiSecret)) {
     throw new UnauthorizedException('내부 API 인증에 실패했습니다.');
   }
 }
 
 function safeEqual(left: string, right: string) {
-  const leftBuffer = Buffer.from(left);
-  const rightBuffer = Buffer.from(right);
+  // 길이 차이로 secret 길이가 유출되지 않도록 양쪽을 SHA-256으로 해시한 뒤 비교
+  const leftHash = createHash('sha256').update(left).digest();
+  const rightHash = createHash('sha256').update(right).digest();
 
-  if (leftBuffer.length !== rightBuffer.length) {
-    return false;
-  }
-
-  return timingSafeEqual(leftBuffer, rightBuffer);
+  return timingSafeEqual(leftHash, rightHash);
 }

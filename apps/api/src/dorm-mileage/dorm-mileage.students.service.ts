@@ -1,9 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { School } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { parseRequiredTextInput } from '../common/parsers';
 import {
-  assertDormTeacherReadAccess,
+  assertTeacherExists,
   assertStudentExists,
 } from './dorm-mileage.access';
 import {
@@ -22,9 +21,10 @@ export class DormMileageStudentsService {
 
   async getStudents(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     query: Record<string, unknown>,
   ) {
-    await assertDormTeacherReadAccess(this.prisma, actorTeacherId);
+    await assertTeacherExists(this.prisma, actorTeacherId, actorSessionId);
 
     const students = await findDormStudentsByFilters(
       this.prisma,
@@ -36,10 +36,11 @@ export class DormMileageStudentsService {
 
   async getStudentSummary(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     studentId: string,
     query: Record<string, unknown>,
   ) {
-    await assertDormTeacherReadAccess(this.prisma, actorTeacherId);
+    await assertTeacherExists(this.prisma, actorTeacherId, actorSessionId);
 
     const [student] = await findDormStudentsByFilters(this.prisma, {
       ...parseAnalyticsFilters(query),
@@ -66,25 +67,32 @@ export class DormMileageStudentsService {
     };
   }
 
-  async getMyDormAccess(actorTeacherId: string | undefined) {
-    const teacherId = parseRequiredTextInput(
-      actorTeacherId,
-      '교사 계정 정보가 올바르지 않습니다.',
-    );
-    const teacher = await this.prisma.teacher.findUnique({
-      where: { teacherId },
+  async getMyDormAccess(
+    actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
+  ) {
+    const teacher = await this.prisma.teacher.findFirst({
+      where: {
+        teacherId: (
+          await assertTeacherExists(this.prisma, actorTeacherId, actorSessionId)
+        ).teacherId,
+        isActive: true,
+      },
       select: { isDormTeacher: true },
     });
 
-    if (!teacher) {
-      throw new UnauthorizedException('유효한 교사 계정이 아닙니다.');
-    }
-
-    return { isDormTeacher: teacher.isDormTeacher };
+    return { isDormTeacher: teacher?.isDormTeacher === true };
   }
 
-  async getMyMileageSummary(actorStudentId: string | undefined) {
-    const student = await assertStudentExists(this.prisma, actorStudentId);
+  async getMyMileageSummary(
+    actorStudentId: string | undefined,
+    actorSessionId: string | undefined,
+  ) {
+    const student = await assertStudentExists(
+      this.prisma,
+      actorStudentId,
+      actorSessionId,
+    );
 
     if (student.school !== School.GBSW) {
       return {

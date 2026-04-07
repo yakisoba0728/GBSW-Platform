@@ -37,6 +37,7 @@ model Student {
   majorSubject         String?              @map("major_subject")
   name                 String
   phone                String
+  isActive             Boolean              @default(true) @map("is_active")
   passwordHash         String               @map("password_hash")
   mustChangePassword   Boolean              @default(true) @map("must_change_password")
   createdAt            DateTime             @default(now()) @map("created_at")
@@ -44,6 +45,7 @@ model Student {
   schoolMileageEntries SchoolMileageEntry[]
   dormMileageEntries   DormMileageEntry[]
 
+  @@index([isActive])
   @@map("students")
 }
 
@@ -51,6 +53,7 @@ model Teacher {
   teacherId                   String               @id @map("teacher_id")
   name                        String
   phone                       String
+  isActive                    Boolean              @default(true) @map("is_active")
   passwordHash                String               @map("password_hash")
   mustChangePassword          Boolean              @default(true) @map("must_change_password")
   isDormTeacher               Boolean              @default(false) @map("is_dorm_teacher")
@@ -63,6 +66,7 @@ model Teacher {
   dormMileageEntriesUpdated   DormMileageEntry[]   @relation("DormEntryUpdatedBy")
   dormMileageEntriesDeleted   DormMileageEntry[]   @relation("DormEntryDeletedBy")
 
+  @@index([isActive])
   @@map("teachers")
 }
 
@@ -79,6 +83,7 @@ model SchoolMileageRule {
   entries      SchoolMileageEntry[]
 
   @@unique([type, category, name])
+  @@unique([displayOrder])
   @@index([isActive, displayOrder])
   @@map("school_mileage_rules")
 }
@@ -124,6 +129,16 @@ model AuthSession {
   @@map("auth_sessions")
 }
 
+model SuperAdminCredential {
+  accountId    String   @id @map("account_id")
+  passwordHash String   @map("password_hash")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("super_admin_credentials")
+}
+
 model LoginThrottle {
   key             String    @id
   failedCount     Int       @default(0) @map("failed_count")
@@ -151,6 +166,7 @@ model DormMileageRule {
   entries DormMileageEntry[]
 
   @@unique([type, category, name])
+  @@unique([displayOrder])
   @@index([isActive, displayOrder])
   @@map("dorm_mileage_rules")
 }

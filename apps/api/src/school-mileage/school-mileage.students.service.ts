@@ -20,9 +20,10 @@ export class SchoolMileageStudentsService {
 
   async getStudents(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     query: Record<string, unknown>,
   ) {
-    await assertTeacherExists(this.prisma, actorTeacherId);
+    await assertTeacherExists(this.prisma, actorTeacherId, actorSessionId);
 
     const students = await findStudentsByFilters(
       this.prisma,
@@ -34,10 +35,11 @@ export class SchoolMileageStudentsService {
 
   async getStudentSummary(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     studentId: string,
     query: Record<string, unknown>,
   ) {
-    await assertTeacherExists(this.prisma, actorTeacherId);
+    await assertTeacherExists(this.prisma, actorTeacherId, actorSessionId);
 
     const [student] = await findStudentsByFilters(this.prisma, {
       ...parseAnalyticsFilters(query),
@@ -64,8 +66,15 @@ export class SchoolMileageStudentsService {
     };
   }
 
-  async getMyMileageSummary(actorStudentId: string | undefined) {
-    const student = await assertStudentExists(this.prisma, actorStudentId);
+  async getMyMileageSummary(
+    actorStudentId: string | undefined,
+    actorSessionId: string | undefined,
+  ) {
+    const student = await assertStudentExists(
+      this.prisma,
+      actorStudentId,
+      actorSessionId,
+    );
 
     const entries = await this.prisma.schoolMileageEntry.findMany({
       where: {

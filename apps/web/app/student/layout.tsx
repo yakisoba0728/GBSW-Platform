@@ -1,9 +1,6 @@
 import StudentShell from './_components/StudentShell'
 import { requireRoleSession } from '@/lib/route-guards'
-
-function deriveSchool(accountId: string): 'GBSW' | 'BYMS' {
-  return accountId.startsWith('BY') ? 'BYMS' : 'GBSW'
-}
+import { redirect } from 'next/navigation'
 
 export default async function StudentLayout({
   children,
@@ -11,7 +8,10 @@ export default async function StudentLayout({
   children: React.ReactNode
 }>) {
   const session = await requireRoleSession('student')
-  const school = deriveSchool(session.accountId)
 
-  return <StudentShell school={school}>{children}</StudentShell>
+  if (!session.school) {
+    redirect('/')
+  }
+
+  return <StudentShell school={session.school}>{children}</StudentShell>
 }

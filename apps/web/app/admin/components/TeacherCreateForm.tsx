@@ -76,11 +76,7 @@ export default function TeacherCreateForm() {
         description: [
           payload?.message ?? '교사 계정이 생성되었습니다.',
           `아이디: ${createdTeacherId}`,
-          `임시 비밀번호: ${
-            payload?.teacher?.temporaryPassword ??
-            payload?.teacher?.initialPassword ??
-            ''
-          }`,
+          `임시 비밀번호: ${payload?.teacher?.temporaryPassword ?? ''}`,
         ].join('\n'),
       })
     } catch {
@@ -114,8 +110,8 @@ export default function TeacherCreateForm() {
             color: 'var(--fg-muted)',
           }}
         >
-          새 교사 계정의 정보를 입력하세요. 교사 아이디는 직접 입력하고 임시
-          비밀번호는 교사 아이디와 전화번호 뒤 4자리로 설정됩니다.
+          새 교사 계정의 정보를 입력하세요. 임시 비밀번호는 계정 생성 직후
+          한 번만 표시되므로 반드시 복사해 두세요.
         </p>
       </div>
 
@@ -176,8 +172,9 @@ export default function TeacherCreateForm() {
           <div className="px-6 py-5" style={{ backgroundColor: 'var(--bg)' }}>
             <SectionLabel>초기 비밀번호</SectionLabel>
             <PasswordRuleBox>
-              교사 임시 비밀번호는 교사 아이디와 전화번호 뒤 4자리로
-              설정되며, 첫 로그인 뒤 반드시 새 비밀번호로 변경해야 합니다.
+              임시 비밀번호는 계정 생성 시 무작위로 생성됩니다. 생성 완료
+              모달에 표시되며, 이후 다시 확인할 수 없으므로 즉시 전달하세요.
+              첫 로그인 뒤 반드시 새 비밀번호로 변경해야 합니다.
             </PasswordRuleBox>
           </div>
         </div>

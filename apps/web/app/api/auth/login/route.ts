@@ -20,15 +20,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const realIp = forwardHeaderValue('x-real-ip', request)
     const upstreamResponse = await fetch(`${getApiBaseUrl()}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(forwardHeaderValue('x-forwarded-for', request) && {
-          'x-forwarded-for': forwardHeaderValue('x-forwarded-for', request)!,
-        }),
-        ...(forwardHeaderValue('x-real-ip', request) && {
-          'x-real-ip': forwardHeaderValue('x-real-ip', request)!,
+        ...(realIp && {
+          'x-real-ip': realIp,
         }),
       },
       body: JSON.stringify({ id, password }),
@@ -91,7 +89,7 @@ function getErrorMessage(payload: unknown, fallback: string) {
   return fallback
 }
 
-function forwardHeaderValue(name: 'x-forwarded-for' | 'x-real-ip', request: NextRequest) {
+function forwardHeaderValue(name: 'x-real-ip', request: NextRequest) {
   const value = request.headers.get(name)?.trim()
 
   return value && value.length > 0 ? value : null
@@ -103,6 +101,7 @@ function parseAuthSession(value: unknown): {
   role: 'super-admin' | 'student' | 'teacher'
   mustChangePassword: boolean
   expiresAt: string
+  school?: 'GBSW' | 'BYMS'
 } | null {
   if (!value || typeof value !== 'object') {
     return null
@@ -124,6 +123,14 @@ function parseAuthSession(value: unknown): {
     return null
   }
 
+  if (
+    session.school !== undefined &&
+    session.school !== 'GBSW' &&
+    session.school !== 'BYMS'
+  ) {
+    return null
+  }
+
   const expiresAtMs = Date.parse(session.expiresAt)
 
   if (!Number.isFinite(expiresAtMs) || expiresAtMs <= Date.now()) {
@@ -136,5 +143,6 @@ function parseAuthSession(value: unknown): {
     role: session.role,
     mustChangePassword: session.mustChangePassword,
     expiresAt: session.expiresAt,
+    ...(session.school ? { school: session.school } : {}),
   }
 }

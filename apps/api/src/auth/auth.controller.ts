@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Post } from '@nestjs/common';
+import { Body, Controller, Headers, Ip, Post } from '@nestjs/common';
 import { assertInternalApiRequest } from '../common/internal-api-auth';
 import { AuthService } from './auth.service';
 
@@ -8,19 +8,24 @@ export class AuthController {
 
   @Post('login')
   login(
-    @Headers('x-forwarded-for') forwardedFor: string | undefined,
     @Headers('x-real-ip') realIp: string | undefined,
+    @Ip() requestIp: string | undefined,
     @Body() body: Record<string, unknown>,
   ) {
     return this.authService.login(body, {
-      forwardedFor,
-      realIp,
+      realIp: realIp ?? requestIp,
     });
   }
 
   @Post('change-password')
-  changePassword(@Body() body: Record<string, unknown>) {
-    return this.authService.changePassword(body);
+  changePassword(
+    @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
+    @Headers('x-actor-session-id') actorSessionId: string | undefined,
+    @Body() body: Record<string, unknown>,
+  ) {
+    assertInternalApiRequest(internalApiSecret);
+
+    return this.authService.changePassword(actorSessionId, body);
   }
 
   @Post('sessions/resolve')

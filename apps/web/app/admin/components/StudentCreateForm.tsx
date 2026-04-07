@@ -184,11 +184,7 @@ export default function StudentCreateForm() {
         description: [
           payload?.message ?? '학생 계정이 생성되었습니다.',
           `아이디: ${payload?.student?.studentId ?? studentId}`,
-          `임시 비밀번호: ${
-            payload?.student?.temporaryPassword ??
-            payload?.student?.initialPassword ??
-            ''
-          }`,
+          `임시 비밀번호: ${payload?.student?.temporaryPassword ?? ''}`,
         ].join('\n'),
       })
     } catch {
@@ -223,8 +219,8 @@ export default function StudentCreateForm() {
           }}
         >
           학생 아이디 생성 정보로 아이디를 만들고, 현재 년도/반/번호와
-          전공과목을 저장합니다. 생성 직후 임시 비밀번호는 생성된 아이디와
-          전화번호 뒤 4자리로 설정됩니다.
+          전공과목을 저장합니다. 임시 비밀번호는 계정 생성 직후 한 번만
+          표시되므로 반드시 복사해 두세요.
         </p>
       </div>
 
@@ -522,8 +518,9 @@ export default function StudentCreateForm() {
           <div className="px-6 py-5" style={{ backgroundColor: 'var(--bg)' }}>
             <SectionLabel>초기 비밀번호</SectionLabel>
             <PasswordRuleBox>
-              학생 임시 비밀번호는 생성된 아이디와 전화번호 뒤 4자리로
-              설정되며, 첫 로그인 뒤 반드시 새 비밀번호로 변경해야 합니다.
+              임시 비밀번호는 계정 생성 시 무작위로 생성됩니다. 생성 완료
+              모달에 표시되며, 이후 다시 확인할 수 없으므로 즉시 전달하세요.
+              첫 로그인 뒤 반드시 새 비밀번호로 변경해야 합니다.
             </PasswordRuleBox>
           </div>
         </div>

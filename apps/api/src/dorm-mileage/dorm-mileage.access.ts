@@ -1,50 +1,27 @@
-import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
 import type { PrismaService } from '../prisma/prisma.service';
-import { parseRequiredTextInput } from '../common/parsers';
-import { assertSuperAdmin, assertStudentExists } from '../school-mileage/school-mileage.access';
+import {
+  assertSuperAdmin,
+  assertStudentExists,
+  assertTeacherExists,
+} from '../school-mileage/school-mileage.access';
 
-export { assertSuperAdmin, assertStudentExists };
+export { assertSuperAdmin, assertStudentExists, assertTeacherExists };
 
 export async function assertDormTeacherOnly(
   prisma: PrismaService,
   actorTeacherId: string | undefined,
+  actorSessionId: string | undefined,
 ) {
-  const teacher = await prisma.teacher.findUnique({
-    where: {
-      teacherId: parseRequiredTextInput(
-        actorTeacherId,
-        '교사 계정 정보가 올바르지 않습니다.',
-      ),
-    },
-    select: {
-      teacherId: true,
-      name: true,
-      isDormTeacher: true,
-    },
-  });
-
-  if (!teacher) {
-    throw new UnauthorizedException('유효한 교사 계정이 아닙니다.');
-  }
-
-  if (!teacher.isDormTeacher) {
-    throw new ForbiddenException('사감 교사만 기숙사 상벌점을 부여할 수 있습니다.');
-  }
-
-  return teacher;
-}
-
-export async function assertDormTeacherReadAccess(
-  prisma: PrismaService,
-  actorTeacherId: string | undefined,
-) {
-  const teacherId = parseRequiredTextInput(
+  const teacher = await assertTeacherExists(
+    prisma,
     actorTeacherId,
-    '교사 계정 정보가 올바르지 않습니다.',
+    actorSessionId,
   );
-  const teacher = await prisma.teacher.findUnique({
+  const dormTeacher = await prisma.teacher.findFirst({
     where: {
-      teacherId,
+      teacherId: teacher.teacherId,
+      isActive: true,
     },
     select: {
       teacherId: true,
@@ -53,15 +30,11 @@ export async function assertDormTeacherReadAccess(
     },
   });
 
-  if (!teacher) {
-    throw new UnauthorizedException('유효한 교사 계정이 아닙니다.');
+  if (!dormTeacher?.isDormTeacher) {
+    throw new ForbiddenException(
+      '사감 교사만 기숙사 상벌점을 부여할 수 있습니다.',
+    );
   }
 
-  if (!teacher.isDormTeacher) {
-    throw new ForbiddenException('사감 교사만 기숙사 상벌점 데이터에 접근할 수 있습니다.');
-  }
-
-  return teacher;
+  return dormTeacher;
 }
-
-

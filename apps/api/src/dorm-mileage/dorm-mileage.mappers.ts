@@ -14,9 +14,7 @@ export function toApiDormMileageType(
 }
 
 export function toPrismaDormMileageType(type: DormMileageApiType) {
-  return type === 'reward'
-    ? DormMileageType.REWARD
-    : DormMileageType.PENALTY;
+  return type === 'reward' ? DormMileageType.REWARD : DormMileageType.PENALTY;
 }
 
 export function calculateStudentGrade(studentId: string, currentYear: number) {

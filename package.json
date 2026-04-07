@@ -10,6 +10,7 @@
     "dev": "node scripts/dev.mjs",
     "build": "pnpm --filter @gbsw/api build && pnpm --filter @gbsw/web build",
     "lint": "pnpm --filter @gbsw/api lint && pnpm --filter @gbsw/web lint",
+    "test": "pnpm --filter @gbsw/api test && pnpm --filter @gbsw/web test",
     "db:up": "docker compose up -d db pgadmin",
     "db:down": "docker compose down",
     "db:prepare": "node scripts/prepare-db.mjs",

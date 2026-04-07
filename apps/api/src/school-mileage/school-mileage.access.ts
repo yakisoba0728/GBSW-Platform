@@ -6,14 +6,23 @@ import { parseRequiredTextInput } from '../common/parsers';
 export async function assertTeacherExists(
   prisma: PrismaService,
   actorTeacherId: string | undefined,
+  actorSessionId: string | undefined,
 ) {
   const teacherId = parseRequiredTextInput(
     actorTeacherId,
     '교사 계정 정보가 올바르지 않습니다.',
   );
-  const teacher = await prisma.teacher.findUnique({
+  await assertActiveSession(
+    prisma,
+    teacherId,
+    AuthRole.TEACHER,
+    actorSessionId,
+    '교사 세션 정보가 올바르지 않습니다.',
+  );
+  const teacher = await prisma.teacher.findFirst({
     where: {
       teacherId,
+      isActive: true,
     },
     select: {
       teacherId: true,
@@ -38,7 +47,11 @@ export async function assertTeacherOrSuperAdmin(
     return assertSuperAdmin(prisma, actorSuperAdminId, actorSessionId);
   }
 
-  const teacher = await assertTeacherExists(prisma, actorTeacherId);
+  const teacher = await assertTeacherExists(
+    prisma,
+    actorTeacherId,
+    actorSessionId,
+  );
 
   return {
     role: 'teacher' as const,
@@ -79,6 +92,20 @@ export async function assertSuperAdmin(
     throw new UnauthorizedException('유효한 최고관리자 계정이 아닙니다.');
   }
 
+  const credential = await prisma.superAdminCredential.findFirst({
+    where: {
+      accountId: superAdminId,
+      isActive: true,
+    },
+    select: {
+      accountId: true,
+    },
+  });
+
+  if (!credential) {
+    throw new UnauthorizedException('유효한 최고관리자 계정이 아닙니다.');
+  }
+
   return {
     role: 'super-admin' as const,
     accountId: superAdminId,
@@ -88,14 +115,23 @@ export async function assertSuperAdmin(
 export async function assertStudentExists(
   prisma: PrismaService,
   actorStudentId: string | undefined,
+  actorSessionId: string | undefined,
 ) {
   const studentId = parseRequiredTextInput(
     actorStudentId,
     '학생 계정 정보가 올바르지 않습니다.',
   );
-  const student = await prisma.student.findUnique({
+  await assertActiveSession(
+    prisma,
+    studentId,
+    AuthRole.STUDENT,
+    actorSessionId,
+    '학생 세션 정보가 올바르지 않습니다.',
+  );
+  const student = await prisma.student.findFirst({
     where: {
       studentId,
+      isActive: true,
     },
     select: {
       studentId: true,
@@ -112,4 +148,35 @@ export async function assertStudentExists(
   }
 
   return student;
+}
+
+async function assertActiveSession(
+  prisma: PrismaService,
+  accountId: string,
+  role: AuthRole,
+  actorSessionId: string | undefined,
+  invalidSessionMessage: string,
+) {
+  const sessionId = parseRequiredTextInput(
+    actorSessionId,
+    invalidSessionMessage,
+  );
+  const session = await prisma.authSession.findFirst({
+    where: {
+      id: sessionId,
+      accountId,
+      role,
+      revokedAt: null,
+      expiresAt: {
+        gt: new Date(),
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!session) {
+    throw new UnauthorizedException('유효한 세션이 아닙니다.');
+  }
 }

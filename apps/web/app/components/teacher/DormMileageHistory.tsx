@@ -6,6 +6,7 @@ import {
   Card,
   NoticeBox,
 } from '../mileage/shared'
+import { useDormRulesContext } from '../dorm-mileage/dorm-rules-context'
 import { ConfirmModal } from '../ui/modal'
 import SuccessModal from '../ui/success-modal'
 import { EmptyStatePane } from '../ui/list'
@@ -37,6 +38,7 @@ export default function DormMileageHistory({
 }: {
   rulesError: string | null
 }) {
+  const { isDormTeacher } = useDormRulesContext()
   const searchParams = useSearchParams()
   const updateSearchParams = useUpdateSearchParams()
   const filters = useMemo(
@@ -51,7 +53,6 @@ export default function DormMileageHistory({
   )
   const page = getPositiveQueryNumber(searchParams, 'page', 1)
   const pageSize = getPositiveQueryNumber(searchParams, 'pageSize', 20)
-  const [isDormTeacher, setIsDormTeacher] = useState<boolean | null>(null)
   const [response, setResponse] = useState<PaginatedDormMileageHistoryResponse>(INITIAL_RESPONSE)
   const [isLoading, setIsLoading] = useState(true)
   const [entriesError, setEntriesError] = useState<string | null>(null)
@@ -133,13 +134,6 @@ export default function DormMileageHistory({
       }
     }
   }, [filters, page, pageSize])
-
-  useEffect(() => {
-    void fetch('/api/teacher/dorm-mileage/access', { cache: 'no-store' })
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => { setIsDormTeacher(data?.isDormTeacher ?? false) })
-      .catch(() => { setIsDormTeacher(false) })
-  }, [])
 
   useEffect(() => {
     void loadEntries()

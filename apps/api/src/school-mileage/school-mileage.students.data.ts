@@ -11,6 +11,7 @@ export async function findStudentsByFilters(
 ) {
   const students = await prisma.student.findMany({
     where: {
+      isActive: true,
       school: filters.school ?? undefined,
       currentClass: filters.classNumber ?? undefined,
       studentId: filters.studentId ?? undefined,

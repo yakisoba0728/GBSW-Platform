@@ -23,6 +23,7 @@ type DormGrantRowCardProps = {
   row: DormGrantRow
   selectedRule: DormMileageRuleSummary | null
   disabled?: boolean
+  readOnly?: boolean
   checked: boolean
   onCheckedChange: (checked: boolean) => void
   onOpenRuleModal: () => void
@@ -35,12 +36,14 @@ export default function DormGrantRowCard({
   row,
   selectedRule,
   disabled = false,
+  readOnly = false,
   checked,
   onCheckedChange,
   onOpenRuleModal,
   onReasonChange,
   onRemove,
 }: DormGrantRowCardProps) {
+  const isInteractive = !disabled && !readOnly
   const leftBorderColor =
     selectedRule === null
       ? 'var(--admin-border)'
@@ -57,7 +60,7 @@ export default function DormGrantRowCard({
     <button
       type="button"
       onClick={onOpenRuleModal}
-      disabled={disabled}
+      disabled={!isInteractive}
       className="flex w-full items-center gap-2 rounded-md border px-3 py-2 text-sm text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60"
       style={{
         ...inputStyle,
@@ -138,7 +141,7 @@ export default function DormGrantRowCard({
           <AnimatedCheckbox
             checked={checked}
             onChange={onCheckedChange}
-            disabled={disabled}
+            disabled={!isInteractive}
             size={18}
           />
           <div>
@@ -167,7 +170,7 @@ export default function DormGrantRowCard({
           <button
             type="button"
             onClick={onRemove}
-            disabled={disabled}
+            disabled={!isInteractive}
             className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg transition-colors hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-50"
             style={{ color: '#dc2626' }}
             aria-label="행 삭제"
@@ -181,6 +184,7 @@ export default function DormGrantRowCard({
           value={row.reason}
           onChange={(event) => onReasonChange(event.target.value)}
           disabled={disabled}
+          readOnly={readOnly}
           className="w-full rounded-md border px-3 py-2 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-60"
           style={inputStyle}
           placeholder="사유 입력 (선택)"
@@ -191,7 +195,7 @@ export default function DormGrantRowCard({
         <AnimatedCheckbox
           checked={checked}
           onChange={onCheckedChange}
-          disabled={disabled}
+          disabled={!isInteractive}
           size={18}
         />
         <div className="w-[160px] flex-shrink-0 overflow-hidden">
@@ -228,6 +232,7 @@ export default function DormGrantRowCard({
             value={row.reason}
             onChange={(event) => onReasonChange(event.target.value)}
             disabled={disabled}
+            readOnly={readOnly}
             className="w-full rounded-md border px-3 py-2 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-60"
             style={inputStyle}
             placeholder="사유 입력 (선택)"
@@ -237,7 +242,7 @@ export default function DormGrantRowCard({
         <button
           type="button"
           onClick={onRemove}
-          disabled={disabled}
+          disabled={!isInteractive}
           className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg transition-colors hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-50"
           style={{ color: '#dc2626' }}
           aria-label="행 삭제"

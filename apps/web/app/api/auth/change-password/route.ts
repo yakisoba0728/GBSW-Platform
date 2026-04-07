@@ -9,6 +9,7 @@ import {
   resolveAuthSession,
   shouldUseSecureCookie,
 } from '@/lib/auth-session'
+import { getInternalApiSecret } from '@/lib/runtime-env'
 
 export async function POST(request: NextRequest) {
   const sessionId = readAuthSessionId(
@@ -32,13 +33,6 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  if (session.role === 'super-admin') {
-    return NextResponse.json(
-      { message: '최고관리자 비밀번호 변경은 지원하지 않습니다.' },
-      { status: 400 },
-    )
-  }
-
   const body = await request.json().catch(() => null)
   const currentPassword =
     typeof body?.currentPassword === 'string' ? body.currentPassword : undefined
@@ -52,14 +46,12 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-internal-api-secret': getInternalApiSecret(),
+          'x-actor-session-id': session.id,
         },
         body: JSON.stringify({
-          accountId: session.accountId,
-          role: session.role,
           currentPassword,
           newPassword,
-          allowMissingCurrentPassword: session.mustChangePassword,
-          sessionId: session.id,
         }),
         cache: 'no-store',
       },
@@ -124,9 +116,10 @@ function getErrorMessage(payload: unknown, fallback: string) {
 function parseAuthSession(value: unknown): {
   id: string
   accountId: string
-  role: 'student' | 'teacher'
+  role: 'super-admin' | 'student' | 'teacher'
   mustChangePassword: boolean
   expiresAt: string
+  school?: 'GBSW' | 'BYMS'
 } | null {
   if (!value || typeof value !== 'object') {
     return null
@@ -139,9 +132,19 @@ function parseAuthSession(value: unknown): {
     session.id.trim().length === 0 ||
     typeof session.accountId !== 'string' ||
     session.accountId.trim().length === 0 ||
-    (session.role !== 'student' && session.role !== 'teacher') ||
+    (session.role !== 'super-admin' &&
+      session.role !== 'student' &&
+      session.role !== 'teacher') ||
     typeof session.mustChangePassword !== 'boolean' ||
     typeof session.expiresAt !== 'string'
+  ) {
+    return null
+  }
+
+  if (
+    session.school !== undefined &&
+    session.school !== 'GBSW' &&
+    session.school !== 'BYMS'
   ) {
     return null
   }
@@ -158,5 +161,6 @@ function parseAuthSession(value: unknown): {
     role: session.role,
     mustChangePassword: session.mustChangePassword,
     expiresAt: session.expiresAt,
+    ...(session.school ? { school: session.school } : {}),
   }
 }

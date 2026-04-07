@@ -1,15 +1,63 @@
 import { Injectable } from '@nestjs/common';
+import { DormMileageType, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { assertDormTeacherReadAccess } from './dorm-mileage.access';
+import { assertTeacherExists } from './dorm-mileage.access';
 import {
   buildClassMileageSummary,
-  buildStudentMileageSummary,
   compareStudentMileageSummary,
-  dormMileageEntrySelect,
-  toApiDormMileageType,
 } from './dorm-mileage.mappers';
 import { parseAnalyticsFilters } from './dorm-mileage.parsers';
 import { findDormStudentsByFilters } from './dorm-mileage.students.data';
+import type {
+  ClassMileageSummary,
+  DormMileageApiType,
+  StudentMileageSummary,
+  StudentSummary,
+} from './dorm-mileage.types';
+
+type OverviewAggregateRow = {
+  rewardCount: number;
+  penaltyCount: number;
+  rewardSum: number;
+  penaltySum: number;
+  uniqueStudents: number;
+  totalCount: number;
+};
+
+type CategoryAggregateRow = {
+  category: string;
+  type: DormMileageType;
+  count: number;
+  totalScore: number;
+};
+
+type TopRuleAggregateRow = {
+  ruleId: number;
+  ruleName: string;
+  category: string;
+  type: DormMileageType;
+  count: number;
+  totalScore: number;
+};
+
+type StudentAggregateRow = {
+  studentId: string;
+  type: DormMileageType;
+  count: number;
+  totalScore: number;
+};
+
+type StudentTotals = {
+  rewardTotal: number;
+  penaltyTotal: number;
+  entryCount: number;
+};
+
+const EMPTY_TOTALS: StudentTotals = {
+  rewardTotal: 0,
+  penaltyTotal: 0,
+  entryCount: 0,
+};
 
 @Injectable()
 export class DormMileageAnalyticsService {
@@ -17,113 +65,79 @@ export class DormMileageAnalyticsService {
 
   async getOverview(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     query: Record<string, unknown>,
   ) {
-    await assertDormTeacherReadAccess(this.prisma, actorTeacherId);
+    await assertTeacherExists(this.prisma, actorTeacherId, actorSessionId);
 
     const filters = parseAnalyticsFilters(query);
     const studentIds = await this.resolveStudentIds(filters);
 
     if (studentIds && studentIds.length === 0) {
-      return {
-        summary: {
-          rewardCount: 0,
-          penaltyCount: 0,
-          rewardSum: 0,
-          penaltySum: 0,
-          uniqueStudents: 0,
-          totalCount: 0,
-        },
-        categoryStats: [],
-        topRules: [],
-      };
+      return emptyOverview();
     }
 
-    const entries = await this.prisma.dormMileageEntry.findMany({
-      where: buildEntryWhere(filters, studentIds),
-      orderBy: [{ awardedAt: 'desc' }, { createdAt: 'desc' }],
-      select: dormMileageEntrySelect,
-    });
+    const whereSql = buildEntryWhereSql(filters, studentIds);
+    const [summary] = await this.prisma.$queryRaw<
+      OverviewAggregateRow[]
+    >(Prisma.sql`
+      SELECT
+        COALESCE(SUM(CASE WHEN e.type = 'REWARD' THEN 1 ELSE 0 END), 0)::int AS "rewardCount",
+        COALESCE(SUM(CASE WHEN e.type = 'PENALTY' THEN 1 ELSE 0 END), 0)::int AS "penaltyCount",
+        COALESCE(SUM(CASE WHEN e.type = 'REWARD' THEN e.score ELSE 0 END), 0)::int AS "rewardSum",
+        COALESCE(SUM(CASE WHEN e.type = 'PENALTY' THEN e.score ELSE 0 END), 0)::int AS "penaltySum",
+        COALESCE(COUNT(DISTINCT e.student_id), 0)::int AS "uniqueStudents",
+        COALESCE(COUNT(*), 0)::int AS "totalCount"
+      FROM dorm_mileage_entries e
+      ${whereSql}
+    `);
 
-    const rewardEntries = entries.filter((entry) => entry.type === 'REWARD');
-    const penaltyEntries = entries.filter((entry) => entry.type === 'PENALTY');
-    const categoryMap = new Map<
-      string,
-      {
-        category: string;
-        type: 'reward' | 'penalty';
-        count: number;
-        totalScore: number;
-      }
-    >();
-    const ruleMap = new Map<
-      number,
-      {
-        ruleId: number;
-        ruleName: string;
-        category: string;
-        type: 'reward' | 'penalty';
-        count: number;
-        totalScore: number;
-      }
-    >();
+    const categoryStats = await this.prisma.$queryRaw<
+      CategoryAggregateRow[]
+    >(Prisma.sql`
+      SELECT
+        r.category AS "category",
+        e.type AS "type",
+        COUNT(*)::int AS "count",
+        COALESCE(SUM(e.score), 0)::int AS "totalScore"
+      FROM dorm_mileage_entries e
+      JOIN dorm_mileage_rules r ON r.id = e.rule_id
+      ${whereSql}
+      GROUP BY r.category, e.type
+      ORDER BY COUNT(*) DESC, COALESCE(SUM(e.score), 0) DESC
+    `);
 
-    for (const entry of entries) {
-      const type = toApiDormMileageType(entry.type);
-      const categoryKey = `${type}:${entry.rule.category}`;
-      const nextCategory = categoryMap.get(categoryKey) ?? {
-        category: entry.rule.category,
-        type,
-        count: 0,
-        totalScore: 0,
-      };
-
-      nextCategory.count += 1;
-      nextCategory.totalScore += entry.score;
-      categoryMap.set(categoryKey, nextCategory);
-
-      const nextRule = ruleMap.get(entry.rule.id) ?? {
-        ruleId: entry.rule.id,
-        ruleName: entry.rule.name,
-        category: entry.rule.category,
-        type,
-        count: 0,
-        totalScore: 0,
-      };
-
-      nextRule.count += 1;
-      nextRule.totalScore += entry.score;
-      ruleMap.set(entry.rule.id, nextRule);
-    }
+    const topRules = await this.prisma.$queryRaw<
+      TopRuleAggregateRow[]
+    >(Prisma.sql`
+      SELECT
+        r.id AS "ruleId",
+        r.name AS "ruleName",
+        r.category AS "category",
+        e.type AS "type",
+        COUNT(*)::int AS "count",
+        COALESCE(SUM(e.score), 0)::int AS "totalScore"
+      FROM dorm_mileage_entries e
+      JOIN dorm_mileage_rules r ON r.id = e.rule_id
+      ${whereSql}
+      GROUP BY r.id, r.name, r.category, e.type
+      ORDER BY COUNT(*) DESC, COALESCE(SUM(e.score), 0) DESC
+      LIMIT 5
+    `);
 
     return {
-      summary: {
-        rewardCount: rewardEntries.length,
-        penaltyCount: penaltyEntries.length,
-        rewardSum: rewardEntries.reduce((acc, entry) => acc + entry.score, 0),
-        penaltySum: penaltyEntries.reduce((acc, entry) => acc + entry.score, 0),
-        uniqueStudents: new Set(entries.map((entry) => entry.student.studentId))
-          .size,
-        totalCount: entries.length,
-      },
-      categoryStats: [...categoryMap.values()].sort(
-        (left, right) =>
-          right.count - left.count || right.totalScore - left.totalScore,
-      ),
-      topRules: [...ruleMap.values()]
-        .sort(
-          (left, right) =>
-            right.count - left.count || right.totalScore - left.totalScore,
-        )
-        .slice(0, 5),
+      summary: summary ?? emptyOverview().summary,
+      categoryStats: categoryStats.map(mapCategoryStat),
+      topRules: topRules.map(mapTopRuleStat),
     };
   }
 
   async getStudentAnalytics(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     query: Record<string, unknown>,
   ) {
-    await assertDormTeacherReadAccess(this.prisma, actorTeacherId);
+    await assertTeacherExists(this.prisma, actorTeacherId, actorSessionId);
 
     const filters = parseAnalyticsFilters(query);
     const students = await findDormStudentsByFilters(this.prisma, {
@@ -137,43 +151,17 @@ export class DormMileageAnalyticsService {
       return { students: [], totalCount: 0 };
     }
 
-    const entries = await this.prisma.dormMileageEntry.findMany({
-      where: buildEntryWhere(
-        filters,
-        students.map((student) => student.studentId),
-      ),
-      select: {
-        studentId: true,
-        type: true,
-        score: true,
-      },
-    });
-
-    if (entries.length === 0) {
-      return { students: [], totalCount: 0 };
-    }
-
-    const entriesByStudentId = new Map<
-      string,
-      Array<{ type: 'REWARD' | 'PENALTY'; score: number }>
-    >();
-
-    for (const entry of entries) {
-      const nextEntries = entriesByStudentId.get(entry.studentId) ?? [];
-
-      nextEntries.push({
-        type: entry.type,
-        score: entry.score,
-      });
-      entriesByStudentId.set(entry.studentId, nextEntries);
-    }
-
+    const aggregateRows = await this.fetchStudentAggregates(
+      filters,
+      students.map((student) => student.studentId),
+    );
+    const totalsByStudentId = buildTotalsByStudentId(aggregateRows);
     const summaries = students
-      .filter((student) => entriesByStudentId.has(student.studentId))
+      .filter((student) => totalsByStudentId.has(student.studentId))
       .map((student) =>
-        buildStudentMileageSummary(
+        buildStudentMileageSummaryFromTotals(
           student,
-          entriesByStudentId.get(student.studentId) ?? [],
+          totalsByStudentId.get(student.studentId) ?? EMPTY_TOTALS,
         ),
       )
       .sort(compareStudentMileageSummary);
@@ -186,9 +174,10 @@ export class DormMileageAnalyticsService {
 
   async getClassAnalytics(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     query: Record<string, unknown>,
   ) {
-    await assertDormTeacherReadAccess(this.prisma, actorTeacherId);
+    await assertTeacherExists(this.prisma, actorTeacherId, actorSessionId);
 
     const filters = parseAnalyticsFilters(query);
     const students = await findDormStudentsByFilters(this.prisma, {
@@ -199,65 +188,30 @@ export class DormMileageAnalyticsService {
     });
 
     if (students.length === 0) {
-      return {
-        classes: [],
-        overall: {
-          classCount: 0,
-          totalStudents: 0,
-          rewardTotal: 0,
-          penaltyTotal: 0,
-          netScore: 0,
-        },
-      };
+      return emptyClassAnalytics();
     }
 
-    const entries = await this.prisma.dormMileageEntry.findMany({
-      where: buildEntryWhere(
-        filters,
-        students.map((student) => student.studentId),
-      ),
-      select: {
-        studentId: true,
-        type: true,
-        score: true,
-      },
-    });
-
-    const entriesByStudentId = new Map<
-      string,
-      Array<{ type: 'REWARD' | 'PENALTY'; score: number }>
-    >();
-
-    for (const entry of entries) {
-      const nextEntries = entriesByStudentId.get(entry.studentId) ?? [];
-
-      nextEntries.push({
-        type: entry.type,
-        score: entry.score,
-      });
-      entriesByStudentId.set(entry.studentId, nextEntries);
-    }
-
-    const studentsByClassNumber = new Map<number, typeof students>();
+    const aggregateRows = await this.fetchStudentAggregates(
+      filters,
+      students.map((student) => student.studentId),
+    );
+    const totalsByStudentId = buildTotalsByStudentId(aggregateRows);
+    const classMap = new Map<number, StudentMileageSummary[]>();
 
     for (const student of students) {
-      const nextStudents = studentsByClassNumber.get(student.classNumber) ?? [];
+      const summary = buildStudentMileageSummaryFromTotals(
+        student,
+        totalsByStudentId.get(student.studentId) ?? EMPTY_TOTALS,
+      );
+      const nextSummaries = classMap.get(summary.classNumber) ?? [];
 
-      nextStudents.push(student);
-      studentsByClassNumber.set(student.classNumber, nextStudents);
+      nextSummaries.push(summary);
+      classMap.set(summary.classNumber, nextSummaries);
     }
 
-    const classes = [...studentsByClassNumber.entries()]
+    const classes = [...classMap.entries()]
       .map(([classNumber, classStudents]) =>
-        buildClassMileageSummary(
-          classNumber,
-          classStudents.map((student) =>
-            buildStudentMileageSummary(
-              student,
-              entriesByStudentId.get(student.studentId) ?? [],
-            ),
-          ),
-        ),
+        buildClassMileageSummary(classNumber, classStudents),
       )
       .sort((left, right) => left.classNumber - right.classNumber);
 
@@ -308,25 +262,129 @@ export class DormMileageAnalyticsService {
 
     return students.map((student) => student.studentId);
   }
+
+  private async fetchStudentAggregates(
+    filters: ReturnType<typeof parseAnalyticsFilters>,
+    studentIds: string[],
+  ) {
+    return this.prisma.$queryRaw<StudentAggregateRow[]>(Prisma.sql`
+      SELECT
+        e.student_id AS "studentId",
+        e.type AS "type",
+        COUNT(*)::int AS "count",
+        COALESCE(SUM(e.score), 0)::int AS "totalScore"
+      FROM dorm_mileage_entries e
+      ${buildEntryWhereSql(filters, studentIds)}
+      GROUP BY e.student_id, e.type
+    `);
+  }
 }
 
-function buildEntryWhere(
+function buildEntryWhereSql(
   filters: ReturnType<typeof parseAnalyticsFilters>,
   studentIds?: string[],
 ) {
+  const conditions = [Prisma.sql`e.deleted_at IS NULL`];
+
+  if (filters.startDate) {
+    conditions.push(Prisma.sql`e.awarded_at >= ${filters.startDate}`);
+  }
+
+  if (filters.endDate) {
+    conditions.push(Prisma.sql`e.awarded_at <= ${filters.endDate}`);
+  }
+
+  if (studentIds?.length) {
+    conditions.push(Prisma.sql`e.student_id IN (${Prisma.join(studentIds)})`);
+  }
+
+  return Prisma.sql`WHERE ${Prisma.join(conditions, ' AND ')}`;
+}
+
+function buildStudentMileageSummaryFromTotals(
+  student: StudentSummary,
+  totals: StudentTotals,
+): StudentMileageSummary {
   return {
-    deletedAt: null,
-    awardedAt:
-      filters.startDate || filters.endDate
-        ? {
-            gte: filters.startDate ?? undefined,
-            lte: filters.endDate ?? undefined,
-          }
-        : undefined,
-    studentId: studentIds
-      ? {
-          in: studentIds,
-        }
-      : undefined,
+    ...student,
+    rewardTotal: totals.rewardTotal,
+    penaltyTotal: totals.penaltyTotal,
+    netScore: totals.rewardTotal - totals.penaltyTotal,
+    entryCount: totals.entryCount,
   };
+}
+
+function buildTotalsByStudentId(rows: StudentAggregateRow[]) {
+  const totalsByStudentId = new Map<string, StudentTotals>();
+
+  for (const row of rows) {
+    const nextTotals = totalsByStudentId.get(row.studentId) ?? {
+      rewardTotal: 0,
+      penaltyTotal: 0,
+      entryCount: 0,
+    };
+
+    if (row.type === 'REWARD') {
+      nextTotals.rewardTotal += row.totalScore;
+    } else {
+      nextTotals.penaltyTotal += row.totalScore;
+    }
+
+    nextTotals.entryCount += row.count;
+    totalsByStudentId.set(row.studentId, nextTotals);
+  }
+
+  return totalsByStudentId;
+}
+
+function mapCategoryStat(row: CategoryAggregateRow) {
+  return {
+    category: row.category,
+    type: toApiDormMileageType(row.type),
+    count: row.count,
+    totalScore: row.totalScore,
+  };
+}
+
+function mapTopRuleStat(row: TopRuleAggregateRow) {
+  return {
+    ruleId: row.ruleId,
+    ruleName: row.ruleName,
+    category: row.category,
+    type: toApiDormMileageType(row.type),
+    count: row.count,
+    totalScore: row.totalScore,
+  };
+}
+
+function emptyOverview() {
+  return {
+    summary: {
+      rewardCount: 0,
+      penaltyCount: 0,
+      rewardSum: 0,
+      penaltySum: 0,
+      uniqueStudents: 0,
+      totalCount: 0,
+    },
+    categoryStats: [],
+    topRules: [],
+  };
+}
+
+function emptyClassAnalytics() {
+  return {
+    classes: [] as ClassMileageSummary[],
+    overall: {
+      classCount: 0,
+      totalStudents: 0,
+      rewardTotal: 0,
+      penaltyTotal: 0,
+      netScore: 0,
+    },
+  };
+}
+
+function toApiDormMileageType(type: DormMileageType): DormMileageApiType {
+  return type === 'REWARD' ? 'reward' : 'penalty';
 }

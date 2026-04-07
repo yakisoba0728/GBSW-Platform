@@ -20,19 +20,27 @@ const ThemeToggle = dynamic(() => import('./ThemeToggle'), {
 
 type ChangePasswordFormProps = {
   accountId: string
-  role: 'student' | 'teacher'
+  role: 'super-admin' | 'student' | 'teacher'
+  requireCurrentPassword?: boolean
+  successRedirectTo?: string
+  embedded?: boolean
 }
 
 export default function ChangePasswordForm({
   accountId,
   role,
+  requireCurrentPassword = false,
+  successRedirectTo,
+  embedded = false,
 }: ChangePasswordFormProps) {
   const router = useRouter()
   const prefersReducedMotion = useMotionPreference()
   const panelMotion = getSectionMotion(prefersReducedMotion)
   const errorMotion = getInlineMessageMotion(prefersReducedMotion)
+  const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -41,6 +49,11 @@ export default function ChangePasswordForm({
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setErrorMessage('')
+
+    if (requireCurrentPassword && currentPassword.trim().length === 0) {
+      setErrorMessage('현재 비밀번호를 입력해주세요.')
+      return
+    }
 
     if (newPassword !== confirmPassword) {
       setErrorMessage('새 비밀번호 확인이 일치하지 않습니다.')
@@ -53,7 +66,10 @@ export default function ChangePasswordForm({
       const response = await fetch('/api/auth/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newPassword }),
+        body: JSON.stringify({
+          ...(requireCurrentPassword ? { currentPassword } : {}),
+          newPassword,
+        }),
       })
 
       const payload = await response.json().catch(() => null)
@@ -64,7 +80,9 @@ export default function ChangePasswordForm({
       }
 
       const redirectTo =
-        typeof payload?.redirectTo === 'string' && payload.redirectTo.length > 0
+        typeof successRedirectTo === 'string' && successRedirectTo.length > 0
+          ? successRedirectTo
+          : typeof payload?.redirectTo === 'string' && payload.redirectTo.length > 0
           ? payload.redirectTo
           : '/'
 
@@ -78,21 +96,22 @@ export default function ChangePasswordForm({
   }
 
   return (
-    <section style={{ display: 'flex', minHeight: '100svh', flex: 1, flexDirection: 'column', backgroundColor: 'var(--bg)', transition: 'background-color 0.3s' }}>
-      {/* 상단 바 */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 32px' }}>
-        <div className="flex lg:hidden" style={{ alignItems: 'center', gap: 8 }}>
-          <Image src="/gbsw-logo.png" alt="GBSW" width={22} height={22} style={{ opacity: 0.6 }} />
-          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)' }}>
-            GBSW Platform
-          </span>
+    <section style={{ display: 'flex', minHeight: embedded ? 'auto' : '100svh', flex: 1, flexDirection: 'column', backgroundColor: 'var(--bg)', transition: 'background-color 0.3s' }}>
+      {!embedded && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 32px' }}>
+          <div className="flex lg:hidden" style={{ alignItems: 'center', gap: 8 }}>
+            <Image src="/gbsw-logo.png" alt="GBSW" width={22} height={22} style={{ opacity: 0.6 }} />
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg)' }}>
+              GBSW Platform
+            </span>
+          </div>
+          <div className="hidden lg:block" />
+          <ThemeToggle />
         </div>
-        <div className="hidden lg:block" />
-        <ThemeToggle />
-      </div>
+      )}
 
       {/* 폼 영역 */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 32px 40px' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: embedded ? '24px' : '24px 32px 40px' }}>
         <motion.div
           initial={panelMotion.initial}
           animate={panelMotion.animate}
@@ -105,14 +124,19 @@ export default function ChangePasswordForm({
               Password Update
             </p>
             <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--fg)', lineHeight: 1.2, letterSpacing: '-0.02em', marginBottom: 10 }}>
-              첫 로그인 비밀번호를 바꿔주세요
+              {role === 'super-admin'
+                ? '최고관리자 비밀번호를 변경하세요'
+                : '첫 로그인 비밀번호를 바꿔주세요'}
             </h1>
             <p style={{ fontSize: 14, color: 'var(--fg-muted)', lineHeight: 1.6 }}>
-              {role === 'student' ? '학생' : '교사'} 계정{' '}
+              {role === 'super-admin'
+                ? '최고관리자 계정 '
+                : `${role === 'student' ? '학생' : '교사'} 계정 `}
               <span style={{ fontWeight: 600, color: 'var(--fg)' }}>{accountId}</span>
-              는 임시 비밀번호 상태입니다. 새 비밀번호를 설정한 뒤 계속 진행할 수 있습니다.
+              {role === 'super-admin'
+                ? '의 비밀번호를 제품 안에서 바로 교체할 수 있습니다.'
+                : '는 임시 비밀번호 상태입니다. 새 비밀번호를 설정한 뒤 계속 진행할 수 있습니다.'}
             </p>
-            {/* 안내 박스 */}
             <div style={{
               marginTop: 12,
               padding: '10px 14px',
@@ -122,12 +146,27 @@ export default function ChangePasswordForm({
               fontSize: 12,
               color: 'var(--fg-muted)',
             }}>
-              임시 비밀번호 변경 상태에서만 현재 비밀번호 입력이 생략됩니다.
+              {requireCurrentPassword
+                ? '보안을 위해 현재 비밀번호를 먼저 확인합니다.'
+                : '임시 비밀번호 변경 상태에서만 현재 비밀번호 입력이 생략됩니다.'}
             </div>
           </div>
 
           {/* 폼 */}
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {requireCurrentPassword && (
+              <PasswordField
+                id="current-password"
+                label="현재 비밀번호"
+                autoComplete="current-password"
+                placeholder="현재 비밀번호를 입력하세요"
+                value={currentPassword}
+                onChange={setCurrentPassword}
+                isVisible={showCurrentPassword}
+                onToggleVisibility={() => setShowCurrentPassword((v) => !v)}
+                disabled={isSubmitting}
+              />
+            )}
             <PasswordField
               id="new-password"
               label="새 비밀번호"
@@ -189,7 +228,9 @@ export default function ChangePasswordForm({
 
           {/* 로그아웃 */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 20, fontSize: 13, color: 'var(--fg-muted)' }}>
-            <span>다른 계정으로 다시 로그인하려면</span>
+            <span>
+              {embedded ? '변경 후에도 현재 세션은 새로 발급됩니다.' : '다른 계정으로 다시 로그인하려면'}
+            </span>
             <LogoutButton
               style={{
                 padding: '6px 14px',

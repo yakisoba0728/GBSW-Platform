@@ -7,6 +7,7 @@ type DormRulesContextValue = {
   rules: DormMileageRuleSummary[]
   isRulesLoading: boolean
   rulesError: string | null
+  isDormTeacher: boolean | null
   loadRules: () => Promise<void>
 }
 
@@ -22,6 +23,8 @@ export function DormRulesProvider({
   const [rules, setRules] = useState<DormMileageRuleSummary[]>([])
   const [isRulesLoading, setIsRulesLoading] = useState(true)
   const [rulesError, setRulesError] = useState<string | null>(null)
+  const [isDormTeacher, setIsDormTeacher] = useState<boolean | null>(null)
+  const shouldLoadDormAccess = apiPath.startsWith('/api/teacher/')
 
   const loadRules = useCallback(async () => {
     setIsRulesLoading(true)
@@ -52,18 +55,46 @@ export function DormRulesProvider({
     }
   }, [apiPath])
 
+  const loadDormAccess = useCallback(async () => {
+    if (!shouldLoadDormAccess) {
+      setIsDormTeacher(null)
+      return
+    }
+
+    try {
+      const response = await fetch('/api/teacher/dorm-mileage/access', {
+        cache: 'no-store',
+      })
+      const result = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        setIsDormTeacher(false)
+        return
+      }
+
+      setIsDormTeacher(result?.isDormTeacher ?? false)
+    } catch {
+      setIsDormTeacher(false)
+    }
+  }, [shouldLoadDormAccess])
+
   useEffect(() => {
     void loadRules()
   }, [loadRules])
+
+  useEffect(() => {
+    void loadDormAccess()
+  }, [loadDormAccess])
 
   const value = useMemo(
     () => ({
       rules,
       isRulesLoading,
       rulesError,
+      isDormTeacher,
       loadRules,
     }),
-    [isRulesLoading, loadRules, rules, rulesError],
+    [isDormTeacher, isRulesLoading, loadRules, rules, rulesError],
   )
 
   return <DormRulesContext.Provider value={value}>{children}</DormRulesContext.Provider>

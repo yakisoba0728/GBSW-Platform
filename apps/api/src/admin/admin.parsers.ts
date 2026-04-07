@@ -1,6 +1,9 @@
+import { randomBytes } from 'node:crypto';
 import { BadRequestException } from '@nestjs/common';
 import { Prisma, School } from '@prisma/client';
 import {
+  parseOptionalPositiveIntInput,
+  parseOptionalTextInput,
   parseRequiredPositiveIntInput,
   parseRequiredTextInput,
   toInputText,
@@ -37,12 +40,32 @@ export function parsePositiveInt(
   return parseRequiredPositiveIntInput(value, label, min, max);
 }
 
-export function parseRequiredText(value: unknown, label: string) {
-  return parseRequiredTextInput(value, `${label}을 입력해주세요.`);
+export function parseRequiredText(
+  value: unknown,
+  label: string,
+  maxLength = 100,
+) {
+  const text = parseRequiredTextInput(
+    value,
+    `${label}을 입력해주세요.`,
+  );
+
+  if (text.length > maxLength) {
+    throw new BadRequestException(`${label}은(는) ${maxLength}자 이하여야 합니다.`);
+  }
+
+  return text;
 }
 
 export function parsePhone(value: unknown) {
   const phone = toInputText(value);
+
+  if (phone.length > 30) {
+    throw new BadRequestException(
+      '전화번호는 010-0000-0000 형식으로 입력해주세요.',
+    );
+  }
+
   const digits = extractPhoneDigits(phone);
 
   if (!/^010\d{8}$/.test(digits)) {
@@ -77,6 +100,10 @@ export function parseMajorSubject(value: unknown) {
     throw new BadRequestException('전공과목을 입력하거나 선택해주세요.');
   }
 
+  if (majorSubject.length > 100) {
+    throw new BadRequestException('전공과목은(는) 100자 이하여야 합니다.');
+  }
+
   return majorSubject;
 }
 
@@ -85,11 +112,15 @@ export function parseBoolean(value: unknown) {
     return value;
   }
 
-  if (typeof value === 'string') {
-    return value === 'true';
+  if (value === 'true') {
+    return true;
   }
 
-  return false;
+  if (value === 'false') {
+    return false;
+  }
+
+  throw new BadRequestException('boolean 값(true/false)을 입력해주세요.');
 }
 
 export function buildStudentId(
@@ -104,8 +135,54 @@ export function buildStudentId(
   return `${prefix}${year}${pad(classNumber)}${pad(studentNumber)}`;
 }
 
-export function buildTemporaryPassword(accountId: string, phone: string) {
-  return `${accountId}${phone.slice(-4)}`;
+export function generateTemporaryPassword() {
+  return randomBytes(8).toString('hex');
+}
+
+export function parseOptionalPhone(value: unknown) {
+  const phone = parseOptionalTextInput(value);
+
+  if (!phone) {
+    return undefined;
+  }
+
+  return parsePhone(phone);
+}
+
+export function parseOptionalMajorSubject(value: unknown) {
+  const majorSubject = parseOptionalTextInput(value, 100);
+
+  return majorSubject ? majorSubject : undefined;
+}
+
+export function parseOptionalRequiredText(
+  value: unknown,
+  label: string,
+  maxLength = 100,
+) {
+  const text = parseOptionalTextInput(value);
+
+  return text ? parseRequiredText(value, label, maxLength) : undefined;
+}
+
+export function parseOptionalSchool(value: unknown) {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+
+  return parseSchool(value);
+}
+
+export function parseOptionalYear(value: unknown, label: string) {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+
+  return parseYearWithLabel(value, label);
+}
+
+export function parseOptionalCurrentNumber(value: unknown, label: string) {
+  return parseOptionalPositiveIntInput(value, label, 1, 99);
 }
 
 export function isUniqueConstraintError(error: unknown) {

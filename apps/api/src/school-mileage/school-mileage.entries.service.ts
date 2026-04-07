@@ -24,9 +24,14 @@ export class SchoolMileageEntriesService {
 
   async createEntries(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     body: Record<string, unknown>,
   ) {
-    const teacher = await assertTeacherExists(this.prisma, actorTeacherId);
+    const teacher = await assertTeacherExists(
+      this.prisma,
+      actorTeacherId,
+      actorSessionId,
+    );
     const entries = parseCreateEntryInput(body.entries);
 
     const studentIds = Array.from(
@@ -40,6 +45,7 @@ export class SchoolMileageEntriesService {
           studentId: {
             in: studentIds,
           },
+          isActive: true,
         },
         select: {
           studentId: true,
@@ -113,9 +119,10 @@ export class SchoolMileageEntriesService {
 
   async getEntries(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     query: Record<string, unknown>,
   ) {
-    await assertTeacherExists(this.prisma, actorTeacherId);
+    await assertTeacherExists(this.prisma, actorTeacherId, actorSessionId);
 
     const filters = parseEntryFilters(query);
     const { page, pageSize } = filters;
@@ -182,10 +189,15 @@ export class SchoolMileageEntriesService {
 
   async updateEntry(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     id: string,
     body: Record<string, unknown>,
   ) {
-    const teacher = await assertTeacherExists(this.prisma, actorTeacherId);
+    const teacher = await assertTeacherExists(
+      this.prisma,
+      actorTeacherId,
+      actorSessionId,
+    );
     const entryId = parseEntryId(id);
     const updateInput = parseUpdateEntryInput(body);
 
@@ -245,8 +257,16 @@ export class SchoolMileageEntriesService {
     };
   }
 
-  async deleteEntry(actorTeacherId: string | undefined, id: string) {
-    const teacher = await assertTeacherExists(this.prisma, actorTeacherId);
+  async deleteEntry(
+    actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
+    id: string,
+  ) {
+    const teacher = await assertTeacherExists(
+      this.prisma,
+      actorTeacherId,
+      actorSessionId,
+    );
     const entryId = parseEntryId(id);
 
     const existingEntry = await this.prisma.schoolMileageEntry.findFirst({
@@ -281,9 +301,14 @@ export class SchoolMileageEntriesService {
   }
   async getMyEntries(
     actorStudentId: string | undefined,
+    actorSessionId: string | undefined,
     query: Record<string, unknown>,
   ) {
-    const student = await assertStudentExists(this.prisma, actorStudentId);
+    const student = await assertStudentExists(
+      this.prisma,
+      actorStudentId,
+      actorSessionId,
+    );
 
     const filters = parseEntryFilters({
       ...query,

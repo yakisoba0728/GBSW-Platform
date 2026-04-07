@@ -16,20 +16,36 @@ export function toInputText(value: unknown) {
   return '';
 }
 
-export function parseRequiredTextInput(value: unknown, message: string) {
+export function parseRequiredTextInput(
+  value: unknown,
+  message: string,
+  maxLength?: number,
+) {
   const text = toInputText(value);
 
   if (!text) {
     throw new BadRequestException(message);
   }
 
+  if (maxLength !== undefined && text.length > maxLength) {
+    throw new BadRequestException(`최대 ${maxLength}자까지 입력할 수 있습니다.`);
+  }
+
   return text;
 }
 
-export function parseOptionalTextInput(value: unknown) {
+export function parseOptionalTextInput(value: unknown, maxLength?: number) {
   const text = toInputText(value);
 
-  return text.length > 0 ? text : undefined;
+  if (!text) {
+    return undefined;
+  }
+
+  if (maxLength !== undefined && text.length > maxLength) {
+    throw new BadRequestException(`최대 ${maxLength}자까지 입력할 수 있습니다.`);
+  }
+
+  return text;
 }
 
 export function parseRequiredPositiveIntInput(

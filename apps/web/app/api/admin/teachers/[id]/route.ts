@@ -1,12 +1,24 @@
 import { NextRequest } from 'next/server'
-import { proxyAdminWriteRequest } from '@/lib/admin-api'
+import { proxyAdminRequest } from '@/lib/admin-api'
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params
+  return proxyAdminRequest(
+    request,
+    `/admin/teachers/${encodeURIComponent(id)}`,
+    'GET',
+  )
+}
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params
-  return proxyAdminWriteRequest(
+  return proxyAdminRequest(
     request,
     `/admin/teachers/${encodeURIComponent(id)}`,
     'PATCH',

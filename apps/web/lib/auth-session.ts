@@ -11,6 +11,7 @@ export type AuthSession = {
   role: AuthRole
   mustChangePassword: boolean
   expiresAt: string
+  school?: 'GBSW' | 'BYMS'
 }
 
 export const AUTH_SESSION_COOKIE = 'gbsw-auth-session'
@@ -182,6 +183,14 @@ function parseAuthSession(value: unknown) {
     return null
   }
 
+  if (
+    session.school !== undefined &&
+    session.school !== 'GBSW' &&
+    session.school !== 'BYMS'
+  ) {
+    return null
+  }
+
   const expiresAtMs = Date.parse(session.expiresAt)
 
   if (!Number.isFinite(expiresAtMs) || expiresAtMs <= Date.now()) {
@@ -194,5 +203,6 @@ function parseAuthSession(value: unknown) {
     role: session.role,
     mustChangePassword: session.mustChangePassword,
     expiresAt: new Date(expiresAtMs).toISOString(),
+    ...(session.school ? { school: session.school } : {}),
   } satisfies AuthSession
 }

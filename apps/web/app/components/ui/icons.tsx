@@ -15,6 +15,7 @@ import {
   Trash2,
   X,
   LogOut,
+  Lock,
 } from 'lucide-react'
 import type { LucideProps } from 'lucide-react'
 
@@ -82,4 +83,8 @@ export function XIcon({ size = 15, ...props }: IconProps) {
 
 export function LogOutIcon({ size = 14, ...props }: IconProps) {
   return <LogOut size={size} strokeWidth={2} aria-hidden="true" {...props} />
+}
+
+export function LockIcon({ size = 15, ...props }: IconProps) {
+  return <Lock size={size} strokeWidth={2} aria-hidden="true" {...props} />
 }

@@ -51,20 +51,35 @@ export class SchoolMileageService {
     );
   }
 
+  toggleRule(
+    actorSuperAdminId: string | undefined,
+    actorSessionId: string | undefined,
+    id: string,
+  ) {
+    return this.rulesService.toggleRule(actorSuperAdminId, actorSessionId, id);
+  }
+
   getStudents(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     query: Record<string, unknown>,
   ) {
-    return this.studentsService.getStudents(actorTeacherId, query);
+    return this.studentsService.getStudents(
+      actorTeacherId,
+      actorSessionId,
+      query,
+    );
   }
 
   getStudentSummary(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     studentId: string,
     query: Record<string, unknown>,
   ) {
     return this.studentsService.getStudentSummary(
       actorTeacherId,
+      actorSessionId,
       studentId,
       query,
     );
@@ -72,63 +87,112 @@ export class SchoolMileageService {
 
   createEntries(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     body: Record<string, unknown>,
   ) {
-    return this.entriesService.createEntries(actorTeacherId, body);
+    return this.entriesService.createEntries(
+      actorTeacherId,
+      actorSessionId,
+      body,
+    );
   }
 
   getEntries(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     query: Record<string, unknown>,
   ) {
-    return this.entriesService.getEntries(actorTeacherId, query);
+    return this.entriesService.getEntries(
+      actorTeacherId,
+      actorSessionId,
+      query,
+    );
   }
 
   updateEntry(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     id: string,
     body: Record<string, unknown>,
   ) {
-    return this.entriesService.updateEntry(actorTeacherId, id, body);
+    return this.entriesService.updateEntry(
+      actorTeacherId,
+      actorSessionId,
+      id,
+      body,
+    );
   }
 
-  deleteEntry(actorTeacherId: string | undefined, id: string) {
-    return this.entriesService.deleteEntry(actorTeacherId, id);
+  deleteEntry(
+    actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
+    id: string,
+  ) {
+    return this.entriesService.deleteEntry(actorTeacherId, actorSessionId, id);
   }
 
   getOverviewAnalytics(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     query: Record<string, unknown>,
   ) {
-    return this.analyticsService.getOverview(actorTeacherId, query);
+    return this.analyticsService.getOverview(
+      actorTeacherId,
+      actorSessionId,
+      query,
+    );
   }
 
   getStudentAnalytics(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     query: Record<string, unknown>,
   ) {
-    return this.analyticsService.getStudentAnalytics(actorTeacherId, query);
+    return this.analyticsService.getStudentAnalytics(
+      actorTeacherId,
+      actorSessionId,
+      query,
+    );
   }
 
   getClassAnalytics(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     query: Record<string, unknown>,
   ) {
-    return this.analyticsService.getClassAnalytics(actorTeacherId, query);
+    return this.analyticsService.getClassAnalytics(
+      actorTeacherId,
+      actorSessionId,
+      query,
+    );
   }
 
-  getMyMileageSummary(actorStudentId: string | undefined) {
-    return this.studentsService.getMyMileageSummary(actorStudentId);
+  getMyMileageSummary(
+    actorStudentId: string | undefined,
+    actorSessionId: string | undefined,
+  ) {
+    return this.studentsService.getMyMileageSummary(
+      actorStudentId,
+      actorSessionId,
+    );
   }
 
   getMyEntries(
     actorStudentId: string | undefined,
+    actorSessionId: string | undefined,
     query: Record<string, unknown>,
   ) {
-    return this.entriesService.getMyEntries(actorStudentId, query);
+    return this.entriesService.getMyEntries(
+      actorStudentId,
+      actorSessionId,
+      query,
+    );
   }
 
-  getMyActiveRules(actorStudentId: string | undefined) {
-    return this.rulesService.getActiveRules(actorStudentId);
+  getMyActiveRules(
+    actorStudentId: string | undefined,
+    actorSessionId: string | undefined,
+  ) {
+    return this.rulesService.getActiveRules(actorStudentId, actorSessionId);
   }
 }

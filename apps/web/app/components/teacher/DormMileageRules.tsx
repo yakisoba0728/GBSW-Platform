@@ -36,6 +36,8 @@ export default function DormMileageRules({
   const [typeFilter, setTypeFilter] = useState<'' | MileageType>('')
   const [categoryFilter, setCategoryFilter] = useState('')
   const [hoveredRowId, setHoveredRowId] = useState<number | null>(null)
+  const [toggleRuleId, setToggleRuleId] = useState<number | null>(null)
+  const [toggleError, setToggleError] = useState<string | null>(null)
 
   const [formModalOpen, setFormModalOpen] = useState(false)
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
@@ -76,6 +78,31 @@ export default function DormMileageRules({
     setFormMode('edit')
     setEditingRule(rule)
     setFormModalOpen(true)
+  }
+
+  async function handleToggle(rule: DormMileageRuleSummary) {
+    setToggleError(null)
+    setToggleRuleId(rule.id)
+
+    try {
+      const response = await fetch(`${apiPath}/${rule.id}/toggle`, {
+        method: 'PATCH',
+      })
+      const payload = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        setToggleError(
+          payload?.message ?? '기숙사 상벌점 항목 상태를 변경하지 못했습니다.',
+        )
+        return
+      }
+
+      await loadRules()
+    } catch {
+      setToggleError('기숙사 상벌점 항목 상태 변경 중 문제가 발생했습니다.')
+    } finally {
+      setToggleRuleId(null)
+    }
   }
 
   async function handleFormSuccess() {
@@ -136,6 +163,14 @@ export default function DormMileageRules({
         <NoticeBox type="error" message={rulesError} />
       )}
 
+      {toggleError && (
+        <NoticeBox
+          type="error"
+          message={toggleError}
+          onDismiss={() => setToggleError(null)}
+        />
+      )}
+
       <Card>
         <FilterRow>
           <div className="relative flex-1" style={{ minWidth: '160px' }}>
@@ -190,17 +225,17 @@ export default function DormMileageRules({
           <table className="w-full text-xs">
             <thead className="table-header">
               <tr>
-                {['ID', '유형', '카테고리', '항목명', '기본점수', '순서', ...(readOnly ? [] : [''])].map((h) => (
+                {['ID', '유형', '카테고리', '항목명', '기본점수', '순서', '상태', ...(readOnly ? [] : ['작업'])].map((h) => (
                   <th key={h} className="px-3">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {isRulesLoading ? (
-                <TableRowSkeleton columns={readOnly ? 6 : 7} count={6} />
+                <TableRowSkeleton columns={readOnly ? 7 : 8} count={6} />
               ) : rulesError ? (
                 <tr>
-                  <td colSpan={readOnly ? 6 : 7} className="p-0">
+                  <td colSpan={readOnly ? 7 : 8} className="p-0">
                     <div className="flex min-h-[320px] items-center justify-center p-4">
                       <NoticeBox type="error" message={rulesError} />
                     </div>
@@ -208,7 +243,7 @@ export default function DormMileageRules({
                 </tr>
               ) : filteredRules.length === 0 ? (
                 <tr>
-                  <td colSpan={readOnly ? 6 : 7} className="p-0">
+                  <td colSpan={readOnly ? 7 : 8} className="p-0">
                     <div className="flex min-h-[320px]">
                       <ListEmptyState
                         fill
@@ -235,6 +270,7 @@ export default function DormMileageRules({
                         hoveredRowId === rule.id
                           ? 'var(--accent-subtle)'
                           : 'transparent',
+                      opacity: rule.isActive ? 1 : 0.7,
                     }}
                     onMouseEnter={() => setHoveredRowId(rule.id)}
                     onMouseLeave={() => setHoveredRowId(null)}
@@ -257,12 +293,23 @@ export default function DormMileageRules({
                     <td className="px-3 py-2" style={{ color: 'var(--fg-muted)', fontFamily: 'var(--font-space-grotesk)' }}>
                       {rule.displayOrder}
                     </td>
+                    <td className="px-3 py-2">
+                      <span
+                        className="rounded-full px-2 py-0.5 text-[11px] font-semibold"
+                        style={{
+                          fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                          backgroundColor: rule.isActive
+                            ? 'rgba(34,197,94,0.12)'
+                            : 'rgba(148,163,184,0.18)',
+                          color: rule.isActive ? '#15803d' : 'var(--fg-muted)',
+                        }}
+                      >
+                        {rule.isActive ? '활성' : '비활성'}
+                      </span>
+                    </td>
                     {!readOnly && (
                       <td className="px-3 py-2">
-                        <div
-                          className="flex items-center gap-1.5 transition-opacity"
-                          style={{ opacity: hoveredRowId === rule.id ? 1 : 0 }}
-                        >
+                        <div className="flex items-center gap-1.5 transition-opacity" style={{ opacity: hoveredRowId === rule.id ? 1 : 0 }}>
                           <Button
                             variant="secondary"
                             size="sm"
@@ -270,6 +317,15 @@ export default function DormMileageRules({
                             onClick={() => handleEdit(rule)}
                           >
                             수정
+                          </Button>
+                          <Button
+                            variant={rule.isActive ? 'ghost' : 'accent'}
+                            size="sm"
+                            loading={toggleRuleId === rule.id}
+                            disabled={toggleRuleId === rule.id}
+                            onClick={() => void handleToggle(rule)}
+                          >
+                            {rule.isActive ? '비활성화' : '활성화'}
                           </Button>
                         </div>
                       </td>

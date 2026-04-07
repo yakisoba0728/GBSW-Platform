@@ -1,7 +1,9 @@
 import type { DashboardNavItem } from '@/app/components/dashboard-nav'
 import {
+  LockIcon,
   ShieldCheckIcon,
   UserPlusIcon,
+  UsersIcon,
 } from '@/app/components/ui/icons'
 
 export const ADMIN_NAV_ITEMS: DashboardNavItem[] = [
@@ -16,6 +18,16 @@ export const ADMIN_NAV_ITEMS: DashboardNavItem[] = [
     ],
   },
   {
+    id: 'admin-manage',
+    label: '계정 관리',
+    section: '운영',
+    icon: <UsersIcon />,
+    children: [
+      { href: '/admin/students', label: '학생 관리' },
+      { href: '/admin/teachers', label: '교사 관리' },
+    ],
+  },
+  {
     id: 'admin-mileage',
     label: '그린 마일리지',
     section: '마일리지 관리',
@@ -25,5 +37,12 @@ export const ADMIN_NAV_ITEMS: DashboardNavItem[] = [
       { href: '/admin/dorm-mileage/rules', label: '기숙사 상벌점 항목' },
       { href: '/admin/dorm-mileage/teachers', label: '사감 교사 관리' },
     ],
+  },
+  {
+    id: 'admin-security',
+    label: '보안',
+    section: '운영',
+    icon: <LockIcon />,
+    children: [{ href: '/admin/security', label: '비밀번호 변경' }],
   },
 ]

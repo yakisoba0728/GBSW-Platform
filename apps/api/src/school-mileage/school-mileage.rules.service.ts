@@ -29,6 +29,10 @@ export class SchoolMileageRulesService {
     actorSuperAdminId?: string,
     actorSessionId?: string,
   ) {
+    const isSuperAdminRequest =
+      typeof actorSuperAdminId === 'string' &&
+      actorSuperAdminId.trim().length > 0;
+
     await assertTeacherOrSuperAdmin(
       this.prisma,
       actorTeacherId,
@@ -37,7 +41,9 @@ export class SchoolMileageRulesService {
     );
 
     const rules = await this.prisma.schoolMileageRule.findMany({
-      where: { isActive: true },
+      where: {
+        isActive: isSuperAdminRequest ? undefined : true,
+      },
       orderBy: {
         displayOrder: 'asc',
       },
@@ -68,27 +74,7 @@ export class SchoolMileageRulesService {
     const input = parseCreateRuleInput(body);
 
     await this.assertRuleNameAvailable(input.type, input.category, input.name);
-
-    const displayOrder =
-      input.displayOrder ?? (await this.getNextDisplayOrder());
-
-    let createdRule;
-
-    try {
-      createdRule = await this.prisma.schoolMileageRule.create({
-        data: {
-          type: toPrismaMileageType(input.type),
-          category: input.category,
-          name: input.name,
-          defaultScore: input.defaultScore,
-          displayOrder,
-        },
-        select: ruleSummarySelect,
-      });
-    } catch (error) {
-      throwRuleConflictIfNeeded(error);
-      throw error;
-    }
+    const createdRule = await this.createRuleWithRetry(input);
 
     return {
       id: createdRule.id,
@@ -152,8 +138,43 @@ export class SchoolMileageRulesService {
     };
   }
 
-  async getActiveRules(actorStudentId: string | undefined) {
-    await assertStudentExists(this.prisma, actorStudentId);
+  async toggleRule(
+    actorSuperAdminId: string | undefined,
+    actorSessionId: string | undefined,
+    id: string,
+  ) {
+    await assertSuperAdmin(this.prisma, actorSuperAdminId, actorSessionId);
+    const ruleId = parseRuleId(id);
+
+    const rule = await this.prisma.schoolMileageRule.findUnique({
+      where: { id: ruleId },
+      select: { id: true, isActive: true },
+    });
+
+    if (!rule) {
+      throw new NotFoundException('상벌점 항목을 찾을 수 없습니다.');
+    }
+
+    const updated = await this.prisma.schoolMileageRule.update({
+      where: { id: rule.id },
+      data: { isActive: !rule.isActive },
+      select: { isActive: true },
+    });
+
+    return {
+      ok: true,
+      message: updated.isActive
+        ? '상벌점 항목이 활성화되었습니다.'
+        : '상벌점 항목이 비활성화되었습니다.',
+      isActive: updated.isActive,
+    };
+  }
+
+  async getActiveRules(
+    actorStudentId: string | undefined,
+    actorSessionId: string | undefined,
+  ) {
+    await assertStudentExists(this.prisma, actorStudentId, actorSessionId);
 
     const rules = await this.prisma.schoolMileageRule.findMany({
       where: { isActive: true },
@@ -176,6 +197,46 @@ export class SchoolMileageRulesService {
     });
 
     return (result._max.displayOrder ?? 0) + 1;
+  }
+
+  private async createRuleWithRetry(
+    input: ReturnType<typeof parseCreateRuleInput>,
+  ) {
+    const shouldAutoAssign = input.displayOrder === undefined;
+
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const displayOrder =
+        input.displayOrder ?? (await this.getNextDisplayOrder());
+
+      try {
+        return await this.prisma.schoolMileageRule.create({
+          data: {
+            type: toPrismaMileageType(input.type),
+            category: input.category,
+            name: input.name,
+            defaultScore: input.defaultScore,
+            displayOrder,
+          },
+          select: ruleSummarySelect,
+        });
+      } catch (error) {
+        if (
+          shouldAutoAssign &&
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === 'P2002' &&
+          attempt < 2
+        ) {
+          continue;
+        }
+
+        throwRuleConflictIfNeeded(error);
+        throw error;
+      }
+    }
+
+    throw new ConflictException(
+      '표시 순서를 결정하지 못했습니다. 다시 시도해주세요.',
+    );
   }
 
   private async assertRuleNameAvailable(

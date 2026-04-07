@@ -60,6 +60,7 @@ export default function DormMileageGrant({
   }, [checkedRows, rows])
   const canSubmit =
     isDormTeacher && rows.length > 0 && !isRulesLoading && rows.every((row) => row.ruleId !== '')
+  const isReadOnly = !isDormTeacher
 
   function handleStudentsAdded(students: DormMileageStudentOption[]) {
     setRows((prev) => {
@@ -243,7 +244,7 @@ export default function DormMileageGrant({
               <AnimatedCheckbox
                 checked={checkedRows.size === rows.length && rows.length > 0}
                 onChange={toggleAll}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isReadOnly}
                 size={18}
               />
               <span className="text-xs" style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg-muted)' }}>
@@ -252,9 +253,9 @@ export default function DormMileageGrant({
             </div>
           )}
           {rows.length >= 2 && (
-            <Button variant="accent" size="sm" onClick={applyFirstRowToSelected} disabled={!canApplyFirstRow || isSubmitting}>선택 항목에 적용</Button>
+            <Button variant="accent" size="sm" onClick={applyFirstRowToSelected} disabled={!canApplyFirstRow || isSubmitting || isReadOnly}>선택 항목에 적용</Button>
           )}
-          <Button variant="primary" size="sm" icon={<UserPlusIcon size={13} strokeWidth={2.5} />} onClick={() => setIsStudentModalOpen(true)} disabled={isSubmitting}>학생 추가</Button>
+          <Button variant="primary" size="sm" icon={<UserPlusIcon size={13} strokeWidth={2.5} />} onClick={() => { if (!isReadOnly) setIsStudentModalOpen(true) }} disabled={isSubmitting || isReadOnly}>학생 추가</Button>
         </div>
 
         <Card className="flex flex-col flex-1 min-h-0 overflow-hidden">
@@ -289,13 +290,22 @@ export default function DormMileageGrant({
                       row.ruleId === '' ? null : (rulesById.get(row.ruleId) ?? null)
                     }
                     disabled={isSubmitting}
+                    readOnly={isReadOnly}
                     checked={checkedRows.has(row.localId)}
                     onCheckedChange={() => toggleRow(row.localId)}
-                    onOpenRuleModal={() => setRuleModalRowId(row.localId)}
+                    onOpenRuleModal={() => {
+                      if (!isReadOnly) {
+                        setRuleModalRowId(row.localId)
+                      }
+                    }}
                     onReasonChange={(reason) =>
                       updateRow(row.localId, { reason })
                     }
-                    onRemove={() => removeRow(row.localId)}
+                    onRemove={() => {
+                      if (!isReadOnly) {
+                        removeRow(row.localId)
+                      }
+                    }}
                   />
                 ))}
               </div>

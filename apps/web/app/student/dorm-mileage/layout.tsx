@@ -8,7 +8,11 @@ export default async function StudentDormMileageLayout({
 }>) {
   const session = await requireRoleSession('student')
 
-  if (session.accountId.startsWith('BY')) {
+  if (!session.school) {
+    redirect('/')
+  }
+
+  if (session.school === 'BYMS') {
     redirect('/student')
   }
 

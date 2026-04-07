@@ -7,7 +7,7 @@ import { School } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   assertDormTeacherOnly,
-  assertDormTeacherReadAccess,
+  assertTeacherExists,
   assertStudentExists,
 } from './dorm-mileage.access';
 import {
@@ -30,9 +30,14 @@ export class DormMileageEntriesService {
 
   async createEntries(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     body: Record<string, unknown>,
   ) {
-    const actor = await assertDormTeacherOnly(this.prisma, actorTeacherId);
+    const actor = await assertDormTeacherOnly(
+      this.prisma,
+      actorTeacherId,
+      actorSessionId,
+    );
     const entries = parseCreateEntryInput(body.entries);
 
     const studentIds = Array.from(
@@ -46,6 +51,7 @@ export class DormMileageEntriesService {
           studentId: {
             in: studentIds,
           },
+          isActive: true,
           school: School.GBSW,
         },
         select: {
@@ -133,9 +139,10 @@ export class DormMileageEntriesService {
 
   async getEntries(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     query: Record<string, unknown>,
   ) {
-    await assertDormTeacherReadAccess(this.prisma, actorTeacherId);
+    await assertTeacherExists(this.prisma, actorTeacherId, actorSessionId);
 
     const filters = parseEntryFilters(query);
     const { page, pageSize } = filters;
@@ -201,10 +208,15 @@ export class DormMileageEntriesService {
 
   async updateEntry(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     id: string,
     body: Record<string, unknown>,
   ) {
-    const actor = await assertDormTeacherOnly(this.prisma, actorTeacherId);
+    const actor = await assertDormTeacherOnly(
+      this.prisma,
+      actorTeacherId,
+      actorSessionId,
+    );
     const entryId = parseEntryId(id);
     const updateInput = parseUpdateEntryInput(body);
 
@@ -290,9 +302,14 @@ export class DormMileageEntriesService {
 
   async deleteEntry(
     actorTeacherId: string | undefined,
+    actorSessionId: string | undefined,
     id: string,
   ) {
-    const actor = await assertDormTeacherOnly(this.prisma, actorTeacherId);
+    const actor = await assertDormTeacherOnly(
+      this.prisma,
+      actorTeacherId,
+      actorSessionId,
+    );
     const entryId = parseEntryId(id);
 
     const existingEntry = await this.prisma.dormMileageEntry.findFirst({
@@ -330,9 +347,14 @@ export class DormMileageEntriesService {
 
   async getMyEntries(
     actorStudentId: string | undefined,
+    actorSessionId: string | undefined,
     query: Record<string, unknown>,
   ) {
-    const student = await assertStudentExists(this.prisma, actorStudentId);
+    const student = await assertStudentExists(
+      this.prisma,
+      actorStudentId,
+      actorSessionId,
+    );
 
     if (student.school !== School.GBSW) {
       return {
@@ -393,8 +415,8 @@ function hasStudentScope(filters: {
 }) {
   return Boolean(
     filters.grade ||
-      filters.classNumber ||
-      filters.studentName ||
-      filters.studentId,
+    filters.classNumber ||
+    filters.studentName ||
+    filters.studentId,
   );
 }

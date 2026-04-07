@@ -3,29 +3,50 @@ import { proxyApiRequest } from './api-proxy'
 
 type AdminPath =
   | '/admin/students'
+  | `/admin/students/${string}`
+  | `/admin/students/${string}/status`
+  | `/admin/students/${string}/deactivate`
   | '/admin/teachers'
+  | `/admin/teachers/${string}`
+  | `/admin/teachers/${string}/status`
+  | `/admin/teachers/${string}/deactivate`
   | '/admin/students/major-subjects'
+
+type AdminCreatePath = '/admin/students' | '/admin/teachers'
+
+type AdminGetPath =
+  | '/admin/students'
+  | '/admin/students/major-subjects'
+  | '/admin/teachers'
+
+type AdminWritePath =
+  | `/admin/students/${string}`
+  | `/admin/students/${string}/status`
+  | `/admin/students/${string}/deactivate`
+  | `/admin/teachers/${string}`
+  | `/admin/teachers/${string}/status`
+  | `/admin/teachers/${string}/deactivate`
 
 type AdminMileageGetPath = '/school-mileage/rules' | '/dorm-mileage/rules'
 
 type AdminMileageWritePath =
   | '/school-mileage/rules'
   | `/school-mileage/rules/${string}`
+  | `/school-mileage/rules/${string}/toggle`
   | '/dorm-mileage/rules'
   | `/dorm-mileage/rules/${string}`
+  | `/dorm-mileage/rules/${string}/toggle`
 
 export async function proxyAdminCreateRequest(
   request: NextRequest,
-  pathname: '/admin/students' | '/admin/teachers',
+  pathname: AdminCreatePath,
 ) {
   return proxyAdminRequest(request, pathname, 'POST')
 }
 
-type AdminWritePath = `/admin/teachers/${string}`
-
 export async function proxyAdminGetRequest(
   request: NextRequest,
-  pathname: '/admin/students/major-subjects' | '/admin/teachers',
+  pathname: AdminGetPath,
 ) {
   return proxyAdminRequest(request, pathname, 'GET')
 }
@@ -53,17 +74,20 @@ export async function proxyAdminMileageWriteRequest(
   return proxyAdminMileageRequest(request, pathname, method)
 }
 
-async function proxyAdminRequest(
+export async function proxyAdminRequest(
   request: NextRequest,
-  pathname: AdminPath | AdminWritePath,
-  method: 'GET' | 'POST' | 'PATCH',
+  pathname: AdminPath,
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
 ) {
   return proxyApiRequest(request, {
     pathname,
     method,
     allowedRole: 'super-admin',
     unauthorizedMessage: '최고관리자 로그인이 필요합니다.',
-    proxyFailureMessage: '계정 생성 요청을 처리하지 못했습니다.',
+    proxyFailureMessage: '관리자 요청을 처리하지 못했습니다.',
+    actorHeaders: (session) => ({
+      'x-actor-super-admin-id': session.accountId,
+    }),
   })
 }
 

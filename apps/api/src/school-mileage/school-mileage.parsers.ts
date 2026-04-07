@@ -94,7 +94,7 @@ export function parseCreateEntryInput(value: unknown) {
         1000000000,
       ),
       score: parseRequiredPositiveIntInput(entry.score, '점수', 1, 1000000000),
-      reason: parseOptionalTextInput(entry.reason) ?? null,
+      reason: parseOptionalTextInput(entry.reason, 500) ?? null,
     } satisfies CreateEntryInput;
   });
 }
@@ -118,7 +118,7 @@ export function parseUpdateEntryInput(body: Record<string, unknown>) {
       : undefined,
     reasonProvided: hasReason,
     reason: hasReason
-      ? (parseOptionalTextInput(body.reason) ?? null)
+      ? (parseOptionalTextInput(body.reason, 500) ?? null)
       : undefined,
     awardedAt: hasAwardedAt
       ? parseRequiredDateInput(body.awardedAt, '부여 일시')
@@ -129,8 +129,8 @@ export function parseUpdateEntryInput(body: Record<string, unknown>) {
 export function parseCreateRuleInput(body: Record<string, unknown>) {
   return {
     type: parseRequiredMileageType(body.type),
-    category: parseRequiredTextInput(body.category, '카테고리를 입력해주세요.'),
-    name: parseRequiredTextInput(body.name, '항목명을 입력해주세요.'),
+    category: parseRequiredTextInput(body.category, '카테고리를 입력해주세요.', 50),
+    name: parseRequiredTextInput(body.name, '항목명을 입력해주세요.', 100),
     defaultScore: parseRequiredPositiveIntInput(
       body.defaultScore,
       '기본점수',
@@ -153,10 +153,10 @@ export function parseUpdateRuleInput(body: Record<string, unknown>) {
 
   return {
     category: hasCategory
-      ? parseRequiredTextInput(body.category, '카테고리를 입력해주세요.')
+      ? parseRequiredTextInput(body.category, '카테고리를 입력해주세요.', 50)
       : undefined,
     name: hasName
-      ? parseRequiredTextInput(body.name, '항목명을 입력해주세요.')
+      ? parseRequiredTextInput(body.name, '항목명을 입력해주세요.', 100)
       : undefined,
     defaultScore: hasDefaultScore
       ? parseRequiredPositiveIntInput(
