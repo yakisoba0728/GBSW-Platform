@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
-import { ListEmptyState, ListSkeleton } from '../ui/list'
+import { ListEmptyState, LoadingSpinner } from '../ui/list'
 import { Button } from '../ui/button'
 import SuccessModal from '../ui/success-modal'
 import AnimatedCheckbox from '../ui/animated-checkbox'
@@ -10,7 +10,7 @@ import DormRuleSelectionModal from './DormRuleSelectionModal'
 import DormStudentSelectionModal from './DormStudentSelectionModal'
 import DormGrantRowCard, { type DormGrantRow } from './DormGrantRowCard'
 import { Card, NoticeBox } from '../mileage/shared'
-import DormAccessDenied from './DormAccessDenied'
+import AccessDeniedOverlay from '../ui/AccessDeniedOverlay'
 import { useDormRulesContext } from '../dorm-mileage/dorm-rules-context'
 import type {
   CreateDormMileageEntriesPayload,
@@ -232,7 +232,8 @@ export default function DormMileageGrant({
         description={errorModal.message}
       />
 
-      <div className="flex flex-col h-full gap-4">
+      <div className="relative flex flex-col h-full gap-4">
+        {!isDormTeacher && <AccessDeniedOverlay message="사감 교사만 기숙사 상벌점을 부여할 수 있습니다." />}
         {rulesError && <NoticeBox type="error" message={rulesError} />}
 
         {isDormTeacher && (
@@ -258,10 +259,10 @@ export default function DormMileageGrant({
         )}
 
         <Card className="flex flex-col flex-1 min-h-0 overflow-hidden">
-          {!isDormTeacher ? (
-            <DormAccessDenied message="사감 교사만 기숙사 상벌점을 부여할 수 있습니다." />
-          ) : isRulesLoading ? (
-            <ListSkeleton count={3} rowHeight="h-14" />
+          {isRulesLoading ? (
+            <div className="flex h-full min-h-[120px] items-center justify-center">
+              <LoadingSpinner />
+            </div>
           ) : rows.length === 0 ? (
             <ListEmptyState
               fill
