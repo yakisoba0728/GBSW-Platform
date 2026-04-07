@@ -1,5 +1,6 @@
 import { AuthRole } from '@prisma/client';
 import { UnauthorizedException } from '@nestjs/common';
+import { getSuperAdminCredentials } from '../config/runtime-env';
 import type { PrismaService } from '../prisma/prisma.service';
 import { parseRequiredTextInput } from '../common/parsers';
 
@@ -92,17 +93,9 @@ export async function assertSuperAdmin(
     throw new UnauthorizedException('유효한 최고관리자 계정이 아닙니다.');
   }
 
-  const credential = await prisma.superAdminCredential.findFirst({
-    where: {
-      accountId: superAdminId,
-      isActive: true,
-    },
-    select: {
-      accountId: true,
-    },
-  });
+  const credentials = getSuperAdminCredentials();
 
-  if (!credential) {
+  if (superAdminId !== credentials.id) {
     throw new UnauthorizedException('유효한 최고관리자 계정이 아닙니다.');
   }
 

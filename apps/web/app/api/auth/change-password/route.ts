@@ -33,6 +33,13 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  if (session.role === 'super-admin') {
+    return NextResponse.json(
+      { message: '최고관리자 비밀번호 변경은 지원하지 않습니다.' },
+      { status: 400 },
+    )
+  }
+
   const body = await request.json().catch(() => null)
   const currentPassword =
     typeof body?.currentPassword === 'string' ? body.currentPassword : undefined
@@ -116,7 +123,7 @@ function getErrorMessage(payload: unknown, fallback: string) {
 function parseAuthSession(value: unknown): {
   id: string
   accountId: string
-  role: 'super-admin' | 'student' | 'teacher'
+  role: 'student' | 'teacher'
   mustChangePassword: boolean
   expiresAt: string
   school?: 'GBSW' | 'BYMS'
@@ -132,9 +139,7 @@ function parseAuthSession(value: unknown): {
     session.id.trim().length === 0 ||
     typeof session.accountId !== 'string' ||
     session.accountId.trim().length === 0 ||
-    (session.role !== 'super-admin' &&
-      session.role !== 'student' &&
-      session.role !== 'teacher') ||
+    (session.role !== 'student' && session.role !== 'teacher') ||
     typeof session.mustChangePassword !== 'boolean' ||
     typeof session.expiresAt !== 'string'
   ) {

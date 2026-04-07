@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthRole as PrismaAuthRole, School } from '@prisma/client';
+import { getSuperAdminCredentials } from '../config/runtime-env';
 import { PrismaService } from '../prisma/prisma.service';
 import { hashPassword, verifyPassword } from './password';
 import {
@@ -81,11 +82,14 @@ export class AuthService {
       throw new UnauthorizedException('로그인이 필요합니다.');
     }
 
-    // 비밀번호 변경 시도 횟수 제한 (first-login 제외, super-admin 제외)
-    if (
-      actorSession.role !== 'super-admin' &&
-      !actorSession.mustChangePassword
-    ) {
+    if (actorSession.role === 'super-admin') {
+      throw new BadRequestException(
+        '최고관리자 비밀번호 변경은 지원하지 않습니다.',
+      );
+    }
+
+    // 비밀번호 변경 시도 횟수 제한 (first-login 제외)
+    if (!actorSession.mustChangePassword) {
       const throttleKey = `change-pwd:${actorSession.accountId}`;
       const lockedSeconds =
         await this.getChangePasswordCooldownSeconds(throttleKey);
@@ -98,38 +102,29 @@ export class AuthService {
       }
     }
 
-    const currentPassword =
-      actorSession.role === 'super-admin'
-        ? parseRequiredPassword(body.currentPassword, '현재 비밀번호')
-        : actorSession.mustChangePassword
-          ? parsePassword(body.currentPassword)
-          : parseRequiredPassword(body.currentPassword, '현재 비밀번호');
+    const currentPassword = actorSession.mustChangePassword
+      ? parsePassword(body.currentPassword)
+      : parseRequiredPassword(body.currentPassword, '현재 비밀번호');
     const newPassword = parseRequiredPassword(body.newPassword, '새 비밀번호');
 
     validateNewPassword(newPassword);
 
     const user =
-      actorSession.role === 'super-admin'
-        ? await this.changeSuperAdminPassword(
+      actorSession.role === 'student'
+        ? await this.changeStudentPassword(
             actorSession.accountId,
             currentPassword,
             newPassword,
+            actorSession.mustChangePassword,
           )
-        : actorSession.role === 'student'
-          ? await this.changeStudentPassword(
-              actorSession.accountId,
-              currentPassword,
-              newPassword,
-              actorSession.mustChangePassword,
-            )
-          : await this.changeTeacherPassword(
-              actorSession.accountId,
-              currentPassword,
-              newPassword,
-              actorSession.mustChangePassword,
-            );
+        : await this.changeTeacherPassword(
+            actorSession.accountId,
+            currentPassword,
+            newPassword,
+            actorSession.mustChangePassword,
+          );
 
-    if (actorSession.role !== 'super-admin' && !actorSession.mustChangePassword) {
+    if (!actorSession.mustChangePassword) {
       await this.clearFailedLoginAttempts(`change-pwd:${actorSession.accountId}`);
     }
 
@@ -179,7 +174,7 @@ export class AuthService {
   }
 
   private async findAuthenticatedUser(id: string, password: string) {
-    const superAdmin = await this.findAuthenticatedSuperAdmin(id, password);
+    const superAdmin = this.findAuthenticatedSuperAdmin(id, password);
 
     if (superAdmin) {
       return superAdmin;
@@ -234,68 +229,19 @@ export class AuthService {
     return null;
   }
 
-  private async findAuthenticatedSuperAdmin(id: string, password: string) {
-    const credential = await this.prisma.superAdminCredential.findFirst({
-      where: {
-        accountId: id,
-        isActive: true,
-      },
-      select: {
-        accountId: true,
-        passwordHash: true,
-      },
-    });
+  private findAuthenticatedSuperAdmin(id: string, password: string) {
+    const credentials = getSuperAdminCredentials();
 
-    if (!credential || !verifyPassword(password, credential.passwordHash)) {
+    if (id !== credentials.id || password !== credentials.password) {
       return null;
     }
 
     return {
-      accountId: credential.accountId,
+      accountId: credentials.id,
       name: '최고관리자',
       role: 'super-admin',
       mustChangePassword: false,
     } satisfies AuthenticatedUser;
-  }
-
-  private async changeSuperAdminPassword(
-    accountId: string,
-    currentPassword: string,
-    newPassword: string,
-  ) {
-    const credential = await this.prisma.superAdminCredential.findFirst({
-      where: {
-        accountId,
-        isActive: true,
-      },
-      select: {
-        accountId: true,
-        passwordHash: true,
-      },
-    });
-
-    if (
-      !credential ||
-      !verifyPassword(currentPassword, credential.passwordHash)
-    ) {
-      throw new UnauthorizedException('현재 비밀번호가 일치하지 않습니다.');
-    }
-
-    await this.prisma.superAdminCredential.update({
-      where: {
-        accountId: credential.accountId,
-      },
-      data: {
-        passwordHash: hashPassword(newPassword),
-      },
-    });
-
-    return {
-      accountId: credential.accountId,
-      name: '최고관리자',
-      role: 'super-admin' as const,
-      mustChangePassword: false,
-    };
   }
 
   private async changeStudentPassword(
@@ -499,17 +445,9 @@ export class AuthService {
     }
 
     if (session.role === PrismaAuthRole.SUPER_ADMIN) {
-      const credential = await this.prisma.superAdminCredential.findFirst({
-        where: {
-          accountId: session.accountId,
-          isActive: true,
-        },
-        select: {
-          accountId: true,
-        },
-      });
+      const credentials = getSuperAdminCredentials();
 
-      if (!credential) {
+      if (session.accountId !== credentials.id) {
         await this.revokeSessionById(normalizedSessionId);
         return null;
       }

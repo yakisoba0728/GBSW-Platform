@@ -1,4 +1,8 @@
-const REQUIRED_RUNTIME_ENV_NAMES = ['INTERNAL_API_SECRET'] as const;
+const REQUIRED_RUNTIME_ENV_NAMES = [
+  'SUPER_ADMIN_ID',
+  'SUPER_ADMIN_PASSWORD',
+  'INTERNAL_API_SECRET',
+] as const;
 
 type RequiredRuntimeEnvName = (typeof REQUIRED_RUNTIME_ENV_NAMES)[number];
 
@@ -7,8 +11,7 @@ type ApiRuntimeEnv = Record<RequiredRuntimeEnvName, string>;
 let cachedRuntimeEnv: ApiRuntimeEnv | null = null;
 
 export function validateApiRuntimeEnv() {
-  getApiRuntimeEnv();
-  getOptionalSuperAdminBootstrapCredentials();
+  return getApiRuntimeEnv();
 }
 
 export function getApiRuntimeEnv() {
@@ -30,25 +33,12 @@ export function getInternalApiSecret() {
   return getApiRuntimeEnv().INTERNAL_API_SECRET;
 }
 
-export function getOptionalSuperAdminBootstrapCredentials() {
-  const id = readOptionalEnv('SUPER_ADMIN_ID');
-  const passwordHash = readOptionalEnv('SUPER_ADMIN_PASSWORD_HASH');
-
-  if (!id && !passwordHash) {
-    return null;
-  }
-
-  if (!id || !passwordHash) {
-    throw new Error(
-      'SUPER_ADMIN_ID와 SUPER_ADMIN_PASSWORD_HASH는 함께 설정해야 합니다.',
-    );
-  }
-
-  validateSuperAdminPasswordHash(passwordHash);
+export function getSuperAdminCredentials() {
+  const { SUPER_ADMIN_ID, SUPER_ADMIN_PASSWORD } = getApiRuntimeEnv();
 
   return {
-    id,
-    passwordHash,
+    id: SUPER_ADMIN_ID,
+    password: SUPER_ADMIN_PASSWORD,
   };
 }
 
@@ -60,30 +50,4 @@ function readRequiredEnv(name: RequiredRuntimeEnvName) {
   }
 
   return value;
-}
-
-function readOptionalEnv(name: string) {
-  const value = process.env[name]?.trim();
-
-  return value && value.length > 0 ? value : null;
-}
-
-function validateSuperAdminPasswordHash(passwordHash: string) {
-  const [salt, hash] = passwordHash.split(':');
-
-  if (!salt || !hash) {
-    throw new Error(
-      'SUPER_ADMIN_PASSWORD_HASH는 "<salt>:<hash>" 형식이어야 합니다.',
-    );
-  }
-
-  if (!/^[0-9a-f]+$/i.test(salt) || !/^[0-9a-f]+$/i.test(hash)) {
-    throw new Error('SUPER_ADMIN_PASSWORD_HASH는 hex 문자열이어야 합니다.');
-  }
-
-  if (salt.length < 32 || hash.length < 128) {
-    throw new Error(
-      'SUPER_ADMIN_PASSWORD_HASH는 hashPassword로 생성한 값을 사용해야 합니다.',
-    );
-  }
 }

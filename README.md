@@ -22,13 +22,7 @@ pnpm dev
 
 - `INTERNAL_API_SECRET`
 - `SUPER_ADMIN_ID`
-- `SUPER_ADMIN_PASSWORD_HASH`
-
-`SUPER_ADMIN_ID`, `SUPER_ADMIN_PASSWORD_HASH`는 최초 최고관리자 credential bootstrap 또는 복구용입니다. DB에 credential이 이미 있으면 두 값은 매 부팅마다 필수는 아니며, 로그인 검증도 런타임마다 env를 직접 비교하지 않고 DB에 저장된 credential을 사용합니다.
-
-```bash
-node -e "const { randomBytes, scryptSync } = require('node:crypto'); const pw = process.argv[1]; const salt = randomBytes(16).toString('hex'); console.log(`${salt}:${scryptSync(pw, salt, 64).toString('hex')}`)" 'change-me-super-admin-password'
-```
+- `SUPER_ADMIN_PASSWORD`
 
 ## 기본 포트
 
@@ -74,7 +68,8 @@ cp .env.production.example .env.production
 - `POSTGRES_PASSWORD`
 - `INTERNAL_API_SECRET`
 - `NEXT_PUBLIC_API_URL`
-- `SUPER_ADMIN_PASSWORD_HASH` (최초 bootstrap 또는 복구 시)
+- `SUPER_ADMIN_ID`
+- `SUPER_ADMIN_PASSWORD`
 
 위 값은 반드시 운영용으로 변경하세요.
 
