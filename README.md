@@ -106,8 +106,8 @@ node scripts/deploy-production.mjs .env
 
 - `db` 컨테이너를 먼저 기동
 - `.env`의 `POSTGRES_PASSWORD`를 현재 DB 사용자 비밀번호로 동기화
-- `api`, `web` 최신 이미지를 먼저 pull
-- GHCR pull이 실패하면 서버에서 `api`, `web`을 병렬로 로컬 빌드
+- `api`, `web` 최신 이미지를 각각 먼저 pull
+- pull에 실패한 서비스만 서버에서 병렬 로컬 빌드
 - `api`, `web`을 `--no-build`로 재기동
 - healthcheck가 통과할 때까지 대기
 
