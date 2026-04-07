@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { DashboardNavItem } from './dashboard-nav'
@@ -41,17 +41,15 @@ type Props = {
 
 export default function DashboardShell({ roleLabel, navItems, children }: Props) {
   const pathname = usePathname()
-  const searchParams = useSearchParams()
   const prefersReducedMotion = useMotionPreference()
   const overlayMotion = getOverlayMotion(prefersReducedMotion)
   const drawerMotion = getDrawerMotion(prefersReducedMotion)
-  const searchQuery = searchParams.toString()
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(() =>
     getInitialOpenMenus(pathname, navItems),
   )
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [isNavigating, setIsNavigating] = useState(false)
-  const locationKey = searchQuery ? `${pathname}?${searchQuery}` : pathname
+  const locationKey = pathname
   const navigationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const activeLabel = getActiveLabel(pathname, navItems)
