@@ -36,7 +36,7 @@ export function NoticeBox({
             <CircleX size={14} strokeWidth={2.5} aria-hidden="true" />
           )}
         </span>
-        <p className="flex-1 whitespace-pre-line leading-relaxed">{message}</p>
+        <p>{message}</p>
         {onDismiss && (
           <button
             type="button"
