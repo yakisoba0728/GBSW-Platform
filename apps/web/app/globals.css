@@ -55,6 +55,9 @@
   /* Layout */
   --sidebar-width: 256px;
   --header-height: 52px;
+
+  /* Overlay */
+  --overlay-bg: rgba(255, 255, 255, 0.75);
 }
 
 .dark {
@@ -88,6 +91,9 @@
   --panel-logo-brightness: 1.05;
 
   --admin-header-bg: rgba(15, 17, 23, 0.9);
+
+  /* Overlay */
+  --overlay-bg: rgba(15, 17, 23, 0.82);
 }
 
 /* ─── Base reset ─────────────────────────────────────────────── */
