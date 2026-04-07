@@ -184,7 +184,7 @@ export default function DashboardShell({ roleLabel, navItems, children }: Props)
             zIndex: 20,
           }}
         >
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--fg)', letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontSize: 16, fontWeight: 600, color: 'var(--fg)', letterSpacing: '-0.01em' }}>
             {activeLabel}
           </h1>
         </header>

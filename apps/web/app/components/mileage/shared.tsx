@@ -176,7 +176,7 @@ export function FilterSelect({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className={`h-8 rounded-lg border bg-transparent px-2.5 text-xs outline-none transition-colors ${className}`}
+      className={`h-9 rounded-lg border bg-transparent px-2.5 text-xs outline-none transition-colors ${className}`}
       style={{ ...inputStyle, borderColor: 'var(--border)' }}
     >
       {placeholder && <option value="">{placeholder}</option>}
