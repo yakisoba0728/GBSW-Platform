@@ -170,7 +170,7 @@ export function Pagination({
           type="button"
           onClick={() => onChange(Math.max(1, page - 1))}
           disabled={page <= 1}
-          className="icon-btn disabled:cursor-not-allowed disabled:opacity-40"
+          className="icon-btn disabled:cursor-not-allowed disabled:opacity-50"
           aria-label="이전 페이지"
         >
           <ChevronLeft size={12} strokeWidth={2.5} aria-hidden="true" />
@@ -207,7 +207,7 @@ export function Pagination({
           type="button"
           onClick={() => onChange(Math.min(pageCount, page + 1))}
           disabled={page >= pageCount}
-          className="icon-btn disabled:cursor-not-allowed disabled:opacity-40"
+          className="icon-btn disabled:cursor-not-allowed disabled:opacity-50"
           aria-label="다음 페이지"
         >
           <ChevronRight size={12} strokeWidth={2.5} aria-hidden="true" />
