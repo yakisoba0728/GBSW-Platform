@@ -1,13 +1,43 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import { CircleX } from 'lucide-react'
+
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false })
+
+// 모듈 레벨 캐시 (SuccessModal과 동일 패턴)
+const lottieCache = new Map<string, object>()
 
 export default function AccessDeniedOverlay({
   message = '접근 권한이 없습니다.',
 }: {
   message?: string
 }) {
+  const [animationData, setAnimationData] = useState<object | null>(
+    () => lottieCache.get('/lottie/error.json') ?? null,
+  )
+
+  useEffect(() => {
+    if (animationData) return
+
+    let isMounted = true
+    fetch('/lottie/error.json')
+      .then((res) => res.json())
+      .then((data) => {
+        lottieCache.set('/lottie/error.json', data)
+        if (isMounted) setAnimationData(data)
+      })
+      .catch(() => {
+        // 로드 실패 시 CircleX fallback 유지
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [animationData])
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -31,22 +61,34 @@ export default function AccessDeniedOverlay({
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           style={{
-            width: 56,
-            height: 56,
-            borderRadius: '50%',
-            backgroundColor: 'var(--destructive-bg, rgba(239,68,68,0.12))',
+            width: 80,
+            height: 80,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
-          >
-            <CircleX size={28} style={{ color: 'var(--destructive, #ef4444)' }} />
-          </motion.div>
+          {animationData ? (
+            <Lottie
+              animationData={animationData}
+              loop={false}
+              style={{ width: '100%', height: '100%' }}
+            />
+          ) : (
+            <div
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                backgroundColor: 'var(--destructive-bg, rgba(239,68,68,0.12))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <CircleX size={28} style={{ color: 'var(--destructive, #ef4444)' }} />
+            </div>
+          )}
         </motion.div>
         <motion.p
           initial={{ opacity: 0 }}
