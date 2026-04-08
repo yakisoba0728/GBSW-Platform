@@ -315,6 +315,11 @@
   to   { opacity: 1; }
 }
 
+@keyframes progressShrink {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+
 /* View Transition 중 element-level 트랜지션 억제 */
 html.no-transitions *,
 html.no-transitions *::before,
