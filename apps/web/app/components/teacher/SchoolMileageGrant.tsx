@@ -5,7 +5,7 @@ import { ListEmptyState, LoadingSpinner } from '../ui/list'
 import { Button } from '../ui/button'
 import SuccessModal from '../ui/success-modal'
 import AnimatedCheckbox from '../ui/animated-checkbox'
-import { UserPlusIcon } from '../ui/icons'
+import { UserPlusCompactIcon, UserPlusFeatureIcon } from '../ui/icons'
 import RuleSelectionModal from './RuleSelectionModal'
 import StudentSelectionModal from './StudentSelectionModal'
 import GrantRowCard, { type GrantRow } from './GrantRowCard'
@@ -249,7 +249,7 @@ export default function SchoolMileageGrant({
           {rows.length >= 2 && (
             <Button variant="accent" size="sm" onClick={applyFirstRowToSelected} disabled={!canApplyFirstRow || isSubmitting}>선택 항목에 적용</Button>
           )}
-          <Button variant="primary" size="sm" icon={<UserPlusIcon size={13} strokeWidth={2.5} />} onClick={() => setIsStudentModalOpen(true)} disabled={isSubmitting}>학생 추가</Button>
+          <Button variant="primary" size="sm" icon={<UserPlusCompactIcon />} onClick={() => setIsStudentModalOpen(true)} disabled={isSubmitting}>학생 추가</Button>
         </div>
 
         <Card className="flex flex-col flex-1 min-h-0 overflow-hidden">
@@ -260,7 +260,8 @@ export default function SchoolMileageGrant({
           ) : rows.length === 0 ? (
             <ListEmptyState
               fill
-              icon={<div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: 'var(--accent-subtle)' }}><UserPlusIcon size={24} strokeWidth={1.7} style={{ color: 'var(--accent)' }} /></div>}
+              icon={<UserPlusFeatureIcon />}
+              iconContained
               title="선택된 학생이 없습니다"
               description="상단 버튼으로 학생을 추가한 뒤 규칙과 점수를 입력하세요."
             />

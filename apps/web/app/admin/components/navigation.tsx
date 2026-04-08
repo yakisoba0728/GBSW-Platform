@@ -2,8 +2,8 @@ import type { DashboardNavItem } from '@/app/components/dashboard-nav'
 import {
   LockIcon,
   ShieldCheckIcon,
-  UserPlusIcon,
-  UsersIcon,
+  UserPlusNavIcon,
+  UsersNavIcon,
 } from '@/app/components/ui/icons'
 
 export const ADMIN_NAV_ITEMS: DashboardNavItem[] = [
@@ -11,7 +11,7 @@ export const ADMIN_NAV_ITEMS: DashboardNavItem[] = [
     id: 'admin-create',
     label: '계정 생성',
     section: '생성',
-    icon: <UserPlusIcon />,
+    icon: <UserPlusNavIcon />,
     children: [
       { href: '/admin/students/create', label: '학생 생성' },
       { href: '/admin/teachers/create', label: '교사 생성' },
@@ -21,7 +21,7 @@ export const ADMIN_NAV_ITEMS: DashboardNavItem[] = [
     id: 'admin-manage',
     label: '계정 관리',
     section: '운영',
-    icon: <UsersIcon />,
+    icon: <UsersNavIcon />,
     children: [
       { href: '/admin/students', label: '학생 관리' },
       { href: '/admin/teachers', label: '교사 관리' },

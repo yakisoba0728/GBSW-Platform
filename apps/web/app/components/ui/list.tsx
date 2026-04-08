@@ -297,12 +297,14 @@ export function ListEmptyState({
   title,
   description,
   fill = false,
+  iconContained = false,
   className = '',
 }: {
   icon?: ReactNode
   title: string
   description?: string
   fill?: boolean
+  iconContained?: boolean
   className?: string
 }) {
   const baseClassName = fill
@@ -313,15 +315,18 @@ export function ListEmptyState({
     <div
       className={`${baseClassName} ${className}`.trim()}
     >
-      {icon && (
-        <div
-          aria-hidden="true"
-          className="flex h-13 w-13 items-center justify-center rounded-2xl"
-          style={{ backgroundColor: 'var(--admin-accent-bg)' }}
-        >
-          {icon}
-        </div>
-      )}
+      {icon &&
+        (iconContained ? (
+          icon
+        ) : (
+          <div
+            aria-hidden="true"
+            className="flex h-12 w-12 items-center justify-center rounded-lg"
+            style={{ backgroundColor: 'var(--accent-subtle)' }}
+          >
+            {icon}
+          </div>
+        ))}
       <div>
         <p
           className="text-sm font-semibold"
@@ -349,6 +354,7 @@ export function EmptyStatePane({
   icon?: ReactNode
   title: string
   description?: string
+  iconContained?: boolean
   className?: string
 }) {
   return (

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { FieldBlock, formatPhoneNumberInput, inputBase, inputBaseStyle } from '@/app/admin/components/account-form-shared'
 import { Button } from '@/app/components/ui/button'
-import { EditIcon, SearchIcon, UserPlusIcon } from '@/app/components/ui/icons'
+import { EditIcon, SearchIcon, UserPlusCompactIcon } from '@/app/components/ui/icons'
 import { ListSkeleton } from '@/app/components/ui/list'
 import { Modal, ModalFooter } from '@/app/components/ui/modal'
 import { NoticeBox } from '@/app/components/ui/notice'
@@ -262,7 +262,7 @@ export default function AdminTeacherList() {
             <Button
               variant="primary"
               size="md"
-              icon={<UserPlusIcon size={13} strokeWidth={2.5} />}
+              icon={<UserPlusCompactIcon />}
             >
               교사 생성
             </Button>

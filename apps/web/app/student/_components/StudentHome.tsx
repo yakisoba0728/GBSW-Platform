@@ -9,7 +9,8 @@ import {
   QuickLinksSkeleton,
   SummaryBarSkeleton,
 } from '@/app/components/ui/page-skeletons'
-import { MileageBadge } from '@/app/components/ui/primitives'
+import { MileageBadge, RefetchWrapper } from '@/app/components/ui/primitives'
+import { useLoadingGate } from '@/app/components/ui/useLoadingGate'
 import type {
   SchoolMileageHistoryItem,
   StudentMileageSummary,
@@ -32,6 +33,8 @@ export default function StudentHome() {
   const [dormSummary, setDormSummary] = useState<StudentDormMileageSummary | null>(null)
   const [dormEntries, setDormEntries] = useState<StudentDormMileageHistoryItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
+  const showLoading = useLoadingGate({ active: loading && !hasLoadedOnce })
   const [error, setError] = useState<string | null>(null)
   const [retryKey, setRetryKey] = useState(0)
 
@@ -39,6 +42,7 @@ export default function StudentHome() {
     const controller = new AbortController()
 
     async function fetchData() {
+      let didLoadSuccessfully = false
       setLoading(true)
       setError(null)
 
@@ -85,6 +89,7 @@ export default function StudentHome() {
           setDormEntries(
             Array.isArray(dormEntriesRes?.items) ? dormEntriesRes.items : [],
           )
+          didLoadSuccessfully = true
         }
       } catch (err: unknown) {
         if (controller.signal.aborted) {
@@ -99,6 +104,9 @@ export default function StudentHome() {
       } finally {
         if (!controller.signal.aborted) {
           setLoading(false)
+          if (didLoadSuccessfully) {
+            setHasLoadedOnce(true)
+          }
         }
       }
     }
@@ -153,48 +161,47 @@ export default function StudentHome() {
     )
   }
 
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <PageHeaderSkeleton />
-
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-          <StatCardSkeleton />
-          <StatCardSkeleton />
-          <StatCardSkeleton />
-        </div>
-
-        <SummaryBarSkeleton />
-
-        <Card>
-          <div className="mb-4">
-            <div
-              className="relative overflow-hidden rounded-md"
-              style={{ height: 14, width: '32%', backgroundColor: 'var(--border)' }}
-            >
-              <div
-                className="absolute inset-0 animate-shimmer"
-                style={{
-                  background:
-                    'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)',
-                }}
-              />
-            </div>
-          </div>
-          <ListSkeleton count={5} />
-        </Card>
-
-        <QuickLinksSkeleton count={3} />
-      </div>
-    )
-  }
-
   const rewardTotal = summary?.rewardTotal ?? 0
   const penaltyTotal = summary?.penaltyTotal ?? 0
   const netScore = summary?.netScore ?? 0
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <>
+      {showLoading && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <PageHeaderSkeleton />
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </div>
+          <SummaryBarSkeleton />
+          <Card>
+            <div className="mb-4">
+              <div
+                className="relative overflow-hidden rounded-md"
+                style={{ height: 14, width: '32%', backgroundColor: 'var(--border)' }}
+              >
+                <div
+                  className="absolute inset-0 animate-shimmer"
+                  style={{
+                    background:
+                      'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)',
+                  }}
+                />
+              </div>
+            </div>
+            <ListSkeleton count={5} />
+          </Card>
+          <QuickLinksSkeleton count={3} />
+        </div>
+      )}
+
+      <RefetchWrapper
+        isFetching={loading && hasLoadedOnce}
+        isInitialLoad={showLoading}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <StudentHomeHeaderSection />
       <StudentHomeStatsSection
         rewardTotal={rewardTotal}
@@ -485,6 +492,8 @@ export default function StudentHome() {
           )}
         </>
       )}
-    </div>
+        </div>
+      </RefetchWrapper>
+    </>
   )
 }

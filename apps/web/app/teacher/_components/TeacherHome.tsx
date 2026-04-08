@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion'
 import { NoticeBox } from '@/app/components/mileage/shared'
+import { RefetchWrapper } from '@/app/components/ui/primitives'
+import { useLoadingGate } from '@/app/components/ui/useLoadingGate'
 import { useRulesContext } from '@/app/components/mileage/rules-context'
 import { StatsGridSkeleton } from '@/app/components/ui/page-skeletons'
 import {
@@ -85,6 +87,8 @@ export default function TeacherHome() {
   const prefersReducedMotion = useMotionPreference()
   const sectionMotion = getSectionMotion(prefersReducedMotion)
   const { rules, isRulesLoading, rulesError } = useRulesContext()
+  const hasRulesSnapshot = rules.length > 0 || Boolean(rulesError)
+  const showLoading = useLoadingGate({ active: isRulesLoading && !hasRulesSnapshot })
 
   const rewardRules = rules.filter((rule) => rule.type === 'reward').length
   const penaltyRules = rules.filter((rule) => rule.type === 'penalty').length
@@ -116,37 +120,42 @@ export default function TeacherHome() {
             </p>
           </motion.div>
 
-          {isRulesLoading ? (
+          {showLoading ? (
             <StatsGridSkeleton count={3} />
           ) : (
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-                gap: 12,
-              }}
+            <RefetchWrapper
+              isFetching={isRulesLoading && hasRulesSnapshot}
+              isInitialLoad={showLoading}
             >
-              <StatCard
-                label="활성 규칙 수"
-                value={rules.length}
-                isLoading={false}
-                step={1}
-              />
-              <StatCard
-                label="상점 규칙"
-                value={rewardRules}
-                color="var(--reward)"
-                isLoading={false}
-                step={2}
-              />
-              <StatCard
-                label="벌점 규칙"
-                value={penaltyRules}
-                color="var(--penalty)"
-                isLoading={false}
-                step={3}
-              />
-            </div>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+                  gap: 12,
+                }}
+              >
+                <StatCard
+                  label="활성 규칙 수"
+                  value={rules.length}
+                  isLoading={false}
+                  step={1}
+                />
+                <StatCard
+                  label="상점 규칙"
+                  value={rewardRules}
+                  color="var(--reward)"
+                  isLoading={false}
+                  step={2}
+                />
+                <StatCard
+                  label="벌점 규칙"
+                  value={penaltyRules}
+                  color="var(--penalty)"
+                  isLoading={false}
+                  step={3}
+                />
+              </div>
+            </RefetchWrapper>
           )}
         </>
       )}

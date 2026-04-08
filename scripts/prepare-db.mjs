@@ -6,6 +6,8 @@ import { loadEnv, rootDir } from './env.mjs';
 const config = loadEnv();
 const composeNetworkName = 'gbsw-platform_default';
 const composeContainerNames = ['gbsw-platform-db', 'gbsw-platform-pgadmin'];
+const pgAdminContainerName = 'gbsw-platform-pgadmin';
+const pgAdminDataVolumeName = 'gbsw-platform_pgadmin-data';
 
 class CommandError extends Error {
   constructor(command, args, code, stderr) {
@@ -48,36 +50,9 @@ try {
   await waitForPort(config.postgresHost, config.postgresPort);
   console.log(`Waiting for pgAdmin on 127.0.0.1:${config.pgAdminPort}...`);
   await waitForPort('127.0.0.1', config.pgAdminPort);
-  const pgAdminStorageUser = toPgAdminStorageUserName(config.pgAdminEmail);
-  const pgPassFilePath = `/var/lib/pgadmin/storage/${pgAdminStorageUser}/.pgpass`;
-  await run('docker', [
-    'exec',
-    'gbsw-platform-pgadmin',
-    'sh',
-    '-lc',
-    [
-      'umask 077',
-      `mkdir -p '/var/lib/pgadmin/storage/${pgAdminStorageUser}'`,
-      `printf '%s\\n' 'db:5432:${config.postgresDatabase}:${config.postgresUser}:${config.postgresPassword}' > '${pgPassFilePath}'`,
-      `chown pgadmin:root '${pgPassFilePath}'`,
-      `chmod 600 '${pgPassFilePath}'`,
-      'rm -f /var/lib/pgadmin/.pgpass',
-    ].join(' && '),
-  ]);
+  await writePgAdminPasswordFile();
   await delay(1_000);
-  await run('docker', [
-    'exec',
-    'gbsw-platform-pgadmin',
-    '/venv/bin/python',
-    '-W',
-    'ignore::SyntaxWarning',
-    '/pgadmin4/setup.py',
-    'load-servers',
-    '/pgadmin4/gbsw-servers.json',
-    '--user',
-    config.pgAdminEmail,
-    '--replace',
-  ]);
+  await ensurePgAdminServersLoaded();
   await run('pnpm', [
     '--filter',
     '@gbsw/api',
@@ -116,6 +91,75 @@ async function waitForPort(host, port, timeoutMs = 60_000) {
   }
 
   throw new Error(`Timed out waiting for ${host}:${port}`);
+}
+
+async function ensurePgAdminServersLoaded() {
+  try {
+    await loadPgAdminServers();
+  } catch (error) {
+    const message = getErrorMessage(error);
+
+    if (!message.includes('The specified user ID')) {
+      throw error;
+    }
+
+    console.warn(
+      `pgAdmin storage does not contain ${config.pgAdminEmail}. Recreating pgAdmin data...`,
+    );
+    await recreatePgAdminData();
+    await waitForPort('127.0.0.1', config.pgAdminPort);
+    await writePgAdminPasswordFile();
+    await delay(1_000);
+    await loadPgAdminServers();
+  }
+}
+
+async function loadPgAdminServers() {
+  const output = await capture('docker', [
+    'exec',
+    pgAdminContainerName,
+    '/venv/bin/python',
+    '-W',
+    'ignore::SyntaxWarning',
+    '/pgadmin4/setup.py',
+    'load-servers',
+    '/pgadmin4/gbsw-servers.json',
+    '--user',
+    config.pgAdminEmail,
+    '--replace',
+  ]);
+
+  if (output) {
+    console.log(output);
+  }
+}
+
+async function recreatePgAdminData() {
+  await run('docker', ['rm', '-f', pgAdminContainerName], { stdio: 'ignore' });
+  await run('docker', ['volume', 'rm', '-f', pgAdminDataVolumeName], {
+    stdio: 'ignore',
+  });
+  await run('docker', ['compose', 'up', '-d', 'pgadmin']);
+}
+
+async function writePgAdminPasswordFile() {
+  const pgAdminStorageUser = toPgAdminStorageUserName(config.pgAdminEmail);
+  const pgPassFilePath = `/var/lib/pgadmin/storage/${pgAdminStorageUser}/.pgpass`;
+
+  await run('docker', [
+    'exec',
+    pgAdminContainerName,
+    'sh',
+    '-lc',
+    [
+      'umask 077',
+      `mkdir -p '/var/lib/pgadmin/storage/${pgAdminStorageUser}'`,
+      `printf '%s\\n' 'db:5432:${config.postgresDatabase}:${config.postgresUser}:${config.postgresPassword}' > '${pgPassFilePath}'`,
+      `chown pgadmin:root '${pgPassFilePath}'`,
+      `chmod 600 '${pgPassFilePath}'`,
+      'rm -f /var/lib/pgadmin/.pgpass',
+    ].join(' && '),
+  ]);
 }
 
 function tryConnect(host, port) {
@@ -185,7 +229,9 @@ function capture(command, args) {
         return;
       }
 
-      reject(new CommandError(command, args, code ?? 1, stderr.trim()));
+      reject(
+        new CommandError(command, args, code ?? 1, (stderr || stdout).trim()),
+      );
     });
   });
 }

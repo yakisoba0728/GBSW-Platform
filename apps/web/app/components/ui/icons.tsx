@@ -18,6 +18,7 @@ import {
   Lock,
 } from 'lucide-react'
 import type { LucideProps } from 'lucide-react'
+import type { ReactNode } from 'react'
 
 type IconProps = LucideProps & { size?: number }
 
@@ -34,8 +35,16 @@ export function UserPlusIcon({ size = 14, ...props }: IconProps) {
   return <UserPlus size={size} strokeWidth={2} aria-hidden="true" {...props} />
 }
 
-export function UsersIcon({ size = 14, ...props }: IconProps) {
+export function UserPlusNavIcon({ size = 14, ...props }: IconProps) {
+  return <UserPlus size={size} strokeWidth={2} aria-hidden="true" {...props} />
+}
+
+export function UsersNavIcon({ size = 14, ...props }: IconProps) {
   return <Users size={size} strokeWidth={2} aria-hidden="true" {...props} />
+}
+
+export function UserPlusCompactIcon({ size = 12, ...props }: IconProps) {
+  return <UserPlus size={size} strokeWidth={2.5} aria-hidden="true" {...props} />
 }
 
 export function UserCheckIcon({ size = 14, ...props }: IconProps) {
@@ -79,15 +88,112 @@ export function SlashIcon({ size = 16, ...props }: IconProps) {
   return <Ban size={size} strokeWidth={2} aria-hidden="true" {...props} />
 }
 
-// ─── 빈 상태/강조 아이콘 (default 20px) ───────────────────────
+// ─── 빈 상태/강조 아이콘 (default 20px / 24px) ───────────────────────
 export function BuildingIcon({ size = 20, ...props }: IconProps) {
   return <Building2 size={size} strokeWidth={1.5} aria-hidden="true" {...props} />
 }
 
-export function UserIcon({ size = 20, ...props }: IconProps) {
-  return <User size={size} strokeWidth={1.5} aria-hidden="true" {...props} />
+export function FeatureBadge({ children }: { children: ReactNode }) {
+  return (
+    <div
+      className="flex h-12 w-12 items-center justify-center rounded-lg"
+      style={{ backgroundColor: 'var(--accent-subtle)' }}
+      aria-hidden="true"
+    >
+      {children}
+    </div>
+  )
+}
+
+export function SearchFeatureIcon({ size = 20, style, ...props }: IconProps) {
+  return (
+    <FeatureBadge>
+      <Search
+        size={size}
+        strokeWidth={1.7}
+        aria-hidden="true"
+        style={{ color: 'var(--accent)', ...style }}
+        {...props}
+      />
+    </FeatureBadge>
+  )
+}
+
+export function BuildingFeatureIcon({ size = 20, style, ...props }: IconProps) {
+  return (
+    <FeatureBadge>
+      <Building2
+        size={size}
+        strokeWidth={1.5}
+        aria-hidden="true"
+        style={{ color: 'var(--accent)', ...style }}
+        {...props}
+      />
+    </FeatureBadge>
+  )
+}
+
+export function UserPlusFeatureIcon({ size = 24, style, ...props }: IconProps) {
+  return (
+    <FeatureBadge>
+      <UserPlus
+        size={size}
+        strokeWidth={1.7}
+        aria-hidden="true"
+        style={{ color: 'var(--accent)', ...style }}
+        {...props}
+      />
+    </FeatureBadge>
+  )
+}
+
+export function UsersFeatureIcon({ size = 24, style, ...props }: IconProps) {
+  return (
+    <FeatureBadge>
+      <Users
+        size={size}
+        strokeWidth={1.7}
+        aria-hidden="true"
+        style={{ color: 'var(--accent)', ...style }}
+        {...props}
+      />
+    </FeatureBadge>
+  )
+}
+
+export function UserFeatureIcon({ size = 24, style, ...props }: IconProps) {
+  return (
+    <FeatureBadge>
+      <User
+        size={size}
+        strokeWidth={1.7}
+        aria-hidden="true"
+        style={{ color: 'var(--accent)', ...style }}
+        {...props}
+      />
+    </FeatureBadge>
+  )
+}
+
+// Backward-compatible alias for stale dev bundles that still import the old name.
+export function PersonFeatureBadgeIcon(props: IconProps) {
+  return <UserFeatureIcon {...props} />
 }
 
 export function FileIcon({ size = 20, ...props }: IconProps) {
   return <FileText size={size} strokeWidth={1.5} aria-hidden="true" {...props} />
+}
+
+export function FileFeatureIcon({ size = 20, style, ...props }: IconProps) {
+  return (
+    <FeatureBadge>
+      <FileText
+        size={size}
+        strokeWidth={1.5}
+        aria-hidden="true"
+        style={{ color: 'var(--accent)', ...style }}
+        {...props}
+      />
+    </FeatureBadge>
+  )
 }

@@ -4,15 +4,25 @@ import { useDormRulesContext } from '@/app/components/dorm-mileage/dorm-rules-co
 import DormMileageGrant from '@/app/components/teacher/DormMileageGrant'
 import { LoadingSpinner } from '@/app/components/ui/list'
 
+import { useLoadingGate } from '@/app/components/ui/useLoadingGate'
+
 export default function TeacherDormMileageGrantPage() {
   const { isDormTeacher } = useDormRulesContext()
+  const showLoading = useLoadingGate({
+    active: isDormTeacher === null,
+    initialVisible: false,
+  })
 
-  if (isDormTeacher === null) {
+  if (showLoading) {
     return (
       <div className="flex h-full min-h-[200px] items-center justify-center">
         <LoadingSpinner />
       </div>
     )
+  }
+
+  if (isDormTeacher === null) {
+    return null
   }
 
   return (

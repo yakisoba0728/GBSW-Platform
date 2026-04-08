@@ -14,15 +14,23 @@ export function TopProgressBar({ active }: TopProgressBarProps) {
   const opacity = useMotionValue(0)
 
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
     if (active) {
-      opacity.set(1)
-      animate(width, 90, { duration: 2, ease: 'easeOut' })
+      timeoutId = setTimeout(() => {
+        opacity.set(1)
+        animate(width, 90, { duration: 2, ease: 'easeOut' })
+      }, 180)
     } else {
       animate(width, 100, { duration: 0.2 }).then(() => {
         animate(opacity, 0, { duration: 0.3 }).then(() => {
           width.set(0)
         })
       })
+    }
+    return () => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId)
+      }
     }
   }, [active]) // eslint-disable-line react-hooks/exhaustive-deps
 

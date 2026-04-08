@@ -10,7 +10,7 @@ import {
   ListEmptyState,
   LoadingSpinner,
 } from '../ui/list'
-import { ChevronRightIcon, UserIcon } from '../ui/icons'
+import { ChevronRightIcon, UserFeatureIcon } from '../ui/icons'
 import type {
   PaginatedSchoolMileageHistoryResponse,
   SchoolCode,
@@ -355,7 +355,8 @@ export default function SchoolMileageStudentView() {
               <div className="flex h-full items-center justify-center">
                 <ListEmptyState
                   fill
-                  icon={<UserIcon style={{ color: 'var(--accent)' }} />}
+                  icon={<UserFeatureIcon />}
+                  iconContained
                   title="학교를 선택하세요"
                   description="학교를 선택하면 학생 목록을 바로 불러옵니다."
                 />
@@ -368,7 +369,8 @@ export default function SchoolMileageStudentView() {
               <div className="flex h-full items-center justify-center">
                 <ListEmptyState
                   fill
-                  icon={<UserIcon style={{ color: 'var(--accent)' }} />}
+                  icon={<UserFeatureIcon />}
+                  iconContained
                   title="학생 목록을 불러오지 못했습니다"
                   description={studentsError}
                 />
@@ -377,7 +379,8 @@ export default function SchoolMileageStudentView() {
               <div className="flex h-full items-center justify-center">
                 <ListEmptyState
                   fill
-                  icon={<UserIcon style={{ color: 'var(--accent)' }} />}
+                  icon={<UserFeatureIcon />}
+                  iconContained
                   title="학생이 없습니다"
                   description="검색 조건을 변경해 보세요."
                 />
@@ -464,7 +467,8 @@ export default function SchoolMileageStudentView() {
           <Card className="flex flex-col flex-1 min-h-0">
             <ListEmptyState
               fill
-              icon={<UserIcon style={{ color: 'var(--accent)' }} />}
+              icon={<UserFeatureIcon />}
+              iconContained
               title="학생을 선택하세요"
               description="좌측 목록에서 학생을 클릭하면 누적 점수와 처리 내역이 표시됩니다."
             />
@@ -473,7 +477,8 @@ export default function SchoolMileageStudentView() {
           <Card className="flex flex-col flex-1 min-h-0">
             <ListEmptyState
               fill
-              icon={<UserIcon style={{ color: 'var(--accent)' }} />}
+              icon={<UserFeatureIcon />}
+              iconContained
               title="학생 정보를 불러오지 못했습니다"
               description={detailError}
             />

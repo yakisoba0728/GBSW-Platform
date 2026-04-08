@@ -2,7 +2,7 @@
 
 import { RefreshCw, Printer, Download } from 'lucide-react'
 import { Button } from '../ui/button'
-import { UsersIcon } from '../ui/icons'
+import { UserPlusCompactIcon } from '../ui/icons'
 import { Card, FilterRow, SectionHeader, inputStyle } from '../mileage/shared'
 
 type ReportType = 'student' | 'class' | 'all'
@@ -172,7 +172,7 @@ export default function ReportFilters({
               <Button
                 variant="accent"
                 size="sm"
-                icon={<UsersIcon size={12} />}
+                icon={<UserPlusCompactIcon />}
                 onClick={onOpenStudentModal}
               >
                 {selectedStudentIds.length > 0

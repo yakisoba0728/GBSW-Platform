@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '../ui/button'
 import { EmptyStatePane, ListSkeleton } from '../ui/list'
 import { ModalBase } from '../ui/modal'
-import { UsersIcon, XIcon } from '../ui/icons'
+import { UsersFeatureIcon, XIcon } from '../ui/icons'
 import type { SchoolMileageStudentOption } from './school-mileage-types'
 import {
   NoticeBox,
@@ -284,12 +284,9 @@ export default function StudentSelectionModal({
           ) : visibleStudents.length === 0 ? (
             <EmptyStatePane
               icon={
-                <UsersIcon
-                  size={28}
-                  strokeWidth={1.5}
-                  style={{ color: 'var(--admin-text-muted)' }}
-                />
+                  <UsersFeatureIcon />
               }
+              iconContained
               title="조건에 맞는 학생이 없습니다."
               description="학교와 학년 조건을 바꿔 다시 찾아보세요."
               className="min-h-[220px]"

@@ -11,10 +11,12 @@ import {
   type School,
 } from '@/app/admin/components/account-form-shared'
 import { Button } from '@/app/components/ui/button'
-import { EditIcon, SearchIcon, UserPlusIcon } from '@/app/components/ui/icons'
+import { EditIcon, SearchIcon, UserPlusCompactIcon } from '@/app/components/ui/icons'
 import { ListSkeleton } from '@/app/components/ui/list'
 import { Modal, ModalFooter } from '@/app/components/ui/modal'
 import { NoticeBox } from '@/app/components/ui/notice'
+import { RefetchWrapper } from '@/app/components/ui/primitives'
+import { useLoadingGate } from '@/app/components/ui/useLoadingGate'
 
 type StudentRecord = {
   studentId: string
@@ -54,6 +56,8 @@ export default function AdminStudentList() {
   const [filters, setFilters] = useState<StudentFilters>(INITIAL_FILTERS)
   const [students, setStudents] = useState<StudentRecord[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
+  const showLoading = useLoadingGate({ active: isLoading && !hasLoadedOnce })
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<{
     type: 'success' | 'error'
@@ -74,6 +78,7 @@ export default function AdminStudentList() {
   )
 
   async function loadStudents(nextFilters: StudentFilters) {
+    let didLoadSuccessfully = false
     setIsLoading(true)
     setError(null)
 
@@ -105,10 +110,14 @@ export default function AdminStudentList() {
       }
 
       setStudents(Array.isArray(payload?.students) ? payload.students : [])
+      didLoadSuccessfully = true
     } catch {
       setError('학생 목록 조회 중 문제가 발생했습니다.')
     } finally {
       setIsLoading(false)
+      if (didLoadSuccessfully) {
+        setHasLoadedOnce(true)
+      }
     }
   }
 
@@ -291,7 +300,7 @@ export default function AdminStudentList() {
             <Button
               variant="primary"
               size="md"
-              icon={<UserPlusIcon size={13} strokeWidth={2.5} />}
+              icon={<UserPlusCompactIcon />}
             >
               학생 생성
             </Button>
@@ -396,106 +405,110 @@ export default function AdminStudentList() {
         }}
       >
         <div className="overflow-x-auto">
-          <table className="min-w-[980px] w-full text-sm" style={{ borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['아이디', '학교', '현재 학적', '이름', '전공과목', '전화번호', '상태', '작업'].map((label) => (
-                  <th
-                    key={label}
-                    scope="col"
-                    className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-widest"
-                    style={{
-                      color: 'var(--fg-muted)',
-                      fontFamily: 'var(--font-space-grotesk)',
-                    }}
-                  >
-                    {label}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={8} className="px-4 py-5">
-                    <ListSkeleton count={6} rowHeight="h-11" />
-                  </td>
+          {showLoading && (
+            <div className="px-4 py-5">
+              <ListSkeleton count={6} rowHeight="h-11" />
+            </div>
+          )}
+          <RefetchWrapper
+            isFetching={isLoading && hasLoadedOnce}
+            isInitialLoad={showLoading}
+          >
+            <table className="min-w-[980px] w-full text-sm" style={{ borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  {['아이디', '학교', '현재 학적', '이름', '전공과목', '전화번호', '상태', '작업'].map((label) => (
+                    <th
+                      key={label}
+                      scope="col"
+                      className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-widest"
+                      style={{
+                        color: 'var(--fg-muted)',
+                        fontFamily: 'var(--font-space-grotesk)',
+                      }}
+                    >
+                      {label}
+                    </th>
+                  ))}
                 </tr>
-              ) : error ? (
-                <tr>
-                  <td colSpan={8} className="px-4 py-10">
-                    <NoticeBox type="error" message={error} />
-                  </td>
-                </tr>
-              ) : students.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={8}
-                    className="px-4 py-14 text-center text-sm"
-                    style={{
-                      color: 'var(--fg-muted)',
-                      fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                    }}
-                  >
-                    조건에 맞는 학생 계정이 없습니다.
-                  </td>
-                </tr>
-              ) : (
-                students.map((student) => (
-                  <tr
-                    key={student.studentId}
-                    style={{
-                      borderBottom: '1px solid var(--border)',
-                      opacity: student.isActive ? 1 : 0.7,
-                    }}
-                  >
-                    <td className="px-4 py-3 text-xs" style={monoCellStyle}>
-                      {student.studentId}
-                    </td>
-                    <td className="px-4 py-3 text-xs" style={monoCellStyle}>
-                      {student.school}
-                    </td>
-                    <td className="px-4 py-3 text-[13px]" style={textCellStyle}>
-                      {student.currentYear}학년 {student.currentClass}반 {student.currentNumber}번
-                    </td>
-                    <td className="px-4 py-3 text-[13px] font-medium" style={textCellStyle}>
-                      {student.name}
-                    </td>
-                    <td className="px-4 py-3 text-[13px]" style={textCellStyle}>
-                      {student.majorSubject ?? '-'}
-                    </td>
-                    <td className="px-4 py-3 text-xs" style={monoCellStyle}>
-                      {formatPhoneNumber(student.phone)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge isActive={student.isActive} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          icon={<EditIcon />}
-                          onClick={() => openEditModal(student)}
-                        >
-                          수정
-                        </Button>
-                        <Button
-                          variant={student.isActive ? 'danger' : 'accent'}
-                          size="sm"
-                          loading={statusUpdatingId === student.studentId}
-                          disabled={statusUpdatingId === student.studentId}
-                          onClick={() => void toggleStudentStatus(student)}
-                        >
-                          {student.isActive ? '비활성화' : '활성화'}
-                        </Button>
-                      </div>
+              </thead>
+              <tbody>
+                {error ? (
+                  <tr>
+                    <td colSpan={8} className="px-4 py-10">
+                      <NoticeBox type="error" message={error} />
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : students.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={8}
+                      className="px-4 py-14 text-center text-sm"
+                      style={{
+                        color: 'var(--fg-muted)',
+                        fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                      }}
+                    >
+                      조건에 맞는 학생 계정이 없습니다.
+                    </td>
+                  </tr>
+                ) : (
+                  students.map((student) => (
+                    <tr
+                      key={student.studentId}
+                      style={{
+                        borderBottom: '1px solid var(--border)',
+                        opacity: student.isActive ? 1 : 0.7,
+                      }}
+                    >
+                      <td className="px-4 py-3 text-xs" style={monoCellStyle}>
+                        {student.studentId}
+                      </td>
+                      <td className="px-4 py-3 text-xs" style={monoCellStyle}>
+                        {student.school}
+                      </td>
+                      <td className="px-4 py-3 text-[13px]" style={textCellStyle}>
+                        {student.currentYear}학년 {student.currentClass}반 {student.currentNumber}번
+                      </td>
+                      <td className="px-4 py-3 text-[13px] font-medium" style={textCellStyle}>
+                        {student.name}
+                      </td>
+                      <td className="px-4 py-3 text-[13px]" style={textCellStyle}>
+                        {student.majorSubject ?? '-'}
+                      </td>
+                      <td className="px-4 py-3 text-xs" style={monoCellStyle}>
+                        {formatPhoneNumber(student.phone)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <StatusBadge isActive={student.isActive} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            icon={<EditIcon />}
+                            onClick={() => openEditModal(student)}
+                          >
+                            수정
+                          </Button>
+                          <Button
+                            variant={student.isActive ? 'danger' : 'accent'}
+                            size="sm"
+                            loading={statusUpdatingId === student.studentId}
+                            disabled={statusUpdatingId === student.studentId}
+                            onClick={() => void toggleStudentStatus(student)}
+                          >
+                            {student.isActive ? '비활성화' : '활성화'}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </RefetchWrapper>
         </div>
       </section>
 
