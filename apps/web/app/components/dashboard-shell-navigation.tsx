@@ -134,7 +134,7 @@ export function NavSidebar({
   navItems: DashboardNavItem[]
   pathname: string
   openMenus: Record<string, boolean>
-  toggleMenu: (id: string) => void
+  toggleMenu: (id: string, currentIsOpen: boolean) => void
   onNavLinkClick: (href: string) => void
   inDrawer: boolean
   closeDrawer: () => void
@@ -228,7 +228,7 @@ export function NavSidebar({
               {hasChildren ? (
                 <motion.button
                   type="button"
-                  onClick={() => toggleMenu(item.id)}
+                  onClick={() => toggleMenu(item.id, isOpen)}
                   whileTap={{ scale: 0.98 }}
                   style={{
                     display: 'flex',

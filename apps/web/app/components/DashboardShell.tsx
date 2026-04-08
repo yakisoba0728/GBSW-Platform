@@ -94,8 +94,8 @@ export default function DashboardShell({ roleLabel, navItems, children }: Props)
 
   const closeDrawer = useCallback(() => setDrawerOpen(false), [])
   const openDrawer = useCallback(() => setDrawerOpen(true), [])
-  const toggleMenu = useCallback((id: string) => {
-    setOpenMenus((prev) => ({ ...prev, [id]: !prev[id] }))
+  const toggleMenu = useCallback((id: string, currentIsOpen: boolean) => {
+    setOpenMenus((prev) => ({ ...prev, [id]: !currentIsOpen }))
   }, [])
   const handleNavLinkClick = useCallback(() => {}, [])
 
