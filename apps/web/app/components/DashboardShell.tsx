@@ -97,7 +97,9 @@ export default function DashboardShell({ roleLabel, navItems, children }: Props)
   const toggleMenu = useCallback((id: string, currentIsOpen: boolean) => {
     setOpenMenus((prev) => ({ ...prev, [id]: !currentIsOpen }))
   }, [])
-  const handleNavLinkClick = useCallback(() => {}, [])
+  const handleNavLinkClick = useCallback(() => {
+    window.dispatchEvent(new Event(APP_NAVIGATION_START_EVENT))
+  }, [])
 
   // Escape 키 + body scroll lock
   useEffect(() => {

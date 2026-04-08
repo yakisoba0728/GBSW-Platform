@@ -168,7 +168,7 @@ export function FiltersTableSkeleton({
           <thead className="table-header">
             <tr>
               {Array.from({ length: columns }).map((_, index) => (
-                <th key={index}>
+                <th key={index} scope="col">
                   <SkeletonBlock width="70%" height={10} />
                 </th>
               ))}

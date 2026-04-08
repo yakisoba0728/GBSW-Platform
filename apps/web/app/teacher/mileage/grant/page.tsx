@@ -7,10 +7,12 @@ export default function TeacherMileageGrantPage() {
   const { rules, isRulesLoading, rulesError } = useRulesContext()
 
   return (
-    <SchoolMileageGrant
-      rules={rules}
-      isRulesLoading={isRulesLoading}
-      rulesError={rulesError}
-    />
+    <div className="flex flex-col h-full">
+      <SchoolMileageGrant
+        rules={rules}
+        isRulesLoading={isRulesLoading}
+        rulesError={rulesError}
+      />
+    </div>
   )
 }

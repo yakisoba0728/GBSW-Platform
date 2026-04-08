@@ -226,7 +226,7 @@ export default function DormMileageRules({
             <thead className="table-header">
               <tr>
                 {['ID', '유형', '카테고리', '항목명', '기본점수', '순서', '상태', ...(readOnly ? [] : ['작업'])].map((h) => (
-                  <th key={h} className="px-3">{h}</th>
+                  <th key={h} className="px-3" scope="col">{h}</th>
                 ))}
               </tr>
             </thead>

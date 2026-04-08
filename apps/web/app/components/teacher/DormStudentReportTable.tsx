@@ -408,6 +408,7 @@ export default function DormStudentReportTable({
             (header) => (
               <th
                 key={header || 'expand'}
+                scope="col"
                 className="px-3 py-3 text-left font-semibold"
                 style={{
                   fontFamily: 'var(--font-noto-sans-kr), sans-serif',

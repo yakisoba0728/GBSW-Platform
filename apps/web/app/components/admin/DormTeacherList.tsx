@@ -131,6 +131,7 @@ export default function DormTeacherList() {
             {['아이디', '이름', '사감 교사'].map((h) => (
               <th
                 key={h}
+                scope="col"
                 className="pb-2 text-left text-[11px] font-medium uppercase tracking-wider"
                 style={{ color: 'var(--fg-muted)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
               >

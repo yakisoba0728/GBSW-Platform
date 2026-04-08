@@ -315,6 +315,7 @@ export function ListEmptyState({
     >
       {icon && (
         <div
+          aria-hidden="true"
           className="flex h-13 w-13 items-center justify-center rounded-2xl"
           style={{ backgroundColor: 'var(--admin-accent-bg)' }}
         >

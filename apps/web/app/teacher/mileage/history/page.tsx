@@ -6,5 +6,9 @@ import { useRulesContext } from '@/app/components/mileage/rules-context'
 export default function TeacherMileageHistoryPage() {
   const { rulesError } = useRulesContext()
 
-  return <SchoolMileageHistory rulesError={rulesError} />
+  return (
+    <div className="flex flex-col h-full">
+      <SchoolMileageHistory rulesError={rulesError} />
+    </div>
+  )
 }

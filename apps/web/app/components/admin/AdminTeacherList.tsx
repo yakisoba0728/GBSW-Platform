@@ -354,6 +354,7 @@ export default function AdminTeacherList() {
                 {['아이디', '이름', '전화번호', '사감 교사', '상태', '작업'].map((label) => (
                   <th
                     key={label}
+                    scope="col"
                     className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-widest"
                     style={{
                       color: 'var(--fg-muted)',

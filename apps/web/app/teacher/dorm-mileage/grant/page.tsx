@@ -15,5 +15,9 @@ export default function TeacherDormMileageGrantPage() {
     )
   }
 
-  return <DormMileageGrant isDormTeacher={isDormTeacher} />
+  return (
+    <div className="flex flex-col h-full">
+      <DormMileageGrant isDormTeacher={isDormTeacher} />
+    </div>
+  )
 }

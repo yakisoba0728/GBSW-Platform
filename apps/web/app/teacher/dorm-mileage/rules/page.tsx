@@ -7,12 +7,14 @@ export default function TeacherDormMileageRulesPage() {
   const { rules, isRulesLoading, rulesError, loadRules } = useDormRulesContext()
 
   return (
-    <DormMileageRules
-      rules={rules}
-      isRulesLoading={isRulesLoading}
-      rulesError={rulesError}
-      loadRules={loadRules}
-      readOnly={true}
-    />
+    <div className="flex flex-col h-full">
+      <DormMileageRules
+        rules={rules}
+        isRulesLoading={isRulesLoading}
+        rulesError={rulesError}
+        loadRules={loadRules}
+        readOnly={true}
+      />
+    </div>
   )
 }

@@ -412,7 +412,7 @@ export default function StudentMileageHistory() {
                 <tr>
                   {['부여 일시', '점수', '규정 항목', '사유', '부여 교사'].map(
                     (h) => (
-                      <th key={h}>{h}</th>
+                      <th key={h} scope="col">{h}</th>
                     ),
                   )}
                 </tr>
@@ -471,7 +471,7 @@ export default function StudentMileageHistory() {
                   <tr>
                     {['부여 일시', '점수', '규정 항목', '사유', '부여 교사'].map(
                       (h) => (
-                        <th key={h}>{h}</th>
+                        <th key={h} scope="col">{h}</th>
                       ),
                     )}
                   </tr>

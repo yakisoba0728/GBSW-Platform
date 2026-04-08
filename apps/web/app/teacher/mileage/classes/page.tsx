@@ -1,5 +1,9 @@
 import SchoolMileageClass from '@/app/components/teacher/SchoolMileageClass'
 
 export default function TeacherMileageClassesPage() {
-  return <SchoolMileageClass />
+  return (
+    <div className="flex flex-col h-full">
+      <SchoolMileageClass />
+    </div>
+  )
 }

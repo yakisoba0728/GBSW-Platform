@@ -137,6 +137,7 @@ function SuccessModalContent({
         exit={overlayMotion.exit}
         transition={overlayMotion.transition}
         onClick={onClose}
+        aria-hidden="true"
         style={{
           position: 'fixed',
           inset: 0,

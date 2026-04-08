@@ -7,12 +7,14 @@ export default function AdminMileageRulesPage() {
   const { rules, isRulesLoading, rulesError, loadRules } = useRulesContext()
 
   return (
-    <SchoolMileageRules
-      rules={rules}
-      isRulesLoading={isRulesLoading}
-      rulesError={rulesError}
-      loadRules={loadRules}
-      apiPath="/api/admin/school-mileage/rules"
-    />
+    <div className="flex flex-col h-full">
+      <SchoolMileageRules
+        rules={rules}
+        isRulesLoading={isRulesLoading}
+        rulesError={rulesError}
+        loadRules={loadRules}
+        apiPath="/api/admin/school-mileage/rules"
+      />
+    </div>
   )
 }

@@ -6,5 +6,9 @@ import { useDormRulesContext } from '@/app/components/dorm-mileage/dorm-rules-co
 export default function TeacherDormMileageHistoryPage() {
   const { rulesError } = useDormRulesContext()
 
-  return <DormMileageHistory rulesError={rulesError} />
+  return (
+    <div className="flex flex-col h-full">
+      <DormMileageHistory rulesError={rulesError} />
+    </div>
+  )
 }

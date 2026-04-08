@@ -60,7 +60,7 @@ export default function StudentEntriesTable({
             <thead className="table-header">
               <tr>
                 {['유형', '카테고리', '항목', '점수', '사유', '일시'].map((h) => (
-                  <th key={h} className="px-3">{h}</th>
+                  <th key={h} className="px-3" scope="col">{h}</th>
                 ))}
               </tr>
             </thead>

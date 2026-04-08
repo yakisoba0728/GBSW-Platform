@@ -7,12 +7,14 @@ export default function AdminDormMileageRulesPage() {
   const { rules, isRulesLoading, rulesError, loadRules } = useDormRulesContext()
 
   return (
-    <DormMileageRules
-      rules={rules}
-      isRulesLoading={isRulesLoading}
-      rulesError={rulesError}
-      loadRules={loadRules}
-      apiPath="/api/admin/dorm-mileage/rules"
-    />
+    <div className="flex flex-col h-full">
+      <DormMileageRules
+        rules={rules}
+        isRulesLoading={isRulesLoading}
+        rulesError={rulesError}
+        loadRules={loadRules}
+        apiPath="/api/admin/dorm-mileage/rules"
+      />
+    </div>
   )
 }
