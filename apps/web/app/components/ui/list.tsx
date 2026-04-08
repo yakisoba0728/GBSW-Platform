@@ -24,19 +24,21 @@ export function AnimatedListItem({
   children,
   className = '',
   style,
+  animated = true,
 }: {
   index: number
   children: ReactNode
   className?: string
   style?: CSSProperties
+  animated?: boolean
 }) {
   const prefersReducedMotion = useMotionPreference()
   const motionProps = getItemMotion(prefersReducedMotion, index)
   return (
     <motion.div
-      initial={motionProps.initial}
-      animate={motionProps.animate}
-      transition={motionProps.transition}
+      initial={animated ? motionProps.initial : false}
+      animate={animated ? motionProps.animate : undefined}
+      transition={animated ? motionProps.transition : undefined}
       className={className}
       style={style}
     >
@@ -69,6 +71,7 @@ export function AnimatedTableRow({
   onMouseEnter,
   onMouseLeave,
   onClick,
+  animated = true,
 }: {
   index: number
   children: ReactNode
@@ -77,14 +80,15 @@ export function AnimatedTableRow({
   onMouseEnter?: () => void
   onMouseLeave?: () => void
   onClick?: () => void
+  animated?: boolean
 }) {
   const prefersReducedMotion = useMotionPreference()
   const motionProps = getItemMotion(prefersReducedMotion, index)
   return (
     <motion.tr
-      initial={motionProps.initial}
-      animate={motionProps.animate}
-      transition={motionProps.transition}
+      initial={animated ? motionProps.initial : false}
+      animate={animated ? motionProps.animate : undefined}
+      transition={animated ? motionProps.transition : undefined}
       className={className}
       style={style}
       onMouseEnter={onMouseEnter}
