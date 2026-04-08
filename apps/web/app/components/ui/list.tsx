@@ -330,7 +330,7 @@ export function ListEmptyState({
         </p>
         {description && (
           <p
-            className="mt-1 text-xs leading-relaxed"
+            className="mt-1 text-xs"
             style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}
           >
             {description}

@@ -245,7 +245,7 @@ export default function AdminTeacherList() {
             교사 관리
           </h2>
           <p
-            className="mt-1 text-xs leading-relaxed"
+            className="mt-1 text-xs"
             style={{
               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
               color: 'var(--fg-muted)',

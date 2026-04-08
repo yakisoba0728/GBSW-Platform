@@ -369,7 +369,7 @@ export function ConfirmModal({
             {title}
           </p>
           <p
-            className="mt-1.5 text-sm leading-relaxed whitespace-pre-line"
+            className="mt-1.5 text-sm"
             style={{
               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
               color: 'var(--admin-text-muted)',
@@ -489,7 +489,7 @@ export function AlertModal({
             </p>
             {message && (
               <p
-                className="mt-1 text-sm leading-relaxed"
+                className="mt-1 text-sm"
                 style={{
                   fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                   color: 'var(--admin-text-muted)',

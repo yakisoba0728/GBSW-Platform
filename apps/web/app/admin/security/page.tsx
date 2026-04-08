@@ -12,7 +12,7 @@ export default function AdminSecurityPage() {
           관리자 보안
         </h2>
         <p
-          className="mt-1 text-xs leading-relaxed"
+          className="mt-1 text-xs"
           style={{
             fontFamily: 'var(--font-noto-sans-kr), sans-serif',
             color: 'var(--fg-muted)',
@@ -41,7 +41,7 @@ export default function AdminSecurityPage() {
               운영 변경 방법
             </h3>
             <p
-              className="mt-2 text-sm leading-relaxed"
+              className="mt-2 text-sm"
               style={{
                 fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                 color: 'var(--fg-muted)',
