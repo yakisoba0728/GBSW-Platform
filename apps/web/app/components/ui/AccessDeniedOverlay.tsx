@@ -68,27 +68,28 @@ export default function AccessDeniedOverlay({
             justifyContent: 'center',
           }}
         >
-          {animationData ? (
-            <Lottie
-              animationData={animationData}
-              loop={false}
-              style={{ width: '100%', height: '100%' }}
-            />
-          ) : (
-            <div
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: '50%',
-                backgroundColor: 'var(--destructive-bg, rgba(239,68,68,0.12))',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              backgroundColor: 'var(--destructive-bg, rgba(239,68,68,0.12))',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+            }}
+          >
+            {animationData ? (
+              <Lottie
+                animationData={animationData}
+                loop={false}
+                style={{ width: 44, height: 44 }}
+              />
+            ) : (
               <CircleX size={28} style={{ color: 'var(--destructive, #ef4444)' }} />
-            </div>
-          )}
+            )}
+          </div>
         </motion.div>
         <motion.p
           initial={{ opacity: 0 }}
