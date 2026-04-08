@@ -63,6 +63,7 @@ export default function SchoolMileageHistory({
   const fetchAbortControllerRef = useRef<AbortController | null>(null)
   const hasLoadedOnceRef = useRef(false)
   const [isFetching, setIsFetching] = useState(false)
+  const [hasAnimated, setHasAnimated] = useState(false)
 
   const pageCount = Math.max(1, Math.ceil(response.totalCount / response.pageSize))
   const hasActiveFilters = Object.values(filters).some((value) => value.length > 0)
@@ -119,6 +120,7 @@ export default function SchoolMileageHistory({
         setIsLoading(false)
         setIsFetching(false)
         fetchAbortControllerRef.current = null
+        setHasAnimated(true)
       }
     }
   }, [filters, page, pageSize])
@@ -245,6 +247,7 @@ export default function SchoolMileageHistory({
                 items={response.items}
                 isLoading={isLoading}
                 isFetching={isFetching}
+                animated={!hasAnimated}
                 onEdit={setEditingItem}
                 onDelete={requestDeleteEntry}
               />
@@ -253,6 +256,7 @@ export default function SchoolMileageHistory({
                 items={response.items}
                 isLoading={isLoading}
                 isFetching={isFetching}
+                animated={!hasAnimated}
                 page={page}
                 pageCount={pageCount}
                 totalCount={response.totalCount}
