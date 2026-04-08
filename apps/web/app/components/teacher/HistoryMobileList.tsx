@@ -16,12 +16,14 @@ export default function HistoryMobileList({
   isFetching,
   onEdit,
   onDelete,
+  animated = true,
 }: {
   items: SchoolMileageHistoryItem[]
   isLoading: boolean
   isFetching: boolean
   onEdit?: (item: SchoolMileageHistoryItem) => void
   onDelete?: (item: SchoolMileageHistoryItem) => void
+  animated?: boolean
   }) {
   return (
     <div className="relative min-h-0 flex-1 pr-0.5 md:hidden">
@@ -43,6 +45,7 @@ export default function HistoryMobileList({
               <AnimatedListItem
                 key={item.id}
                 index={index}
+                animated={animated}
                 className="rounded-lg border px-3.5 py-3"
                 style={{
                   borderColor: 'var(--admin-border)',

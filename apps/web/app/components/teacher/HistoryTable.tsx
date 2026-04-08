@@ -21,6 +21,7 @@ export default function HistoryTable({
   onEdit,
   onDelete,
   onPageChange,
+  animated = true,
 }: {
   items: SchoolMileageHistoryItem[]
   isLoading: boolean
@@ -31,6 +32,7 @@ export default function HistoryTable({
   onEdit?: (item: SchoolMileageHistoryItem) => void
   onDelete?: (item: SchoolMileageHistoryItem) => void
   onPageChange: (page: number) => void
+  animated?: boolean
   }) {
   return (
     <>
@@ -103,6 +105,7 @@ export default function HistoryTable({
                   <AnimatedTableRow
                     key={item.id}
                     index={index}
+                    animated={animated}
                     className="transition-colors hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
                     style={{ borderBottom: '1px solid var(--border)' }}
                   >
