@@ -105,7 +105,7 @@ export function Button({
     borderRadius: '8px',
     fontFamily: 'var(--font-noto-sans-kr), sans-serif',
     fontWeight: 500,
-    lineHeight: 1,
+    lineHeight: 1.2,
     cursor: isInert ? 'not-allowed' : 'pointer',
     opacity: isInert ? 0.5 : 1,
     transition: 'background 0.15s ease, filter 0.15s ease, color 0.15s ease',
