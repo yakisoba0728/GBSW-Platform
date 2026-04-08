@@ -79,6 +79,7 @@ export function Modal({
               zIndex: 1000,
               background: 'rgba(0,0,0,0.5)',
               backdropFilter: 'blur(2px)',
+              WebkitBackdropFilter: 'blur(2px)',
             }}
           />
 
@@ -110,7 +111,7 @@ export function Modal({
                 border: '1px solid var(--border)',
                 borderRadius: 16,
                 boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-                overflow: 'hidden',
+                overflow: 'auto',
               }}
             >
               {/* Header */}
@@ -300,7 +301,7 @@ export function ModalBase({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center px-3 py-4 ${overlayClass}`}
+      className={`fixed inset-0 z-[1002] flex items-center justify-center px-3 py-4 ${overlayClass}`}
       style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
