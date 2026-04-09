@@ -23,10 +23,6 @@ type AuthenticatedUser = {
   school?: School;
 };
 
-type ClientIpHeaders = {
-  realIp?: string;
-};
-
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 8;
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOGIN_WINDOW_MS = 1000 * 60 * 10;
@@ -37,11 +33,10 @@ const CHANGE_PWD_LOCK_MS = 1000 * 60 * 10; // 10분 잠금
 export class AuthService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async login(body: Record<string, unknown>, clientIpHeaders: ClientIpHeaders = {}) {
+  async login(body: Record<string, unknown>) {
     const id = parseRequiredText(body.id, '아이디');
     const password = parseRequiredPassword(body.password, '비밀번호');
-    const clientIp = normalizeClientIp(clientIpHeaders);
-    const throttleKeys = buildLoginThrottleKeys(id, clientIp);
+    const throttleKeys = buildLoginThrottleKeys(id);
     const cooldownSeconds =
       await this.getRemainingLoginCooldownSecondsForKeys(throttleKeys);
 
@@ -711,22 +706,8 @@ function fromPrismaAuthRole(role: PrismaAuthRole) {
   }
 }
 
-function normalizeClientIp({ realIp }: ClientIpHeaders) {
-  const rawIp = realIp?.trim();
-
-  if (!rawIp) {
-    return null;
-  }
-
-  const normalizedIp = rawIp.replace(/^::ffff:/, '').trim();
-
-  return normalizedIp.length > 0 ? normalizedIp : null;
-}
-
-function buildLoginThrottleKeys(accountId: string, clientIp: string | null) {
-  return clientIp
-    ? [`account:${accountId}`, `ip:${clientIp}`]
-    : [`account:${accountId}`];
+function buildLoginThrottleKeys(accountId: string) {
+  return [`account:${accountId}`];
 }
 
 function uniqueKeys(keys: string[]) {

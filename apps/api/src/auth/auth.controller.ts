@@ -7,11 +7,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  login(
-    @Headers('x-real-ip') realIp: string | undefined,
-    @Body() body: Record<string, unknown>,
-  ) {
-    return this.authService.login(body, { realIp });
+  login(@Body() body: Record<string, unknown>) {
+    return this.authService.login(body);
   }
 
   @Post('change-password')
