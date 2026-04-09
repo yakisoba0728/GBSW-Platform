@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Card, NoticeBox } from '../mileage/shared'
+import { Card } from '../ui/card'
+import { NoticeBox } from '../mileage/shared'
 import SuccessModal from '../ui/success-modal'
 import {
   AnimatedListItem,
@@ -261,8 +262,6 @@ export default function SharedMileageStudentView<
       if (!response.ok) {
         setDetailError(entriesLoadErrorMessage)
         setShowErrorModal(true)
-        setStudentEntries([])
-        setTotalEntryCount(0)
         return
       }
 
@@ -272,8 +271,6 @@ export default function SharedMileageStudentView<
       if ((error as Error).name !== 'AbortError') {
         setDetailError(entriesLoadCatchMessage)
         setShowErrorModal(true)
-        setStudentEntries([])
-        setTotalEntryCount(0)
       }
     } finally {
       if (abortEntriesRef.current === controller) {

@@ -1,9 +1,4 @@
-import SchoolMileageStudentView from '@/app/components/teacher/SchoolMileageStudentView'
-
-export default function TeacherMileageStudentsPage() {
-  return (
-    <div className="flex flex-col h-full">
-      <SchoolMileageStudentView />
-    </div>
-  )
+import { redirect } from 'next/navigation'
+export default function RedirectPage() {
+  redirect('/teacher/school/students')
 }

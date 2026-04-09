@@ -1,15 +1,23 @@
 'use client'
 
-import DormGrantRowCard, { type DormGrantRow } from './DormGrantRowCard'
-import DormRuleSelectionModal from './DormRuleSelectionModal'
-import DormStudentSelectionModal from './DormStudentSelectionModal'
+import SharedGrantRowCard from './SharedGrantRowCard'
+import SharedRuleSelectionModal from './SharedRuleSelectionModal'
+import SharedStudentSelectionModal from './SharedStudentSelectionModal'
 import SharedMileageGrantView from './SharedMileageGrantView'
-import { useDormRulesContext } from '../dorm-mileage/dorm-rules-context'
+import { useDormRulesContext } from '../mileage/rules-context'
 import type {
   CreateDormMileageEntriesPayload,
   DormMileageRuleSummary,
   DormMileageStudentOption,
 } from './dorm-mileage-types'
+
+type DormGrantRow = {
+  localId: number
+  student: DormMileageStudentOption
+  ruleId: number | ''
+  score: number | ''
+  reason: string
+}
 
 export default function DormMileageGrant({
   isDormTeacher,
@@ -52,21 +60,40 @@ export default function DormMileageGrant({
       emptyDescription="상단 버튼으로 학생을 추가한 뒤 규칙과 점수를 입력하세요."
       submitIdleLabel={(rowCount) => `전체 부여하기 (${rowCount}명)`}
       renderStudentSelectionModal={(props) => (
-        <DormStudentSelectionModal {...props} />
+        <SharedStudentSelectionModal<DormMileageStudentOption>
+          {...props}
+          apiPath="/api/teacher/dorm-mileage/students"
+          title="대상 학생 추가"
+          description="학년·반 조건으로 기숙사 학생을 찾아 추가하세요."
+          emptyDescription="학년·반 조건을 바꿔 다시 찾아보세요."
+          loadErrorMessage="학생 목록을 불러오지 못했습니다."
+          fetchErrorMessage="학생 목록을 불러오는 중 문제가 발생했습니다."
+        />
       )}
       renderRuleSelectionModal={(props) => (
-        <DormRuleSelectionModal
+        <SharedRuleSelectionModal<DormMileageRuleSummary>
           isOpen={props.isOpen}
           rewardRules={props.rewardRules}
           penaltyRules={props.penaltyRules}
           currentRuleId={props.currentRuleId}
+          title="기숙사 상벌점 항목 선택"
+          description="항목을 선택하면 기본 점수가 자동 적용됩니다. 범위가 있는 항목은 점수를 직접 입력할 수 있습니다."
+          allowScoreRange
           onSelect={(rule, score) =>
             props.onSelectRule({ ruleId: rule.id, score })
           }
           onClose={props.onClose}
         />
       )}
-      renderGrantRowCard={(props) => <DormGrantRowCard {...props} />}
+      renderGrantRowCard={(props) => (
+        <SharedGrantRowCard<
+          DormMileageStudentOption,
+          DormMileageRuleSummary,
+          DormGrantRow
+        >
+          {...props}
+        />
+      )}
     />
   )
 }

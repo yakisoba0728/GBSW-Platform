@@ -1,12 +1,9 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import {
-  Card,
-  ScoreSummaryBar,
-  StatCard,
-} from '@/app/components/mileage/shared'
+import { Card, StatCard } from '@/app/components/ui/card'
+import { ScoreSummaryBar } from '@/app/components/mileage/shared'
 import {
   getSectionMotion,
   getStaggerDelay,
@@ -27,27 +24,14 @@ type SharedStudentSummary = {
   entryCount: number
 }
 
-type SharedStudentHistoryEntry = {
-  type: 'reward' | 'penalty'
-  score: number
-  ruleCategory: string
-  awardedAt: string
-}
-
-const ENTRY_PAGE_SIZE = 100
-
 type SharedStudentMileageStatsViewProps = {
-  summaryPath: string
-  entriesPath: string
+  statsPath: string
   introDescription: string
-  entriesLoadFailureMessage: string
 }
 
 export default function SharedStudentMileageStatsView({
-  summaryPath,
-  entriesPath,
+  statsPath,
   introDescription,
-  entriesLoadFailureMessage,
 }: SharedStudentMileageStatsViewProps) {
   const prefersReducedMotion = useMotionPreference()
   const getMotion = (step = 0) =>
@@ -57,7 +41,13 @@ export default function SharedStudentMileageStatsView({
     )
 
   const [summary, setSummary] = useState<SharedStudentSummary | null>(null)
-  const [entries, setEntries] = useState<SharedStudentHistoryEntry[]>([])
+  const [categoryStats, setCategoryStats] = useState<{
+    reward: Array<{ category: string; total: number }>
+    penalty: Array<{ category: string; total: number }>
+  }>({ reward: [], penalty: [] })
+  const [monthlyStats, setMonthlyStats] = useState<
+    Array<{ key: string; label: string; reward: number; penalty: number }>
+  >([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -69,26 +59,28 @@ export default function SharedStudentMileageStatsView({
       setError(null)
 
       try {
-        const [summaryRes, allEntries] = await Promise.all([
-          fetch(summaryPath, {
-            cache: 'no-store',
-            signal: controller.signal,
-          }).then((response) => {
-            if (!response.ok) {
-              throw new Error('요약 데이터를 불러오지 못했습니다.')
-            }
+        const response = await fetch(statsPath, {
+          cache: 'no-store',
+          signal: controller.signal,
+        })
+        const payload = await response.json().catch(() => null)
 
-            return response.json()
-          }),
-          fetchAllEntries<SharedStudentHistoryEntry>(
-            controller.signal,
-            entriesPath,
-            entriesLoadFailureMessage,
-          ),
-        ])
+        if (!response.ok) {
+          throw new Error(payload?.message ?? '통계 데이터를 불러오지 못했습니다.')
+        }
 
-        setSummary((summaryRes.summary ?? null) as SharedStudentSummary | null)
-        setEntries(allEntries)
+        setSummary((payload?.summary ?? null) as SharedStudentSummary | null)
+        setCategoryStats({
+          reward: Array.isArray(payload?.categoryStats?.reward)
+            ? payload.categoryStats.reward
+            : [],
+          penalty: Array.isArray(payload?.categoryStats?.penalty)
+            ? payload.categoryStats.penalty
+            : [],
+        })
+        setMonthlyStats(
+          Array.isArray(payload?.monthlyStats) ? payload.monthlyStats : [],
+        )
       } catch (err: unknown) {
         if (err instanceof Error && err.name === 'AbortError') {
           return
@@ -111,77 +103,7 @@ export default function SharedStudentMileageStatsView({
     return () => {
       controller.abort()
     }
-  }, [entriesLoadFailureMessage, entriesPath, summaryPath])
-
-  const categoryStats = useMemo(() => {
-    if (!entries.length) {
-      return { reward: [], penalty: [] }
-    }
-
-    const rewardMap = new Map<string, number>()
-    const penaltyMap = new Map<string, number>()
-
-    for (const entry of entries) {
-      const targetMap = entry.type === 'reward' ? rewardMap : penaltyMap
-      targetMap.set(
-        entry.ruleCategory,
-        (targetMap.get(entry.ruleCategory) ?? 0) + entry.score,
-      )
-    }
-
-    const toSorted = (map: Map<string, number>) =>
-      [...map.entries()]
-        .map(([category, total]) => ({ category, total }))
-        .sort((left, right) => right.total - left.total)
-
-    return {
-      reward: toSorted(rewardMap),
-      penalty: toSorted(penaltyMap),
-    }
-  }, [entries])
-
-  const monthlyStats = useMemo(() => {
-    if (!entries.length) {
-      return []
-    }
-
-    const now = new Date()
-    const months: Array<{
-      key: string
-      label: string
-      reward: number
-      penalty: number
-    }> = []
-
-    for (let index = 5; index >= 0; index -= 1) {
-      const date = new Date(now.getFullYear(), now.getMonth() - index, 1)
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-      months.push({
-        key,
-        label: `${date.getMonth() + 1}월`,
-        reward: 0,
-        penalty: 0,
-      })
-    }
-
-    for (const entry of entries) {
-      const date = new Date(entry.awardedAt)
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-      const month = months.find((item) => item.key === key)
-
-      if (!month) {
-        continue
-      }
-
-      if (entry.type === 'reward') {
-        month.reward += entry.score
-      } else {
-        month.penalty += entry.score
-      }
-    }
-
-    return months
-  }, [entries])
+  }, [statsPath])
 
   if (loading) {
     return (
@@ -378,73 +300,4 @@ export default function SharedStudentMileageStatsView({
       </div>
     </div>
   )
-}
-
-async function fetchAllEntries<Entry extends SharedStudentHistoryEntry>(
-  signal: AbortSignal,
-  entriesPath: string,
-  loadFailureMessage: string,
-) {
-  const firstPage = await fetchEntriesPage<Entry>(
-    1,
-    signal,
-    entriesPath,
-    loadFailureMessage,
-  )
-  const totalPages = Math.max(
-    1,
-    Math.ceil(firstPage.totalCount / firstPage.pageSize),
-  )
-
-  if (totalPages === 1) {
-    return firstPage.items
-  }
-
-  const remainingPages = await Promise.all(
-    Array.from({ length: totalPages - 1 }, (_, index) =>
-      fetchEntriesPage<Entry>(
-        index + 2,
-        signal,
-        entriesPath,
-        loadFailureMessage,
-      ),
-    ),
-  )
-
-  return [
-    ...firstPage.items,
-    ...remainingPages.flatMap((page) => page.items),
-  ]
-}
-
-async function fetchEntriesPage<Entry extends SharedStudentHistoryEntry>(
-  page: number,
-  signal: AbortSignal,
-  entriesPath: string,
-  loadFailureMessage: string,
-) {
-  const response = await fetch(
-    `${entriesPath}?page=${page}&pageSize=${ENTRY_PAGE_SIZE}`,
-    {
-      cache: 'no-store',
-      signal,
-    },
-  )
-  const result = await response.json().catch(() => null)
-
-  if (!response.ok) {
-    throw new Error(result?.message ?? loadFailureMessage)
-  }
-
-  return {
-    items: Array.isArray(result?.items) ? (result.items as Entry[]) : [],
-    totalCount:
-      typeof result?.totalCount === 'number' && result.totalCount >= 0
-        ? result.totalCount
-        : 0,
-    pageSize:
-      typeof result?.pageSize === 'number' && result.pageSize > 0
-        ? result.pageSize
-        : ENTRY_PAGE_SIZE,
-  }
 }

@@ -35,7 +35,7 @@ export type SharedMileageHistoryItem = {
   ruleName: string
   ruleDefaultScore: number
   studentId: string
-  studentName: string
+  studentName: string | null
   school?: SharedSchoolCode
   grade: number | null
   classNumber: number
@@ -161,7 +161,7 @@ export type SharedReportHistoryItem = {
   awardedAt: string
   ruleCategory: string
   ruleName: string
-  studentName: string
+  studentName: string | null
   classNumber: number
   studentNumber: number
   teacherName: string

@@ -1,9 +1,4 @@
-import StudentDormMileageRules from '@/app/components/student/StudentDormMileageRules'
-
-export default function StudentDormMileageRulesPage() {
-  return (
-    <div className="flex flex-col h-full">
-      <StudentDormMileageRules />
-    </div>
-  )
+import { redirect } from 'next/navigation'
+export default function RedirectPage() {
+  redirect('/student/dorm/rules')
 }

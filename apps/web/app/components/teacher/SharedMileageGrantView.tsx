@@ -1,7 +1,8 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
-import { Card, NoticeBox } from '../mileage/shared'
+import { Card } from '../ui/card'
+import { NoticeBox } from '../mileage/shared'
 import AccessDeniedOverlay from '../ui/AccessDeniedOverlay'
 import { Button } from '../ui/button'
 import { UserPlusCompactIcon, UserPlusFeatureIcon } from '../ui/icons'

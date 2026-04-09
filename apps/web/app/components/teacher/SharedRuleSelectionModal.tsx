@@ -115,15 +115,15 @@ export default function SharedRuleSelectionModal<Rule extends SharedMileageRuleS
         style={{
           backgroundColor: isSelected
             ? isReward
-              ? 'rgba(34,197,94,0.08)'
-              : 'rgba(239,68,68,0.08)'
+              ? 'var(--reward-bg-faint)'
+              : 'var(--penalty-bg-faint)'
             : 'transparent',
           borderWidth: 1,
           borderStyle: 'solid',
           borderColor: isSelected
             ? isReward
-              ? 'rgba(34,197,94,0.3)'
-              : 'rgba(239,68,68,0.3)'
+              ? 'var(--reward-bg-active)'
+              : 'var(--penalty-bg-active)'
             : 'transparent',
         }}
       >
@@ -136,10 +136,10 @@ export default function SharedRuleSelectionModal<Rule extends SharedMileageRuleS
             className="w-[52px] flex-shrink-0 rounded-md px-2 py-0.5 text-center text-xs font-bold"
             style={{
               backgroundColor: isReward
-                ? 'rgba(34,197,94,0.15)'
-                : 'rgba(239,68,68,0.15)',
+                ? 'var(--reward-bg-hover)'
+                : 'var(--penalty-bg-hover)',
               color: isReward ? '#15803d' : '#b91c1c',
-              border: `1px solid ${isReward ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
+              border: `1px solid ${isReward ? 'var(--reward-bg-active)' : 'var(--penalty-bg-active)'}`,
               fontFamily: 'var(--font-space-grotesk)',
             }}
           >
@@ -292,12 +292,12 @@ export default function SharedRuleSelectionModal<Rule extends SharedMileageRuleS
                   <div className="mb-2 flex items-center gap-1.5 px-1">
                     <span
                       className="inline-block h-2 w-2 rounded-full"
-                      style={{ backgroundColor: '#16a34a' }}
+                      style={{ backgroundColor: 'var(--reward)' }}
                     />
                     <p
                       className="text-[11px] font-semibold tracking-wide"
                       style={{
-                        color: '#16a34a',
+                        color: 'var(--reward)',
                         fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                       }}
                     >
@@ -315,12 +315,12 @@ export default function SharedRuleSelectionModal<Rule extends SharedMileageRuleS
                   <div className="mb-2 flex items-center gap-1.5 px-1">
                     <span
                       className="inline-block h-2 w-2 rounded-full"
-                      style={{ backgroundColor: '#dc2626' }}
+                      style={{ backgroundColor: 'var(--penalty)' }}
                     />
                     <p
                       className="text-[11px] font-semibold tracking-wide"
                       style={{
-                        color: '#dc2626',
+                        color: 'var(--penalty)',
                         fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                       }}
                     >

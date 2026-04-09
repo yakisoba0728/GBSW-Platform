@@ -58,8 +58,8 @@ export default function SharedGrantRowCard<
     selectedRule === null
       ? 'var(--admin-border)'
       : selectedRule.type === 'reward'
-        ? '#16a34a'
-        : '#dc2626'
+        ? 'var(--reward)'
+        : 'var(--penalty)'
 
   const displayScore =
     row.score === ''
@@ -86,13 +86,13 @@ export default function SharedGrantRowCard<
             style={{
               backgroundColor:
                 selectedRule.type === 'reward'
-                  ? 'rgba(34,197,94,0.15)'
-                  : 'rgba(239,68,68,0.15)',
+                  ? 'var(--reward-bg-hover)'
+                  : 'var(--penalty-bg-hover)',
               color: selectedRule.type === 'reward' ? '#15803d' : '#b91c1c',
               border: `1px solid ${
                 selectedRule.type === 'reward'
-                  ? 'rgba(34,197,94,0.3)'
-                  : 'rgba(239,68,68,0.3)'
+                  ? 'var(--reward-bg-active)'
+                  : 'var(--penalty-bg-active)'
               }`,
               fontFamily: 'var(--font-space-grotesk)',
               lineHeight: '1.4',
@@ -199,7 +199,7 @@ export default function SharedGrantRowCard<
             onClick={onRemove}
             disabled={!isInteractive}
             className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg transition-colors hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-50"
-            style={{ color: '#dc2626' }}
+            style={{ color: 'var(--penalty)' }}
             aria-label="행 삭제"
           >
             <XIcon />
@@ -249,7 +249,7 @@ export default function SharedGrantRowCard<
           onClick={onRemove}
           disabled={!isInteractive}
           className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg transition-colors hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-50"
-          style={{ color: '#dc2626' }}
+          style={{ color: 'var(--penalty)' }}
           aria-label="행 삭제"
         >
           <XIcon />

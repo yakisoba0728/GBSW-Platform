@@ -1,6 +1,6 @@
 'use client'
 
-import DormStudentReportTable from './DormStudentReportTable'
+import SharedStudentReportTable from './SharedStudentReportTable'
 import SharedMileageReportPreview from './SharedMileageReportPreview'
 import type { ReportPreviewType } from './ReportPreviewShell'
 import type {
@@ -70,7 +70,11 @@ export default function DormMileageReportPreview({
       onPrint={onPrint}
       onPageChange={onPageChange}
       renderStudentReportTable={(props) => (
-        <DormStudentReportTable {...props} />
+        <SharedStudentReportTable<DormStudentMileageSummary, DormMileageHistoryItem>
+          {...props}
+          entriesApiPath="/api/teacher/dorm-mileage/entries"
+          emptyDescription="이 학생에게 아직 기숙사 상벌점 내역이 없습니다."
+        />
       )}
     />
   )

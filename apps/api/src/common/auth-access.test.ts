@@ -1,4 +1,5 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { createHash } from 'node:crypto';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { resetApiRuntimeEnvCache } from '../config/runtime-env';
 import {
   assertStudentExists,
@@ -61,9 +62,15 @@ describe('auth-access helpers', () => {
   it('accepts a matching super-admin credential set', async () => {
     setRuntimeEnv();
 
+    const fingerprint = createHash('sha256')
+      .update('super-admin:super-admin-password')
+      .digest('hex');
+
     const prisma = {
       authSession: {
-        findFirst: () => Promise.resolve({ id: 'session-1' }),
+        findFirst: () =>
+          Promise.resolve({ id: 'session-1', credentialFingerprint: fingerprint }),
+        updateMany: vi.fn().mockResolvedValue({ count: 0 }),
       },
     };
 
@@ -114,6 +121,44 @@ describe('auth-access helpers', () => {
     await expect(
       assertSuperAdmin(prisma as never, 'other-admin', 'session-1'),
     ).rejects.toThrow('유효한 최고관리자 계정이 아닙니다.');
+  });
+
+  it('routes non-blank super-admin header through the assertSuperAdmin path', async () => {
+    process.env.INTERNAL_API_SECRET = 'test-internal-secret';
+    process.env.SUPER_ADMIN_ID = 'super-admin';
+    process.env.SUPER_ADMIN_PASSWORD = 'super-admin-password';
+
+    const fingerprint = createHash('sha256')
+      .update('super-admin:super-admin-password')
+      .digest('hex');
+
+    const prisma = {
+      authSession: {
+        findFirst: () =>
+          Promise.resolve({
+            id: 'session-1',
+            credentialFingerprint: fingerprint,
+          }),
+        updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+      },
+      teacher: {
+        findFirst: vi.fn().mockRejectedValue(new Error('should not be called')),
+      },
+    };
+
+    await expect(
+      assertTeacherOrSuperAdmin(
+        prisma as never,
+        'teacher-1',
+        'super-admin',
+        'session-1',
+      ),
+    ).resolves.toEqual({
+      role: 'super-admin',
+      accountId: 'super-admin',
+    });
+
+    expect(prisma.teacher.findFirst).not.toHaveBeenCalled();
   });
 });
 

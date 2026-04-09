@@ -1,9 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState, type ReactNode } from 'react'
+import { useState, type FocusEvent, type ReactNode } from 'react'
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'accent'
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'accent' | 'outline' | 'destructive'
 type ButtonSize = 'sm' | 'md' | 'lg'
 
 interface ButtonProps {
@@ -58,6 +58,18 @@ function getVariantStyle(variant: ButtonVariant, hovered: boolean): React.CSSPro
         border: '1px solid var(--accent)',
         color: hovered ? '#ffffff' : 'var(--accent)',
       }
+    case 'outline':
+      return {
+        background: hovered ? 'var(--bg-muted)' : 'transparent',
+        border: '1px solid var(--border)',
+        color: 'var(--fg)',
+      }
+    case 'destructive':
+      return {
+        background: hovered ? 'var(--penalty-subtle)' : 'transparent',
+        border: '1px solid var(--penalty-border)',
+        color: 'var(--penalty)',
+      }
   }
 }
 
@@ -94,6 +106,7 @@ export function Button({
   fullWidth = false,
 }: ButtonProps) {
   const [hovered, setHovered] = useState(false)
+  const [focusVisible, setFocusVisible] = useState(false)
   const isInert = disabled || loading
 
   const baseStyle: React.CSSProperties = {
@@ -112,6 +125,7 @@ export function Button({
     userSelect: 'none',
     whiteSpace: 'nowrap',
     outline: 'none',
+    boxShadow: focusVisible ? '0 0 0 3px rgba(var(--accent-rgb), 0.28)' : 'none',
     ...(fullWidth ? { width: '100%' } : {}),
     ...sizeStyles[size],
     ...getVariantStyle(variant, hovered && !isInert),
@@ -131,6 +145,8 @@ export function Button({
         className={className}
         style={baseStyle}
         aria-busy={loading}
+        onFocus={(event: FocusEvent<HTMLButtonElement>) => setFocusVisible(event.currentTarget.matches(':focus-visible'))}
+        onBlur={() => setFocusVisible(false)}
       >
         <span
           style={{
@@ -171,6 +187,8 @@ export function Button({
       whileTap={{ scale: 0.97 }}
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
+      onFocus={(event) => setFocusVisible(event.currentTarget.matches(':focus-visible'))}
+      onBlur={() => setFocusVisible(false)}
     >
       <span
         style={{

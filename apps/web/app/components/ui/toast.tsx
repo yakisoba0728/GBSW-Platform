@@ -59,8 +59,8 @@ function ToastItemComponent({
       exit={motionProps.exit}
       transition={motionProps.transition}
       style={{
-        minWidth: 280,
-        maxWidth: 380,
+        width: '100%',
+        maxWidth: 400,
         padding: '12px 16px',
         borderRadius: 10,
         background: 'var(--bg)',
@@ -165,9 +165,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           position: 'fixed',
           bottom: 20,
           right: 20,
+          left: 20,
           zIndex: 9998,
           display: 'flex',
           flexDirection: 'column-reverse',
+          alignItems: 'flex-end',
           gap: 8,
         }}
       >

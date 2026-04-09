@@ -2,7 +2,8 @@
 
 import { Filter } from 'lucide-react'
 import { Button } from '../ui/button'
-import { Card, SCHOOL_OPTIONS, inputStyle } from '../mileage/shared'
+import { Card } from '../ui/card'
+import { SCHOOL_OPTIONS, inputStyle } from '../mileage/shared'
 
 type SharedHistoryFiltersState = {
   school?: string

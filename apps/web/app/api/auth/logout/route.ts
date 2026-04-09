@@ -15,10 +15,9 @@ export async function POST(request: NextRequest) {
     try {
       await revokeAuthSession(sessionId)
     } catch {
-      return createLogoutResponse(
-        request,
+      return NextResponse.json(
         { message: '로그아웃 요청을 처리하지 못했습니다.' },
-        502,
+        { status: 502 },
       )
     }
   }

@@ -1,6 +1,24 @@
 #!/bin/sh
 set -eu
 
+require_real_value() {
+  name="$1"
+  value="${2:-}"
+
+  case "$value" in
+    "" | change-me* | change-this* | replace-me* | admin@example.com)
+      echo "$name must be set to a real value for production pgAdmin" >&2
+      exit 1
+      ;;
+  esac
+}
+
+require_real_value "PGADMIN_DEFAULT_EMAIL" "${PGADMIN_DEFAULT_EMAIL:-}"
+require_real_value "PGADMIN_DEFAULT_PASSWORD" "${PGADMIN_DEFAULT_PASSWORD:-}"
+require_real_value "POSTGRES_USER" "${POSTGRES_USER:-}"
+require_real_value "POSTGRES_PASSWORD" "${POSTGRES_PASSWORD:-}"
+require_real_value "POSTGRES_DB" "${POSTGRES_DB:-}"
+
 storage_user="${PGADMIN_DEFAULT_EMAIL:-}"
 
 case "$storage_user" in

@@ -10,6 +10,8 @@ describe('mileage-summary helpers', () => {
   it('calculates a student grade from the account id prefix', () => {
     expect(calculateStudentGrade('GB240101', 2024)).toBe(1);
     expect(calculateStudentGrade('GB230101', 2024)).toBe(2);
+    expect(calculateStudentGrade('GB260101', 1)).toBe(1);
+    expect(calculateStudentGrade('GB260101', 3)).toBe(3);
     expect(calculateStudentGrade('invalid-id', 2024)).toBeNull();
   });
 
@@ -128,7 +130,31 @@ describe('mileage-summary helpers', () => {
     ).toBeLessThan(0);
     expect(
       classSummary.bottomStudents.map((student) => student.studentId),
-    ).toEqual(['GB240104', 'GB240103', 'GB240102']);
+    ).toEqual(['GB240104']);
     expect(classSummary.studentCount).toBe(5);
+  });
+
+  it('bottomStudents never overlaps with topStudents', () => {
+    // 6 students — top 3 should not appear in bottom 3
+    const summaries = Array.from({ length: 6 }, (_, i) => ({
+      studentId: `ST${i}`,
+      name: `학생${i}`,
+      grade: 1,
+      classNumber: 1,
+      studentNumber: i + 1,
+      rewardTotal: 6 - i,
+      penaltyTotal: 0,
+      netScore: 6 - i,
+      entryCount: 1,
+    }));
+
+    const result = buildClassMileageSummary(1, summaries);
+    const topIds = new Set(result.topStudents.map((s) => s.studentId));
+    const bottomIds = result.bottomStudents.map((s) => s.studentId);
+
+    expect(bottomIds.some((id) => topIds.has(id))).toBe(false);
+    expect(result.bottomStudents).toHaveLength(3);
+    // Worst student first
+    expect(result.bottomStudents[0].studentId).toBe('ST5');
   });
 });

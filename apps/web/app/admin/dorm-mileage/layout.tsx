@@ -1,6 +1,6 @@
 'use client'
 
-import { DormRulesProvider } from '@/app/components/dorm-mileage/dorm-rules-context'
+import { DormRulesProvider } from '@/app/components/mileage/rules-context'
 
 export default function AdminDormMileageLayout({ children }: { children: React.ReactNode }) {
   return (

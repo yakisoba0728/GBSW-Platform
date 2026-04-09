@@ -73,7 +73,7 @@ export default function AccessDeniedOverlay({
               width: 56,
               height: 56,
               borderRadius: '50%',
-              backgroundColor: 'var(--destructive-bg, rgba(239,68,68,0.12))',
+              backgroundColor: 'var(--destructive-bg, var(--penalty-bg-muted))',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

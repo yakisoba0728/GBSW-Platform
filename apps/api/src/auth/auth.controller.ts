@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Post } from '@nestjs/common';
+import { Body, Controller, Headers, Patch, Post } from '@nestjs/common';
 import { assertInternalApiRequest } from '../common/internal-api-auth';
 import { AuthService } from './auth.service';
 
@@ -40,5 +40,34 @@ export class AuthController {
     assertInternalApiRequest(internalApiSecret);
 
     return this.authService.revokeSession(body);
+  }
+
+  @Patch('link-email')
+  linkEmail(
+    @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
+    @Headers('x-actor-session-id') actorSessionId: string | undefined,
+    @Body() body: Record<string, unknown>,
+  ) {
+    assertInternalApiRequest(internalApiSecret);
+    return this.authService.linkEmail(actorSessionId, body);
+  }
+
+  @Patch('link-phone')
+  linkPhone(
+    @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
+    @Headers('x-actor-session-id') actorSessionId: string | undefined,
+    @Body() body: Record<string, unknown>,
+  ) {
+    assertInternalApiRequest(internalApiSecret);
+    return this.authService.linkPhone(actorSessionId, body);
+  }
+
+  @Post('sessions/refresh-onboarding')
+  refreshOnboardingSession(
+    @Headers('x-internal-api-secret') internalApiSecret: string | undefined,
+    @Headers('x-actor-session-id') actorSessionId: string | undefined,
+  ) {
+    assertInternalApiRequest(internalApiSecret);
+    return this.authService.refreshOnboardingSession(actorSessionId);
   }
 }

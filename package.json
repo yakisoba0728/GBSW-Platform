@@ -14,6 +14,7 @@
     "db:up": "docker compose up -d db pgadmin",
     "db:down": "docker compose down",
     "db:prepare": "node scripts/prepare-db.mjs",
+    "db:migrate": "pnpm --filter @gbsw/api exec prisma migrate deploy --schema prisma/schema.prisma",
     "deploy:production": "node scripts/deploy-production.mjs"
   },
   "pnpm": {

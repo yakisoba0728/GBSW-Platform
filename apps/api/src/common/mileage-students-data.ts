@@ -11,7 +11,7 @@ type MileageStudentFilters = {
 
 type MileageStudentRecord = {
   studentId: string;
-  name: string;
+  name: string | null;
   school: School;
   currentYear: number;
   currentClass: number;

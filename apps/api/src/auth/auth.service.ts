@@ -4,8 +4,10 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { createHash } from 'node:crypto';
 import { AuthRole as PrismaAuthRole, School } from '@prisma/client';
-import { getSuperAdminCredentials } from '../config/runtime-env';
+import { getSuperAdminCredentials, safeStringEqual } from '../config/runtime-env';
+import { parsePhone } from '../admin/admin.parsers';
 import { PrismaService } from '../prisma/prisma.service';
 import { hashPassword, verifyPassword } from './password';
 import {
@@ -17,10 +19,12 @@ import {
 
 type AuthenticatedUser = {
   accountId: string;
-  name: string;
+  name: string | null;
   role: 'super-admin' | 'student' | 'teacher';
   mustChangePassword: boolean;
   school?: School;
+  hasLinkedEmail?: boolean;
+  hasLinkedPhone?: boolean;
 };
 
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 8;
@@ -36,7 +40,8 @@ export class AuthService {
   async login(body: Record<string, unknown>) {
     const id = parseRequiredText(body.id, '아이디');
     const password = parseRequiredPassword(body.password, '비밀번호');
-    const throttleKeys = buildLoginThrottleKeys(id);
+    const candidates = await this.findLoginCandidates(id);
+    const throttleKeys = buildLoginThrottleKeys(id, candidates);
     const cooldownSeconds =
       await this.getRemainingLoginCooldownSecondsForKeys(throttleKeys);
 
@@ -47,7 +52,7 @@ export class AuthService {
       );
     }
 
-    const user = await this.findAuthenticatedUser(id, password);
+    const user = this.findAuthenticatedUser(id, password, candidates);
 
     if (!user) {
       await this.registerFailedLoginAttemptForKeys(throttleKeys);
@@ -170,58 +175,213 @@ export class AuthService {
     };
   }
 
-  private async findAuthenticatedUser(id: string, password: string) {
+  async linkEmail(
+    actorSessionId: string | undefined,
+    body: Record<string, unknown>,
+  ) {
+    const sessionId = parseRequiredText(actorSessionId, '세션 아이디');
+    const session = await this.getActiveSession(sessionId);
+
+    if (!session) throw new UnauthorizedException('로그인이 필요합니다.');
+    if (session.role === 'super-admin')
+      throw new BadRequestException(
+        '슈퍼관리자는 이메일 연동을 사용할 수 없습니다.',
+      );
+
+    const email = parseRequiredText(body.email, '이메일', 255);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new BadRequestException('올바른 이메일 형식을 입력해주세요.');
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      if (session.role === 'student') {
+        await tx.student.update({
+          where: { studentId: session.accountId },
+          data: { email, hasLinkedEmail: true },
+        });
+      } else {
+        await tx.teacher.update({
+          where: { teacherId: session.accountId },
+          data: { email, hasLinkedEmail: true },
+        });
+      }
+
+      await tx.authSession.update({
+        where: { id: sessionId },
+        data: { hasLinkedEmail: true },
+      });
+    });
+
+    return { ok: true };
+  }
+
+  async linkPhone(
+    actorSessionId: string | undefined,
+    body: Record<string, unknown>,
+  ) {
+    const sessionId = parseRequiredText(actorSessionId, '세션 아이디');
+    const session = await this.getActiveSession(sessionId);
+
+    if (!session) throw new UnauthorizedException('로그인이 필요합니다.');
+    if (session.role === 'super-admin')
+      throw new BadRequestException(
+        '슈퍼관리자는 전화번호 연동을 사용할 수 없습니다.',
+      );
+
+    const phone = parsePhone(body.phone);
+
+    await this.prisma.$transaction(async (tx) => {
+      if (session.role === 'student') {
+        await tx.student.update({
+          where: { studentId: session.accountId },
+          data: { phone, hasLinkedPhone: true },
+        });
+      } else {
+        await tx.teacher.update({
+          where: { teacherId: session.accountId },
+          data: { phone, hasLinkedPhone: true },
+        });
+      }
+
+      await tx.authSession.update({
+        where: { id: sessionId },
+        data: { hasLinkedPhone: true },
+      });
+    });
+
+    return { ok: true };
+  }
+
+  async refreshOnboardingSession(actorSessionId: string | undefined) {
+    const sessionId = parseRequiredText(actorSessionId, '세션 아이디');
+    const session = await this.getActiveSession(sessionId);
+
+    if (!session) throw new UnauthorizedException('로그인이 필요합니다.');
+
+    let hasLinkedEmail = false;
+    let hasLinkedPhone = false;
+
+    if (session.role === 'student') {
+      const student = await this.prisma.student.findUnique({
+        where: { studentId: session.accountId },
+        select: { hasLinkedEmail: true, hasLinkedPhone: true },
+      });
+      hasLinkedEmail = student?.hasLinkedEmail ?? false;
+      hasLinkedPhone = student?.hasLinkedPhone ?? false;
+    } else if (session.role === 'teacher') {
+      const teacher = await this.prisma.teacher.findUnique({
+        where: { teacherId: session.accountId },
+        select: { hasLinkedEmail: true, hasLinkedPhone: true },
+      });
+      hasLinkedEmail = teacher?.hasLinkedEmail ?? false;
+      hasLinkedPhone = teacher?.hasLinkedPhone ?? false;
+    }
+
+    const updated = await this.prisma.authSession.update({
+      where: { id: sessionId },
+      data: { hasLinkedEmail, hasLinkedPhone },
+      select: {
+        id: true,
+        accountId: true,
+        role: true,
+        mustChangePassword: true,
+        hasLinkedEmail: true,
+        hasLinkedPhone: true,
+        expiresAt: true,
+      },
+    });
+
+    const school =
+      session.role === 'student'
+        ? (session as { school?: School }).school
+        : undefined;
+
+    return { ok: true, session: serializeSession(updated, school) };
+  }
+
+  private async findLoginCandidates(id: string) {
+    const [student, teacher] = await Promise.all([
+      this.prisma.student.findFirst({
+        where: {
+          studentId: id,
+          isActive: true,
+        },
+        select: {
+          studentId: true,
+          name: true,
+          passwordHash: true,
+          mustChangePassword: true,
+          school: true,
+          hasLinkedEmail: true,
+          hasLinkedPhone: true,
+        },
+      }),
+      this.prisma.teacher.findFirst({
+        where: {
+          teacherId: id,
+          isActive: true,
+        },
+        select: {
+          teacherId: true,
+          name: true,
+          passwordHash: true,
+          mustChangePassword: true,
+          hasLinkedEmail: true,
+          hasLinkedPhone: true,
+        },
+      }),
+    ]);
+
+    return { student, teacher };
+  }
+
+  private findAuthenticatedUser(
+    id: string,
+    password: string,
+    candidates?: Awaited<ReturnType<AuthService['findLoginCandidates']>>,
+  ) {
     const superAdmin = this.findAuthenticatedSuperAdmin(id, password);
 
     if (superAdmin) {
       return superAdmin;
     }
 
-    const student = await this.prisma.student.findFirst({
-      where: {
-        studentId: id,
-        isActive: true,
-      },
-      select: {
-        studentId: true,
-        name: true,
-        passwordHash: true,
-        mustChangePassword: true,
-        school: true,
-      },
-    });
+    const student = candidates?.student ?? null;
+    const teacher = candidates?.teacher ?? null;
 
-    if (student && verifyPassword(password, student.passwordHash)) {
-      return {
-        accountId: student.studentId,
-        name: student.name,
-        role: 'student',
-        mustChangePassword: student.mustChangePassword,
-        school: student.school,
-      } satisfies AuthenticatedUser;
+    const matchingStudent: AuthenticatedUser | null =
+      student && verifyPassword(password, student.passwordHash)
+        ? {
+            accountId: student.studentId,
+            name: student.name,
+            role: 'student' as const,
+            mustChangePassword: student.mustChangePassword,
+            school: student.school,
+            hasLinkedEmail: student.hasLinkedEmail,
+            hasLinkedPhone: student.hasLinkedPhone,
+          }
+        : null;
+
+    const matchingTeacher: AuthenticatedUser | null =
+      teacher && verifyPassword(password, teacher.passwordHash)
+        ? {
+            accountId: teacher.teacherId,
+            name: teacher.name,
+            role: 'teacher' as const,
+            mustChangePassword: teacher.mustChangePassword,
+            hasLinkedEmail: teacher.hasLinkedEmail,
+            hasLinkedPhone: teacher.hasLinkedPhone,
+          }
+        : null;
+
+    if (matchingStudent && matchingTeacher) {
+      throw new UnauthorizedException(
+        '동일한 아이디를 가진 학생/교사 계정이 동시에 존재합니다. 관리자에게 문의해주세요.',
+      );
     }
 
-    const teacher = await this.prisma.teacher.findFirst({
-      where: {
-        teacherId: id,
-        isActive: true,
-      },
-      select: {
-        teacherId: true,
-        name: true,
-        passwordHash: true,
-        mustChangePassword: true,
-      },
-    });
-
-    if (teacher && verifyPassword(password, teacher.passwordHash)) {
-      return {
-        accountId: teacher.teacherId,
-        name: teacher.name,
-        role: 'teacher',
-        mustChangePassword: teacher.mustChangePassword,
-      } satisfies AuthenticatedUser;
-    }
+    if (matchingTeacher) return matchingTeacher;
+    if (matchingStudent) return matchingStudent;
 
     return null;
   }
@@ -229,7 +389,7 @@ export class AuthService {
   private findAuthenticatedSuperAdmin(id: string, password: string) {
     const credentials = getSuperAdminCredentials();
 
-    if (id !== credentials.id || password !== credentials.password) {
+    if (!safeStringEqual(id, credentials.id) || !safeStringEqual(password, credentials.password)) {
       return null;
     }
 
@@ -258,6 +418,8 @@ export class AuthService {
         passwordHash: true,
         mustChangePassword: true,
         school: true,
+        hasLinkedEmail: true,
+        hasLinkedPhone: true,
       },
     });
 
@@ -291,6 +453,8 @@ export class AuthService {
       role: 'student' as const,
       mustChangePassword: false,
       school: student.school,
+      hasLinkedEmail: student.hasLinkedEmail,
+      hasLinkedPhone: student.hasLinkedPhone,
     };
   }
 
@@ -310,6 +474,8 @@ export class AuthService {
         name: true,
         passwordHash: true,
         mustChangePassword: true,
+        hasLinkedEmail: true,
+        hasLinkedPhone: true,
       },
     });
 
@@ -342,13 +508,20 @@ export class AuthService {
       name: teacher.name,
       role: 'teacher' as const,
       mustChangePassword: false,
+      hasLinkedEmail: teacher.hasLinkedEmail,
+      hasLinkedPhone: teacher.hasLinkedPhone,
     };
   }
 
   private async createSession(
     user: Pick<
       AuthenticatedUser,
-      'accountId' | 'role' | 'mustChangePassword' | 'school'
+      | 'accountId'
+      | 'role'
+      | 'mustChangePassword'
+      | 'school'
+      | 'hasLinkedEmail'
+      | 'hasLinkedPhone'
     >,
   ) {
     const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
@@ -357,14 +530,23 @@ export class AuthService {
       data: {
         accountId: user.accountId,
         role: toPrismaAuthRole(user.role),
+        credentialFingerprint:
+          user.role === 'super-admin'
+            ? getSuperAdminCredentialFingerprint()
+            : null,
         mustChangePassword: user.mustChangePassword,
+        hasLinkedEmail: user.hasLinkedEmail ?? false,
+        hasLinkedPhone: user.hasLinkedPhone ?? false,
         expiresAt,
       },
       select: {
         id: true,
         accountId: true,
         role: true,
+        credentialFingerprint: true,
         mustChangePassword: true,
+        hasLinkedEmail: true,
+        hasLinkedPhone: true,
         expiresAt: true,
       },
     });
@@ -387,7 +569,10 @@ export class AuthService {
         id: true,
         accountId: true,
         role: true,
+        credentialFingerprint: true,
         mustChangePassword: true,
+        hasLinkedEmail: true,
+        hasLinkedPhone: true,
         expiresAt: true,
         revokedAt: true,
       },
@@ -445,6 +630,13 @@ export class AuthService {
       const credentials = getSuperAdminCredentials();
 
       if (session.accountId !== credentials.id) {
+        await this.revokeSessionById(normalizedSessionId);
+        return null;
+      }
+
+      if (
+        session.credentialFingerprint !== getSuperAdminCredentialFingerprint()
+      ) {
         await this.revokeSessionById(normalizedSessionId);
         return null;
       }
@@ -669,7 +861,10 @@ function serializeSession(
     id: string;
     accountId: string;
     role: PrismaAuthRole;
+    credentialFingerprint?: string | null;
     mustChangePassword: boolean;
+    hasLinkedEmail: boolean;
+    hasLinkedPhone: boolean;
     expiresAt: Date;
   },
   school?: School,
@@ -679,6 +874,8 @@ function serializeSession(
     accountId: session.accountId,
     role: fromPrismaAuthRole(session.role),
     mustChangePassword: session.mustChangePassword,
+    hasLinkedEmail: session.hasLinkedEmail,
+    hasLinkedPhone: session.hasLinkedPhone,
     expiresAt: session.expiresAt.toISOString(),
     ...(school ? { school } : {}),
   };
@@ -706,8 +903,40 @@ function fromPrismaAuthRole(role: PrismaAuthRole) {
   }
 }
 
-function buildLoginThrottleKeys(accountId: string) {
-  return [`account:${accountId}`];
+function buildLoginThrottleKeys(
+  accountId: string,
+  candidates: {
+    student?: object | null;
+    teacher?: object | null;
+  },
+) {
+  const credentials = getSuperAdminCredentials();
+
+  if (accountId === credentials.id) {
+    return [`super-admin:${accountId}`];
+  }
+
+  if (candidates.student && candidates.teacher) {
+    return [`ambiguous:${accountId}`];
+  }
+
+  if (candidates.teacher) {
+    return [`teacher:${accountId}`];
+  }
+
+  if (candidates.student) {
+    return [`student:${accountId}`];
+  }
+
+  return [`login-id:${accountId}`];
+}
+
+function getSuperAdminCredentialFingerprint() {
+  const credentials = getSuperAdminCredentials();
+
+  return createHash('sha256')
+    .update(`${credentials.id}:${credentials.password}`)
+    .digest('hex');
 }
 
 function uniqueKeys(keys: string[]) {

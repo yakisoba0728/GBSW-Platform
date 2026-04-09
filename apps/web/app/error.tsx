@@ -1,14 +1,20 @@
 'use client'
 
+import { useEffect } from 'react'
 import AuthShell from './components/auth/AuthShell'
 import RouteErrorFallback from './components/ui/RouteErrorFallback'
 
 export default function RootError({
+  error,
   reset,
 }: {
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  useEffect(() => {
+    console.error(error)
+  }, [error])
+
   return (
     <AuthShell>
       <section

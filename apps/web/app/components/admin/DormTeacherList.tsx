@@ -1,15 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   DormBadge,
   monoCellStyle,
   textCellStyle,
 } from '@/app/components/admin/account-ui-shared'
-import { RefetchWrapper } from '@/app/components/ui/primitives'
-import { useLoadingGate } from '@/app/components/ui/useLoadingGate'
+import { DataTable, type DataTableColumn } from '@/app/components/ui/data-table'
 import { ListSkeleton } from '@/app/components/ui/list'
 import { NoticeBox } from '@/app/components/ui/notice'
+import { RefetchWrapper } from '@/app/components/ui/primitives'
+import { useLoadingGate } from '@/app/components/ui/useLoadingGate'
 
 type Teacher = {
   teacherId: string
@@ -52,6 +53,78 @@ export default function DormTeacherList() {
       }
     }
   }
+
+  const teacherColumns: DataTableColumn<Teacher>[] = useMemo(
+    () => [
+      {
+        key: 'teacherId',
+        header: '아이디',
+        render: (teacher) => (
+          <span className="text-xs" style={monoCellStyle}>
+            {teacher.teacherId}
+          </span>
+        ),
+      },
+      {
+        key: 'name',
+        header: '이름',
+        render: (teacher) => (
+          <span className="text-[13px] font-medium" style={textCellStyle}>
+            {teacher.name}
+          </span>
+        ),
+      },
+      {
+        key: 'isDormTeacher',
+        header: '사감 교사',
+        render: (teacher) => (
+          <div className="flex items-center gap-3">
+            <DormBadge enabled={teacher.isDormTeacher} />
+            <button
+              type="button"
+              role="switch"
+              aria-checked={teacher.isDormTeacher}
+              disabled={updatingId === teacher.teacherId}
+              onClick={() => void toggleDormTeacher(teacher)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                width: 36,
+                height: 20,
+                borderRadius: 10,
+                padding: '2px',
+                backgroundColor: teacher.isDormTeacher
+                  ? 'var(--accent)'
+                  : 'var(--border)',
+                border: 'none',
+                cursor:
+                  updatingId === teacher.teacherId
+                    ? 'not-allowed'
+                    : 'pointer',
+                opacity: updatingId === teacher.teacherId ? 0.6 : 1,
+                transition: 'background-color 0.15s',
+              }}
+            >
+              <span
+                style={{
+                  display: 'block',
+                  width: 16,
+                  height: 16,
+                  borderRadius: '50%',
+                  backgroundColor: '#fff',
+                  transform: teacher.isDormTeacher
+                    ? 'translateX(16px)'
+                    : 'translateX(0)',
+                  transition: 'transform 0.15s',
+                }}
+              />
+            </button>
+          </div>
+        ),
+      },
+    ],
+    [updatingId],
+  )
 
   async function toggleDormTeacher(teacher: Teacher) {
     const nextValue = !teacher.isDormTeacher
@@ -107,97 +180,23 @@ export default function DormTeacherList() {
         <NoticeBox type="error" message={error} />
       ) : (
         <div className="overflow-x-auto">
-          {showLoading && (
+          {showLoading ? (
             <div className="py-5">
               <ListSkeleton count={5} rowHeight="h-11" />
             </div>
+          ) : (
+            <RefetchWrapper
+              isFetching={isLoading && hasLoadedOnce}
+              isInitialLoad={false}
+            >
+              <DataTable
+                columns={teacherColumns}
+                data={teachers}
+                rowKey={(t) => t.teacherId}
+                animated={false}
+              />
+            </RefetchWrapper>
           )}
-          <RefetchWrapper
-            isFetching={isLoading && hasLoadedOnce}
-            isInitialLoad={showLoading}
-          >
-            <table className="w-full text-sm" style={{ borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  {['아이디', '이름', '사감 교사'].map((h) => (
-                    <th
-                      key={h}
-                      scope="col"
-                      className="pb-2 text-left text-[11px] font-medium uppercase tracking-wider"
-                      style={{ color: 'var(--fg-muted)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {teachers.map((teacher) => (
-                  <tr
-                    key={teacher.teacherId}
-                    style={{ borderBottom: '1px solid var(--border)' }}
-                  >
-                    <td
-                      className="py-3 text-xs"
-                      style={monoCellStyle}
-                    >
-                      {teacher.teacherId}
-                    </td>
-                    <td
-                      className="py-3 text-[13px] font-medium"
-                      style={textCellStyle}
-                    >
-                      {teacher.name}
-                    </td>
-                    <td className="py-3">
-                      <div className="flex items-center gap-3">
-                        <DormBadge enabled={teacher.isDormTeacher} />
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={teacher.isDormTeacher}
-                          disabled={updatingId === teacher.teacherId}
-                          onClick={() => void toggleDormTeacher(teacher)}
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            width: 36,
-                            height: 20,
-                            borderRadius: 10,
-                            padding: '2px',
-                            backgroundColor: teacher.isDormTeacher
-                              ? 'var(--accent)'
-                              : 'var(--border)',
-                            border: 'none',
-                            cursor:
-                              updatingId === teacher.teacherId
-                                ? 'not-allowed'
-                                : 'pointer',
-                            opacity: updatingId === teacher.teacherId ? 0.6 : 1,
-                            transition: 'background-color 0.15s',
-                          }}
-                        >
-                          <span
-                            style={{
-                              display: 'block',
-                              width: 16,
-                              height: 16,
-                              borderRadius: '50%',
-                              backgroundColor: '#fff',
-                              transform: teacher.isDormTeacher
-                                ? 'translateX(16px)'
-                                : 'translateX(0)',
-                              transition: 'transform 0.15s',
-                            }}
-                          />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </RefetchWrapper>
         </div>
       )}
     </div>

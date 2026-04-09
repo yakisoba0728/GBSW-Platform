@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Filter } from 'lucide-react'
+import { Card } from '@/app/components/ui/card'
 import {
-  Card,
   NoticeBox,
   formatAwardedAt,
   formatAwardedAtParts,
@@ -141,7 +141,6 @@ export default function SharedStudentMileageHistoryView<
       if (!fetchResponse.ok) {
         setLoadError(result?.message ?? loadFailureMessage)
         setShowLoadErrorModal(true)
-        setResponse((prev) => ({ ...prev, items: [], totalCount: 0, page }))
         return
       }
 
@@ -167,7 +166,6 @@ export default function SharedStudentMileageHistoryView<
 
       setLoadError(loadExceptionMessage)
       setShowLoadErrorModal(true)
-      setResponse((prev) => ({ ...prev, items: [], totalCount: 0, page }))
     } finally {
       if (fetchAbortControllerRef.current === abortController) {
         hasLoadedOnceRef.current = true

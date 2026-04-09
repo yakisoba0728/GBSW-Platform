@@ -1,9 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import dotenv from 'dotenv';
-import { readRequiredDirectApiOrigin, rootDir } from './env.mjs';
+import {
+  captureCommand,
+  readRequiredDirectApiOrigin,
+  readRequiredEnv,
+  readRequiredSecret,
+  rootDir,
+  runCommand,
+} from './env.mjs';
 
 const envFileArgument = process.argv[2] ?? process.env.ENV_FILE ?? '.env.production';
 const envFilePath = path.resolve(rootDir, envFileArgument);
@@ -15,21 +21,25 @@ if (!fs.existsSync(envFilePath)) {
 
 dotenv.config({ path: envFilePath, quiet: true });
 
-const postgresUser = requireEnv('POSTGRES_USER');
-const postgresPassword = requireEnv('POSTGRES_PASSWORD');
-const postgresDatabase = requireEnv('POSTGRES_DB');
+const postgresUser = readRequiredEnv('POSTGRES_USER', envFilePath);
+const postgresPassword = readRequiredSecret('POSTGRES_PASSWORD', envFilePath);
+const postgresDatabase = readRequiredEnv('POSTGRES_DB', envFilePath);
 const webPort = requirePort('WEB_PORT');
+const pgAdminEmail = readRequiredSecret('PGADMIN_DEFAULT_EMAIL', envFilePath);
+readRequiredSecret('PGADMIN_DEFAULT_PASSWORD', envFilePath);
 const publicApiUrl = readRequiredDirectApiOrigin(
   'NEXT_PUBLIC_API_URL',
   envFilePath,
 );
-requireEnv('INTERNAL_API_SECRET');
-requireEnv('SUPER_ADMIN_ID');
-requireEnv('SUPER_ADMIN_PASSWORD');
+readRequiredSecret('INTERNAL_API_SECRET', envFilePath);
+readRequiredSecret('SUPER_ADMIN_ID', envFilePath);
+readRequiredSecret('SUPER_ADMIN_PASSWORD', envFilePath);
 const composeArgs = [
   'compose',
   '--env-file',
   path.relative(rootDir, envFilePath),
+  '--profile',
+  'admin',
   '-f',
   'docker-compose.production.yml',
 ];
@@ -37,16 +47,27 @@ const composeArgs = [
 try {
   console.log(`Using production env file: ${path.relative(rootDir, envFilePath)}`);
   console.log(`Validated NEXT_PUBLIC_API_URL: ${publicApiUrl}`);
+  console.log(`Validated pgAdmin account: ${pgAdminEmail}`);
 
-  await run('docker', [...composeArgs, 'config', '--quiet'], { stdio: 'ignore' });
-  await run('docker', [...composeArgs, 'up', '-d', 'db']);
+  await runCommand('docker', [...composeArgs, 'config', '--quiet'], {
+    stdio: 'ignore',
+  });
+  await runCommand('docker', [...composeArgs, 'build', 'api', 'web']);
+  await runCommand('docker', [...composeArgs, 'up', '-d', 'db', 'pgadmin']);
 
-  const dbContainerId = await capture('docker', [...composeArgs, 'ps', '-q', 'db']);
+  const dbContainerId = await captureCommand('docker', [...composeArgs, 'ps', '-q', 'db']);
+  const pgAdminContainerId = await captureCommand('docker', [
+    ...composeArgs,
+    'ps',
+    '-q',
+    'pgadmin',
+  ]);
   await waitForHealthyContainer(dbContainerId, 'db');
+  await waitForHealthyContainer(pgAdminContainerId, 'pgadmin');
 
   const sql = `ALTER ROLE ${quoteIdentifier(postgresUser)} WITH PASSWORD ${quoteLiteral(postgresPassword)};`;
 
-  await run('docker', [
+  await runCommand('docker', [
     ...composeArgs,
     'exec',
     '-T',
@@ -64,10 +85,34 @@ try {
     sql,
   ]);
 
-  await run('docker', [...composeArgs, 'up', '-d', '--build', 'api', 'web']);
+  console.log('Running Prisma migrate deploy in the api image...');
+  await runCommand('docker', [
+    ...composeArgs,
+    'run',
+    '--rm',
+    '--no-deps',
+    'api',
+    './node_modules/.bin/prisma',
+    'migrate',
+    'deploy',
+    '--schema',
+    'prisma/schema.prisma',
+  ]);
 
-  const apiContainerId = await capture('docker', [...composeArgs, 'ps', '-q', 'api']);
-  const webContainerId = await capture('docker', [...composeArgs, 'ps', '-q', 'web']);
+  await runCommand('docker', [...composeArgs, 'up', '-d', 'api', 'web']);
+
+  const apiContainerId = await captureCommand('docker', [
+    ...composeArgs,
+    'ps',
+    '-q',
+    'api',
+  ]);
+  const webContainerId = await captureCommand('docker', [
+    ...composeArgs,
+    'ps',
+    '-q',
+    'web',
+  ]);
 
   await waitForHealthyContainer(apiContainerId, 'api');
   await waitForHealthyContainer(webContainerId, 'web');
@@ -77,6 +122,7 @@ try {
     `Inspect services with: docker ${composeArgs.join(' ')} ps`,
   );
   console.log(`Web port: ${webPort}`);
+  console.log(`pgAdmin port: ${process.env.PGADMIN_PORT ?? '5050'}`);
 } catch (error) {
   console.error(getErrorMessage(error));
   process.exit(1);
@@ -90,7 +136,7 @@ async function waitForHealthyContainer(containerId, label, timeoutMs = 90_000) {
   const startedAt = Date.now();
 
   while (Date.now() - startedAt < timeoutMs) {
-    const status = await capture('docker', [
+    const status = await captureCommand('docker', [
       'inspect',
       '-f',
       '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}',
@@ -120,13 +166,7 @@ function quoteLiteral(value) {
 }
 
 function requireEnv(name) {
-  const value = process.env[name]?.trim();
-
-  if (!value) {
-    throw new Error(`${name} must be set in ${envFilePath}`);
-  }
-
-  return value;
+  return readRequiredEnv(name, envFilePath);
 }
 
 function requirePort(name) {
@@ -146,62 +186,4 @@ function getErrorMessage(error) {
   }
 
   return 'Production deployment failed.';
-}
-
-function run(command, args, options = {}) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
-      cwd: rootDir,
-      env: process.env,
-      stdio: options.stdio ?? 'inherit',
-    });
-
-    child.once('error', reject);
-    child.once('exit', (code) => {
-      if (code === 0) {
-        resolve();
-        return;
-      }
-
-      reject(
-        new Error(`${command} ${args.join(' ')} exited with code ${code ?? 1}`),
-      );
-    });
-  });
-}
-
-function capture(command, args) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
-      cwd: rootDir,
-      env: process.env,
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-
-    let stdout = '';
-    let stderr = '';
-
-    child.stdout.setEncoding('utf8');
-    child.stderr.setEncoding('utf8');
-
-    child.stdout.on('data', (chunk) => {
-      stdout += chunk;
-    });
-
-    child.stderr.on('data', (chunk) => {
-      stderr += chunk;
-    });
-
-    child.once('error', reject);
-    child.once('exit', (code) => {
-      if (code === 0) {
-        resolve(stdout.trim());
-        return;
-      }
-
-      reject(
-        new Error(stderr.trim() || `${command} ${args.join(' ')} exited with code ${code ?? 1}`),
-      );
-    });
-  });
 }

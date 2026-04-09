@@ -71,6 +71,17 @@ export default function SharedStudentSelectionModal<Student extends SharedMileag
       ),
     [addedStudentIds, visibleStudents],
   )
+  const visibleStudentIds = useMemo(
+    () => new Set(visibleStudents.map((student) => student.studentId)),
+    [visibleStudents],
+  )
+  const hiddenSelectedCount = useMemo(
+    () =>
+      [...selectedStudents.keys()].filter(
+        (studentId) => !visibleStudentIds.has(studentId),
+      ).length,
+    [selectedStudents, visibleStudentIds],
+  )
 
   const allSelected =
     selectableStudents.length > 0 &&
@@ -314,6 +325,34 @@ export default function SharedStudentSelectionModal<Student extends SharedMileag
             선택됨
           </span>
         </div>
+
+        {hiddenSelectedCount > 0 && (
+          <div className="px-5 pt-3">
+            <NoticeBox
+              type="error"
+              message={`현재 필터 밖에 있는 학생 ${hiddenSelectedCount}명이 계속 선택된 상태입니다. 숨겨진 선택이 보고서에 포함될 수 있습니다.`}
+            />
+            <div className="mt-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  setSelectedStudents((prev) => {
+                    const next = new Map(prev)
+                    for (const studentId of prev.keys()) {
+                      if (!visibleStudentIds.has(studentId)) {
+                        next.delete(studentId)
+                      }
+                    }
+                    return next
+                  })
+                }
+              >
+                숨겨진 선택 해제
+              </Button>
+            </div>
+          </div>
+        )}
 
         <div className="flex-1 overflow-y-auto px-5 py-4">
           {error && <NoticeBox type="error" message={error} />}

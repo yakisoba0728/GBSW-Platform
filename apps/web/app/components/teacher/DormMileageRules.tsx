@@ -1,6 +1,6 @@
 'use client'
 
-import DormRuleFormModal from './DormRuleFormModal'
+import SharedRuleFormModal from './SharedRuleFormModal'
 import SharedMileageRulesView from './SharedMileageRulesView'
 import type { DormMileageRuleSummary } from './dorm-mileage-types'
 
@@ -43,7 +43,14 @@ export default function DormMileageRules({
       createSuccessDescription="새 기숙사 상벌점 항목이 추가되었습니다."
       editSuccessDescription="기숙사 상벌점 항목이 수정되었습니다."
       emptyDescription="검색 조건을 변경하거나 새 항목을 추가해 보세요."
-      renderFormModal={(props) => <DormRuleFormModal {...props} />}
+      renderFormModal={(props) => (
+        <SharedRuleFormModal<DormMileageRuleSummary>
+          {...props}
+          apiPath={props.apiPath ?? '/api/teacher/dorm-mileage/rules'}
+          datalistId="dorm-rule-category-list"
+          allowScoreRange
+        />
+      )}
       formatScoreDisplay={formatScoreDisplay}
     />
   )

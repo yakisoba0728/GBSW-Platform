@@ -152,10 +152,10 @@ export default function SharedEditEntryModal<Item extends SharedMileageHistoryIt
                     style={{
                       backgroundColor:
                         item.type === 'reward'
-                          ? 'rgba(34,197,94,0.15)'
-                          : 'rgba(239,68,68,0.15)',
+                          ? 'var(--reward-bg-hover)'
+                          : 'var(--penalty-bg-hover)',
                       color: item.type === 'reward' ? '#15803d' : '#b91c1c',
-                      border: `1px solid ${item.type === 'reward' ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                      border: `1px solid ${item.type === 'reward' ? 'var(--reward-bg-active)' : 'var(--penalty-bg-active)'}`,
                       fontFamily: 'var(--font-space-grotesk)',
                     }}
                   >

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Card } from '@/app/components/mileage/shared'
+import { Card } from '@/app/components/ui/card'
 import { ListSkeleton, StatCardSkeleton } from '@/app/components/ui/list'
 import {
   PageHeaderSkeleton,
@@ -35,39 +35,37 @@ export default function StudentHome() {
   const [loading, setLoading] = useState(true)
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
   const showLoading = useLoadingGate({ active: loading && !hasLoadedOnce })
-  const [error, setError] = useState<string | null>(null)
+  const [schoolError, setSchoolError] = useState<string | null>(null)
+  const [dormError, setDormError] = useState<string | null>(null)
   const [retryKey, setRetryKey] = useState(0)
 
   useEffect(() => {
     const controller = new AbortController()
 
     async function fetchData() {
-      let didLoadSuccessfully = false
       setLoading(true)
-      setError(null)
+      setSchoolError(null)
+      setDormError(null)
 
-      try {
-        const [summaryRes, entriesRes, dormSummaryRes, dormEntriesRes] = await Promise.all([
+      // Fetch school and dorm data independently so one failure doesn't hide the other
+      const [schoolResult, dormResult] = await Promise.allSettled([
+        Promise.all([
           fetch('/api/student/school-mileage/summary', {
             cache: 'no-store',
             signal: controller.signal,
           }).then((response) => {
-            if (!response.ok) {
-              throw new Error('요약 데이터를 불러오지 못했습니다.')
-            }
-
+            if (!response.ok) throw new Error('요약 데이터를 불러오지 못했습니다.')
             return response.json()
           }),
           fetch('/api/student/school-mileage/entries?pageSize=5', {
             cache: 'no-store',
             signal: controller.signal,
           }).then((response) => {
-            if (!response.ok) {
-              throw new Error('상벌점 내역을 불러오지 못했습니다.')
-            }
-
+            if (!response.ok) throw new Error('상벌점 내역을 불러오지 못했습니다.')
             return response.json()
           }),
+        ]),
+        Promise.all([
           fetch('/api/student/dorm-mileage/summary', {
             cache: 'no-store',
             signal: controller.signal,
@@ -80,35 +78,40 @@ export default function StudentHome() {
           })
             .then((response) => (response.ok ? response.json() : null))
             .catch(() => null),
-        ])
+        ]),
+      ])
 
-        if (!controller.signal.aborted) {
-          setSummary(summaryRes.summary ?? null)
-          setEntries(Array.isArray(entriesRes.items) ? entriesRes.items : [])
-          setDormSummary(dormSummaryRes?.summary ?? null)
-          setDormEntries(
-            Array.isArray(dormEntriesRes?.items) ? dormEntriesRes.items : [],
-          )
-          didLoadSuccessfully = true
-        }
-      } catch (err: unknown) {
-        if (controller.signal.aborted) {
-          return
-        }
+      if (controller.signal.aborted) return
 
-        setError(
-          err instanceof Error
-            ? err.message
+      let didLoadSuccessfully = false
+
+      if (schoolResult.status === 'fulfilled') {
+        const [summaryRes, entriesRes] = schoolResult.value
+        setSummary(summaryRes.summary ?? null)
+        setEntries(Array.isArray(entriesRes.items) ? entriesRes.items : [])
+        didLoadSuccessfully = true
+      } else {
+        setSchoolError(
+          schoolResult.reason instanceof Error
+            ? schoolResult.reason.message
             : '데이터를 불러오는 중 오류가 발생했습니다.',
         )
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false)
-          if (didLoadSuccessfully) {
-            setHasLoadedOnce(true)
-          }
-        }
       }
+
+      if (dormResult.status === 'fulfilled') {
+        const [dormSummaryRes, dormEntriesRes] = dormResult.value
+        setDormSummary(dormSummaryRes?.summary ?? null)
+        setDormEntries(Array.isArray(dormEntriesRes?.items) ? dormEntriesRes.items : [])
+      } else {
+        setDormError(
+          dormResult.reason instanceof Error
+            ? dormResult.reason.message
+            : '기숙사 데이터를 불러오는 중 오류가 발생했습니다.',
+        )
+      }
+
+      setLoading(false)
+      if (didLoadSuccessfully) setHasLoadedOnce(true)
     }
 
     void fetchData()
@@ -117,49 +120,6 @@ export default function StudentHome() {
       controller.abort()
     }
   }, [retryKey])
-
-  if (error) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <div
-          className="rounded-xl border px-5 py-5"
-          style={{
-            borderColor: 'var(--penalty)',
-            backgroundColor: 'color-mix(in srgb, var(--penalty) 8%, transparent)',
-            textAlign: 'center',
-          }}
-        >
-          <p
-            style={{
-              fontSize: 13,
-              color: 'var(--penalty)',
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              marginBottom: 12,
-            }}
-          >
-            {error}
-          </p>
-          <button
-            type="button"
-            onClick={() => setRetryKey((key) => key + 1)}
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              color: 'var(--accent)',
-              backgroundColor: 'transparent',
-              border: '1px solid var(--accent)',
-              borderRadius: 8,
-              padding: '6px 16px',
-              cursor: 'pointer',
-            }}
-          >
-            다시 시도
-          </button>
-        </div>
-      </div>
-    )
-  }
 
   const rewardTotal = summary?.rewardTotal ?? 0
   const penaltyTotal = summary?.penaltyTotal ?? 0
@@ -202,6 +162,46 @@ export default function StudentHome() {
         isInitialLoad={showLoading}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {schoolError && (
+        <div
+          className="rounded-xl border px-5 py-5"
+          style={{
+            borderColor: 'var(--penalty)',
+            backgroundColor: 'color-mix(in srgb, var(--penalty) 8%, transparent)',
+            textAlign: 'center',
+          }}
+        >
+          <p
+            style={{
+              fontSize: 13,
+              color: 'var(--penalty)',
+              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+              marginBottom: 12,
+            }}
+          >
+            {schoolError}
+          </p>
+          <button
+            type="button"
+            onClick={() => setRetryKey((key) => key + 1)}
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+              color: 'var(--accent)',
+              backgroundColor: 'transparent',
+              border: '1px solid var(--accent)',
+              borderRadius: 8,
+              padding: '6px 16px',
+              cursor: 'pointer',
+            }}
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
+      {!schoolError && (
+        <>
       <StudentHomeHeaderSection />
       <StudentHomeStatsSection
         rewardTotal={rewardTotal}
@@ -214,8 +214,31 @@ export default function StudentHome() {
       />
       <StudentHomeRecentEntriesSection entries={entries} />
       <StudentHomeQuickLinksSection />
+        </>
+      )}
 
-      {dormSummary && (
+      {dormError && (
+        <div
+          className="rounded-xl border px-5 py-4"
+          style={{
+            borderColor: 'var(--penalty)',
+            backgroundColor: 'color-mix(in srgb, var(--penalty) 8%, transparent)',
+            textAlign: 'center',
+          }}
+        >
+          <p
+            style={{
+              fontSize: 13,
+              color: 'var(--penalty)',
+              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+            }}
+          >
+            {dormError}
+          </p>
+        </div>
+      )}
+
+      {!dormError && dormSummary && (
         <>
           <div
             style={{

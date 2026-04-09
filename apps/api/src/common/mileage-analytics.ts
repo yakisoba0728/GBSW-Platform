@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { MileageScope, Prisma } from '@prisma/client';
 
 type MileageDateFilters = {
   startDate?: Date;
@@ -50,10 +50,12 @@ export const EMPTY_MILEAGE_TOTALS: MileageStudentTotals = {
 };
 
 export function buildMileageEntryWhere(
+  scope: MileageScope,
   filters: MileageDateFilters,
   studentIds?: string[],
 ) {
   return {
+    scope,
     deletedAt: null,
     awardedAt:
       filters.startDate || filters.endDate
@@ -71,10 +73,14 @@ export function buildMileageEntryWhere(
 }
 
 export function buildMileageEntryWhereSql(
+  scope: MileageScope,
   filters: MileageDateFilters,
   studentIds?: string[],
 ) {
-  const conditions: Prisma.Sql[] = [Prisma.sql`e.deleted_at IS NULL`];
+  const conditions: Prisma.Sql[] = [
+    Prisma.sql`e.deleted_at IS NULL`,
+    Prisma.sql`e.scope = ${scope}::"MileageScope"`,
+  ];
 
   if (filters.startDate) {
     conditions.push(Prisma.sql`e.awarded_at >= ${filters.startDate}`);

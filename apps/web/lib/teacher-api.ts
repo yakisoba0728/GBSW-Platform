@@ -6,23 +6,33 @@ type TeacherGetPath =
   | '/school-mileage/students'
   | `/school-mileage/students/${string}/summary`
   | '/school-mileage/entries'
+  | '/school-mileage/entries/export'
   | '/school-mileage/analytics/overview'
+  | '/school-mileage/analytics/export'
   | '/school-mileage/analytics/students'
   | '/school-mileage/analytics/classes'
   | '/dorm-mileage/rules'
   | '/dorm-mileage/students'
   | `/dorm-mileage/students/${string}/summary`
   | '/dorm-mileage/entries'
+  | '/dorm-mileage/entries/export'
   | '/dorm-mileage/analytics/overview'
+  | '/dorm-mileage/analytics/export'
   | '/dorm-mileage/analytics/students'
   | '/dorm-mileage/analytics/classes'
   | '/dorm-mileage/my/access'
+  | '/teacher/students'
+  | `/teacher/students/${string}`
 
 type TeacherWritePath =
   | '/school-mileage/entries/batch'
   | `/school-mileage/entries/${string}`
   | '/dorm-mileage/entries/batch'
   | `/dorm-mileage/entries/${string}`
+  | '/teacher/students'
+  | '/teacher/students/bulk'
+  | `/teacher/students/${string}`
+  | `/teacher/students/${string}/reset-password`
 
 export async function proxyTeacherGetRequest(
   request: NextRequest,
@@ -32,6 +42,21 @@ export async function proxyTeacherGetRequest(
 }
 
 export async function proxyTeacherWriteRequest(
+  request: NextRequest,
+  pathname: TeacherWritePath,
+  method: 'POST' | 'PATCH' | 'DELETE',
+) {
+  return proxyTeacherRequest(request, pathname, method)
+}
+
+export async function proxyTeacherStudentGetRequest(
+  request: NextRequest,
+  pathname: TeacherGetPath,
+) {
+  return proxyTeacherRequest(request, pathname, 'GET')
+}
+
+export async function proxyTeacherStudentWriteRequest(
   request: NextRequest,
   pathname: TeacherWritePath,
   method: 'POST' | 'PATCH' | 'DELETE',

@@ -12,12 +12,12 @@ enum School {
   BYMS
 }
 
-enum SchoolMileageType {
-  REWARD
-  PENALTY
+enum MileageScope {
+  SCHOOL
+  DORM
 }
 
-enum DormMileageType {
+enum MileageType {
   REWARD
   PENALTY
 }
@@ -29,102 +29,122 @@ enum AuthRole {
 }
 
 model Student {
-  studentId            String               @id @map("student_id")
-  school               School
-  currentYear          Int                  @map("current_year")
-  currentClass         Int                  @map("current_class_number")
-  currentNumber        Int                  @map("current_student_number")
-  majorSubject         String?              @map("major_subject")
-  name                 String
-  phone                String
-  isActive             Boolean              @default(true) @map("is_active")
-  passwordHash         String               @map("password_hash")
-  mustChangePassword   Boolean              @default(true) @map("must_change_password")
-  createdAt            DateTime             @default(now()) @map("created_at")
-  updatedAt            DateTime             @updatedAt @map("updated_at")
-  schoolMileageEntries SchoolMileageEntry[]
-  dormMileageEntries   DormMileageEntry[]
+  studentId          String   @id @map("student_id")
+  school             School
+  currentYear        Int      @map("current_year")
+  currentClass       Int      @map("current_class_number")
+  currentNumber      Int      @map("current_student_number")
+  majorSubject       String?  @map("major_subject")
+  name               String?
+  phone              String?
+  email              String?
+  hasLinkedPhone     Boolean  @default(false) @map("has_linked_phone")
+  hasLinkedEmail     Boolean  @default(false) @map("has_linked_email")
+  isActive           Boolean  @default(true) @map("is_active")
+  passwordHash       String   @map("password_hash")
+  mustChangePassword Boolean  @default(true) @map("must_change_password")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  mileageEntries MileageEntry[]
 
   @@index([isActive])
+  // Partial unique index: see migration 20260410000000 — email IS NOT NULL
+  // Partial unique index: see migration 20260410000000 — phone IS NOT NULL
   @@index([school, isActive, currentClass, currentNumber], map: "students_school_is_active_current_class_current_number_idx")
   @@map("students")
 }
 
 model Teacher {
-  teacherId                   String               @id @map("teacher_id")
-  name                        String
-  phone                       String
-  isActive                    Boolean              @default(true) @map("is_active")
-  passwordHash                String               @map("password_hash")
-  mustChangePassword          Boolean              @default(true) @map("must_change_password")
-  isDormTeacher               Boolean              @default(false) @map("is_dorm_teacher")
-  createdAt                   DateTime             @default(now()) @map("created_at")
-  updatedAt                   DateTime             @updatedAt @map("updated_at")
-  createdSchoolMileageEntries SchoolMileageEntry[] @relation("SchoolMileageCreatedBy")
-  updatedSchoolMileageEntries SchoolMileageEntry[] @relation("SchoolMileageUpdatedBy")
-  deletedSchoolMileageEntries SchoolMileageEntry[] @relation("SchoolMileageDeletedBy")
-  dormMileageEntries          DormMileageEntry[]   @relation("DormEntryCreatedBy")
-  dormMileageEntriesUpdated   DormMileageEntry[]   @relation("DormEntryUpdatedBy")
-  dormMileageEntriesDeleted   DormMileageEntry[]   @relation("DormEntryDeletedBy")
+  teacherId          String   @id @map("teacher_id")
+  name               String
+  phone              String?
+  email              String?
+  hasLinkedPhone     Boolean  @default(false) @map("has_linked_phone")
+  hasLinkedEmail     Boolean  @default(false) @map("has_linked_email")
+  isActive           Boolean  @default(true) @map("is_active")
+  passwordHash       String   @map("password_hash")
+  mustChangePassword Boolean  @default(true) @map("must_change_password")
+  isDormTeacher      Boolean  @default(false) @map("is_dorm_teacher")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  createdMileageEntries MileageEntry[] @relation("MileageCreatedBy")
+  updatedMileageEntries MileageEntry[] @relation("MileageUpdatedBy")
+  deletedMileageEntries MileageEntry[] @relation("MileageDeletedBy")
 
   @@index([isActive])
+  // Partial unique index: see migration 20260410000000 — email IS NOT NULL
+  // Partial unique index: see migration 20260410000000 — phone IS NOT NULL
   @@index([isActive, name], map: "teachers_is_active_name_idx")
   @@map("teachers")
 }
 
-model SchoolMileageRule {
-  id           Int                  @id @default(autoincrement())
-  type         SchoolMileageType
+model MileageRule {
+  id           Int          @id @default(autoincrement())
+  scope        MileageScope
+  type         MileageType
   category     String
   name         String
-  defaultScore Int                  @map("default_score")
-  displayOrder Int                  @map("display_order")
-  isActive     Boolean              @default(true) @map("is_active")
-  createdAt    DateTime             @default(now()) @map("created_at")
-  updatedAt    DateTime             @updatedAt @map("updated_at")
-  entries      SchoolMileageEntry[]
+  defaultScore Int          @map("default_score")
+  minScore     Int?         @map("min_score")
+  maxScore     Int?         @map("max_score")
+  displayOrder Int          @map("display_order")
+  isActive     Boolean      @default(true) @map("is_active")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
 
-  @@unique([type, category, name])
-  @@unique([displayOrder])
-  @@index([isActive, displayOrder])
-  @@map("school_mileage_rules")
+  entries MileageEntry[]
+
+  @@unique([scope, type, category, name])
+  @@unique([scope, displayOrder])
+  @@index([scope, isActive, displayOrder])
+  @@map("mileage_rules")
 }
 
-model SchoolMileageEntry {
-  id                 Int               @id @default(autoincrement())
-  studentId          String            @map("student_id")
-  ruleId             Int               @map("rule_id")
-  type               SchoolMileageType
+model MileageEntry {
+  id                 Int          @id @default(autoincrement())
+  scope              MileageScope
+  studentId          String       @map("student_id")
+  ruleId             Int          @map("rule_id")
+  type               MileageType
   score              Int
   reason             String?
-  awardedAt          DateTime          @map("awarded_at")
-  createdByTeacherId String            @map("created_by_teacher_id")
-  updatedByTeacherId String?           @map("updated_by_teacher_id")
-  deletedByTeacherId String?           @map("deleted_by_teacher_id")
-  createdAt          DateTime          @default(now()) @map("created_at")
-  updatedAt          DateTime          @updatedAt @map("updated_at")
-  deletedAt          DateTime?         @map("deleted_at")
-  student            Student           @relation(fields: [studentId], references: [studentId])
-  rule               SchoolMileageRule @relation(fields: [ruleId], references: [id])
-  createdByTeacher   Teacher           @relation("SchoolMileageCreatedBy", fields: [createdByTeacherId], references: [teacherId])
-  updatedByTeacher   Teacher?          @relation("SchoolMileageUpdatedBy", fields: [updatedByTeacherId], references: [teacherId])
-  deletedByTeacher   Teacher?          @relation("SchoolMileageDeletedBy", fields: [deletedByTeacherId], references: [teacherId])
+  awardedAt          DateTime     @map("awarded_at")
+  createdByTeacherId String       @map("created_by_teacher_id")
+  updatedByTeacherId String?      @map("updated_by_teacher_id")
+  deletedByTeacherId String?      @map("deleted_by_teacher_id")
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+  deletedAt          DateTime?    @map("deleted_at")
 
-  @@index([studentId, deletedAt, awardedAt])
-  @@index([type, deletedAt, awardedAt])
-  @@index([deletedAt, awardedAt])
-  @@map("school_mileage_entries")
+  student          Student     @relation(fields: [studentId], references: [studentId])
+  rule             MileageRule @relation(fields: [ruleId], references: [id])
+  createdByTeacher Teacher     @relation("MileageCreatedBy", fields: [createdByTeacherId], references: [teacherId])
+  updatedByTeacher Teacher?    @relation("MileageUpdatedBy", fields: [updatedByTeacherId], references: [teacherId])
+  deletedByTeacher Teacher?    @relation("MileageDeletedBy", fields: [deletedByTeacherId], references: [teacherId])
+
+  @@index([scope, studentId, deletedAt, awardedAt])
+  @@index([scope, type, deletedAt, awardedAt])
+  @@index([scope, deletedAt, awardedAt])
+  @@index([ruleId])
+  @@index([updatedByTeacherId])
+  @@index([deletedByTeacherId])
+  @@map("mileage_entries")
 }
 
 model AuthSession {
-  id                 String   @id @default(cuid())
-  accountId          String   @map("account_id")
+  id                 String    @id @default(cuid())
+  accountId          String    @map("account_id")
   role               AuthRole
-  mustChangePassword Boolean  @default(false) @map("must_change_password")
-  expiresAt          DateTime @map("expires_at")
+  credentialFingerprint String? @map("credential_fingerprint")
+  mustChangePassword Boolean   @default(false) @map("must_change_password")
+  hasLinkedEmail     Boolean   @default(false) @map("has_linked_email")
+  hasLinkedPhone     Boolean   @default(false) @map("has_linked_phone")
+  expiresAt          DateTime  @map("expires_at")
   revokedAt          DateTime? @map("revoked_at")
-  createdAt          DateTime @default(now()) @map("created_at")
-  updatedAt          DateTime @updatedAt @map("updated_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
 
   @@index([accountId, role, revokedAt, expiresAt])
   @@index([expiresAt, revokedAt])
@@ -139,53 +159,6 @@ model LoginThrottle {
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
+  @@index([lockedUntil])
   @@map("login_throttles")
-}
-
-model DormMileageRule {
-  id           Int             @id @default(autoincrement())
-  type         DormMileageType
-  category     String
-  name         String
-  defaultScore Int             @map("default_score")
-  minScore     Int?            @map("min_score")
-  maxScore     Int?            @map("max_score")
-  displayOrder Int             @map("display_order")
-  isActive     Boolean         @default(true) @map("is_active")
-  createdAt    DateTime        @default(now()) @map("created_at")
-  updatedAt    DateTime        @updatedAt @map("updated_at")
-
-  entries DormMileageEntry[]
-
-  @@unique([type, category, name])
-  @@unique([displayOrder])
-  @@index([isActive, displayOrder])
-  @@map("dorm_mileage_rules")
-}
-
-model DormMileageEntry {
-  id                 Int             @id @default(autoincrement())
-  studentId          String          @map("student_id")
-  ruleId             Int             @map("rule_id")
-  type               DormMileageType
-  score              Int
-  reason             String?
-  awardedAt          DateTime        @map("awarded_at")
-  createdByTeacherId String          @map("created_by_teacher_id")
-  updatedByTeacherId String?         @map("updated_by_teacher_id")
-  deletedByTeacherId String?         @map("deleted_by_teacher_id")
-  createdAt          DateTime        @default(now()) @map("created_at")
-  updatedAt          DateTime        @updatedAt @map("updated_at")
-  deletedAt          DateTime?       @map("deleted_at")
-
-  student          Student         @relation(fields: [studentId], references: [studentId])
-  rule             DormMileageRule @relation(fields: [ruleId], references: [id])
-  createdByTeacher Teacher         @relation("DormEntryCreatedBy", fields: [createdByTeacherId], references: [teacherId])
-  updatedByTeacher Teacher?        @relation("DormEntryUpdatedBy", fields: [updatedByTeacherId], references: [teacherId])
-  deletedByTeacher Teacher?        @relation("DormEntryDeletedBy", fields: [deletedByTeacherId], references: [teacherId])
-
-  @@index([studentId, deletedAt, awardedAt])
-  @@index([type, deletedAt, awardedAt])
-  @@index([deletedAt, awardedAt])
-  @@map("dorm_mileage_entries")
 }

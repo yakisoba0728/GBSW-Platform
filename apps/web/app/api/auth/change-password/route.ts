@@ -1,5 +1,10 @@
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import {
+  getResponseMessage,
+  readJsonRequestBody,
+  readResponseBody,
+} from '@/lib/api-proxy'
 import { getApiBaseUrl } from '@/lib/api-base-url'
 import {
   AUTH_SESSION_COOKIE,
@@ -40,7 +45,16 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const body = await request.json().catch(() => null)
+  const bodyResult = await readJsonRequestBody(request)
+
+  if (!bodyResult.ok) {
+    return NextResponse.json(
+      { message: '요청 본문이 올바르지 않습니다.' },
+      { status: 400 },
+    )
+  }
+
+  const body = bodyResult.body as Record<string, unknown> | null
   const currentPassword =
     typeof body?.currentPassword === 'string' ? body.currentPassword : undefined
   const newPassword =
@@ -64,15 +78,19 @@ export async function POST(request: NextRequest) {
       },
     )
 
-    const payload = await upstreamResponse.json().catch(() => null)
+    const responseBody = await readResponseBody(upstreamResponse)
 
     if (!upstreamResponse.ok) {
       return NextResponse.json(
-        { message: getErrorMessage(payload, '비밀번호를 변경하지 못했습니다.') },
+        { message: getResponseMessage(responseBody, '비밀번호를 변경하지 못했습니다.') },
         { status: upstreamResponse.status },
       )
     }
 
+    const payload =
+      responseBody.kind === 'json'
+        ? (responseBody.body as Record<string, unknown> | null)
+        : null
     const nextSession = parseAuthSession(payload?.session)
 
     if (!nextSession) {
@@ -106,25 +124,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function getErrorMessage(payload: unknown, fallback: string) {
-  if (
-    payload &&
-    typeof payload === 'object' &&
-    'message' in payload &&
-    typeof payload.message === 'string' &&
-    payload.message.trim().length > 0
-  ) {
-    return payload.message.trim()
-  }
-
-  return fallback
-}
-
 function parseAuthSession(value: unknown): {
   id: string
   accountId: string
   role: 'student' | 'teacher'
   mustChangePassword: boolean
+  hasLinkedEmail: boolean
+  hasLinkedPhone: boolean
   expiresAt: string
   school?: 'GBSW' | 'BYMS'
 } | null {
@@ -141,6 +147,8 @@ function parseAuthSession(value: unknown): {
     session.accountId.trim().length === 0 ||
     (session.role !== 'student' && session.role !== 'teacher') ||
     typeof session.mustChangePassword !== 'boolean' ||
+    typeof session.hasLinkedEmail !== 'boolean' ||
+    typeof session.hasLinkedPhone !== 'boolean' ||
     typeof session.expiresAt !== 'string'
   ) {
     return null
@@ -165,6 +173,8 @@ function parseAuthSession(value: unknown): {
     accountId: session.accountId.trim(),
     role: session.role,
     mustChangePassword: session.mustChangePassword,
+    hasLinkedEmail: session.hasLinkedEmail,
+    hasLinkedPhone: session.hasLinkedPhone,
     expiresAt: session.expiresAt,
     ...(session.school ? { school: session.school } : {}),
   }

@@ -15,9 +15,9 @@ export function buildStudentNavItems(school: 'GBSW' | 'BYMS'): DashboardNavItem[
       section: '마일리지',
       icon: <ShieldCheckIcon />,
       children: [
-        { href: '/student/mileage/history', label: '상벌점 내역' },
-        { href: '/student/mileage/rules', label: '규정 항목' },
-        { href: '/student/mileage/stats', label: '내 통계' },
+        { href: '/student/school/history', label: '상벌점 내역' },
+        { href: '/student/school/rules', label: '규정 항목' },
+        { href: '/student/school/stats', label: '내 통계' },
       ],
     },
   ]
@@ -28,9 +28,9 @@ export function buildStudentNavItems(school: 'GBSW' | 'BYMS'): DashboardNavItem[
       label: '기숙사 상벌점',
       icon: <ShieldCheckIcon />,
       children: [
-        { href: '/student/dorm-mileage/history', label: '기숙사 상벌점 내역' },
-        { href: '/student/dorm-mileage/rules', label: '기숙사 규정 항목' },
-        { href: '/student/dorm-mileage/stats', label: '기숙사 내 통계' },
+        { href: '/student/dorm/history', label: '기숙사 상벌점 내역' },
+        { href: '/student/dorm/rules', label: '기숙사 규정 항목' },
+        { href: '/student/dorm/stats', label: '기숙사 내 통계' },
       ],
     })
   }

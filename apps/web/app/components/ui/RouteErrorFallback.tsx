@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect } from 'react'
+import { dispatchAppNavigationComplete } from '@/lib/url-state'
 import { Button } from './button'
 
 export default function RouteErrorFallback({
@@ -11,6 +13,10 @@ export default function RouteErrorFallback({
   description?: string
   onRetry: () => void
 }) {
+  useEffect(() => {
+    dispatchAppNavigationComplete()
+  }, [])
+
   return (
     <div
       className="rounded-xl border px-5 py-5"

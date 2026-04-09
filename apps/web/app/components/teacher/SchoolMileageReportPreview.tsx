@@ -1,12 +1,14 @@
 'use client'
 
 import SharedMileageReportPreview from './SharedMileageReportPreview'
-import StudentReportTable from './StudentReportTable'
+import SharedStudentReportTable from './SharedStudentReportTable'
 import type { ReportPreviewType } from './ReportPreviewShell'
 import type {
   ClassMileageAnalyticsResponse,
   PaginatedSchoolMileageHistoryResponse,
+  SchoolMileageHistoryItem,
   StudentMileageAnalyticsResponse,
+  StudentMileageSummary,
 } from './school-mileage-types'
 
 export default function SchoolMileageReportPreview({
@@ -69,7 +71,13 @@ export default function SchoolMileageReportPreview({
       showPrintOnlyAllEntries
       onPrint={onPrint}
       onPageChange={onPageChange}
-      renderStudentReportTable={(props) => <StudentReportTable {...props} />}
+      renderStudentReportTable={(props) => (
+        <SharedStudentReportTable<StudentMileageSummary, SchoolMileageHistoryItem>
+          {...props}
+          entriesApiPath="/api/teacher/school-mileage/entries"
+          emptyDescription="이 학생에게 아직 상벌점 내역이 없습니다."
+        />
+      )}
     />
   )
 }

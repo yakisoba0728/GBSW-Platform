@@ -1,3 +1,5 @@
+import { timingSafeEqual, createHash } from 'crypto';
+
 const REQUIRED_RUNTIME_ENV_NAMES = [
   'SUPER_ADMIN_ID',
   'SUPER_ADMIN_PASSWORD',
@@ -54,4 +56,16 @@ function readRequiredEnv(name: RequiredRuntimeEnvName) {
   }
 
   return value;
+}
+
+export function safeStringEqual(a: string, b: string): boolean {
+  // Hash to fixed length so timingSafeEqual receives equal-length buffers
+  // without leaking information about the original string lengths.
+  const hash = (s: string) => createHash('sha256').update(s).digest();
+  return timingSafeEqual(hash(a), hash(b));
+}
+
+export function getSuperAdminCredentialFingerprint(): string {
+  const { id, password } = getSuperAdminCredentials();
+  return createHash('sha256').update(`${id}:${password}`).digest('hex');
 }

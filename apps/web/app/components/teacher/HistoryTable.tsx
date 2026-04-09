@@ -1,11 +1,8 @@
 'use client'
 
+import { useMemo } from 'react'
+import { DataTable, type DataTableColumn } from '../ui/data-table'
 import { formatAwardedAtParts, getSchoolLabel } from '../mileage/shared'
-import {
-  AnimatedTableRow,
-  EmptyStatePane,
-  TableRowSkeleton,
-} from '../ui/list'
 import { EditIcon, SearchIcon, TrashIcon } from '../ui/icons'
 import Tooltip from '../ui/tooltip'
 import { IconButton, MileageBadge, Pagination, RefetchWrapper } from '../ui/primitives'
@@ -36,43 +33,142 @@ export default function HistoryTable<T extends SharedMileageHistoryItem>({
   onPageChange,
   animated = true,
 }: Props<T>) {
+  const columns = useMemo<DataTableColumn<T>[]>(
+    () => [
+      {
+        key: 'awardedAt',
+        header: '\uBD80\uC5EC \uC77C\uC2DC',
+        width: 108,
+        render: (item) => {
+          const { date, time } = formatAwardedAtParts(item.awardedAt)
+          return (
+            <div
+              style={{
+                fontSize: '11px',
+                borderLeft: `2px solid ${item.type === 'reward' ? 'var(--reward)' : 'var(--penalty)'}`,
+                paddingLeft: '10px',
+              }}
+            >
+              <p style={{ color: 'var(--fg-muted)', whiteSpace: 'nowrap' }}>{date}</p>
+              <p style={{ color: 'var(--fg-muted)', opacity: 0.6, whiteSpace: 'nowrap', marginTop: '2px' }}>
+                {time}
+              </p>
+            </div>
+          )
+        },
+      },
+      {
+        key: 'student',
+        header: '\uD559\uC0DD',
+        width: 200,
+        render: (item) => (
+          <div style={{ overflow: 'hidden' }}>
+            <div className="flex min-w-0 items-baseline gap-1">
+              <p
+                className="truncate text-[13px] font-semibold"
+                style={{ color: 'var(--fg)', flexShrink: 0, maxWidth: '55%' }}
+              >
+                {item.studentName}
+              </p>
+              <p className="truncate text-[11px]" style={{ color: 'var(--fg-muted)' }}>
+                {item.grade ? `${item.grade}\uD559\uB144 ` : ''}
+                {item.classNumber}\uBC18 {item.studentNumber}\uBC88
+              </p>
+            </div>
+            <p className="mt-0.5 truncate text-[11px]" style={{ color: 'var(--fg-muted)' }}>
+              {item.school ? `${getSchoolLabel(item.school)} \u00B7 ` : ''}
+              {item.studentId}
+            </p>
+          </div>
+        ),
+      },
+      {
+        key: 'score',
+        header: '\uC810\uC218',
+        width: 68,
+        render: (item) => <MileageBadge type={item.type} score={item.score} />,
+      },
+      {
+        key: 'rule',
+        header: '\uADDC\uC815 \uD56D\uBAA9',
+        width: 190,
+        render: (item) => (
+          <Tooltip content={`${item.ruleName} \u2014 ${item.ruleCategory}`}>
+            <div style={{ overflow: 'hidden' }}>
+              <p className="truncate text-[13px] font-medium" style={{ color: 'var(--fg)' }}>
+                {item.ruleName}
+              </p>
+              <p className="mt-0.5 truncate text-[11px]" style={{ color: 'var(--fg-muted)' }}>
+                {item.ruleCategory}
+              </p>
+            </div>
+          </Tooltip>
+        ),
+      },
+      {
+        key: 'reason',
+        header: '\uC0AC\uC720',
+        width: 118,
+        render: (item) =>
+          item.reason?.trim() ? (
+            <Tooltip content={item.reason.trim()}>
+              <span
+                className="block truncate text-[11px]"
+                style={{ color: 'var(--fg-muted)' }}
+              >
+                {item.reason.trim()}
+              </span>
+            </Tooltip>
+          ) : (
+            <span style={{ color: 'var(--fg-muted)', opacity: 0.4 }}>&mdash;</span>
+          ),
+      },
+      {
+        key: 'teacher',
+        header: '\uBD80\uC5EC \uAD50\uC0AC',
+        width: 110,
+        render: (item) => (
+          <div style={{ overflow: 'hidden' }}>
+            <p className="truncate text-[11px]" style={{ color: 'var(--fg-muted)' }}>
+              {item.teacherName}
+            </p>
+            <p
+              className="mt-0.5 truncate text-[11px]"
+              style={{ color: 'var(--fg-muted)', opacity: 0.6 }}
+            >
+              {item.teacherId}
+            </p>
+          </div>
+        ),
+      },
+      {
+        key: 'actions',
+        header: '',
+        width: 56,
+        render: (item) =>
+          (onEdit || onDelete) ? (
+            <div className="flex items-center gap-1">
+              {onEdit && <IconButton icon={<EditIcon />} label="\uD3B8\uC9D1" onClick={() => onEdit(item)} />}
+              {onDelete && (
+                <IconButton
+                  icon={<TrashIcon />}
+                  label="\uC0AD\uC81C"
+                  variant="danger"
+                  onClick={() => onDelete(item)}
+                />
+              )}
+            </div>
+          ) : null,
+      },
+    ],
+    [onEdit, onDelete],
+  )
+
   return (
     <>
       <div className="relative hidden min-h-0 flex-1 overflow-x-auto overflow-y-auto md:block">
         {isLoading ? (
-          <table
-            className="w-full min-w-[800px] table-fixed"
-            style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-          >
-            <colgroup>
-              <col style={{ width: 108 }} />
-              <col style={{ width: 200 }} />
-              <col style={{ width: 68 }} />
-              <col style={{ width: 190 }} />
-              <col style={{ width: 118 }} />
-              <col style={{ width: 110 }} />
-              <col style={{ width: 56 }} />
-            </colgroup>
-
-            <thead className="table-header">
-              <tr>
-                {['부여 일시', '학생', '점수', '규정 항목', '사유', '부여 교사', ''].map((h) => (
-                  <th key={h} scope="col">{h}</th>
-                ))}
-              </tr>
-            </thead>
-
-            <tbody>
-              <TableRowSkeleton columns={7} count={8} />
-            </tbody>
-          </table>
-        ) : items.length === 0 ? (
-          <EmptyStatePane
-            className="h-full"
-            icon={<SearchIcon size={20} style={{ color: 'var(--accent)' }} />}
-            title="조회 결과가 없습니다"
-            description="필터 조건을 변경해 보세요."
-          />
+          <DataTable columns={columns} data={[]} rowKey={() => 0} loading />
         ) : (
           <RefetchWrapper
             isFetching={isFetching}
@@ -80,119 +176,15 @@ export default function HistoryTable<T extends SharedMileageHistoryItem>({
             className="h-full"
             contentClassName="h-full"
           >
-            <table
-              className="w-full min-w-[800px] table-fixed"
-              style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
-            >
-              <colgroup>
-                <col style={{ width: 108 }} />
-                <col style={{ width: 200 }} />
-                <col style={{ width: 68 }} />
-                <col style={{ width: 190 }} />
-                <col style={{ width: 118 }} />
-                <col style={{ width: 110 }} />
-                <col style={{ width: 56 }} />
-              </colgroup>
-
-              <thead className="table-header">
-                <tr>
-                  {['부여 일시', '학생', '점수', '규정 항목', '사유', '부여 교사', ''].map((h) => (
-                    <th key={h} scope="col">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-
-              <tbody>
-                {items.map((item, index) => (
-                  <AnimatedTableRow
-                    key={item.id}
-                    index={index}
-                    animated={animated}
-                    className="transition-colors hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
-                    style={{ borderBottom: '1px solid var(--border)' }}
-                  >
-                    {/* 일시 */}
-                    <td
-                      className="py-2 pr-3 text-[11px]"
-                      style={{
-                        borderLeft: `2px solid ${item.type === 'reward' ? 'var(--reward)' : 'var(--penalty)'}`,
-                        paddingLeft: '10px',
-                      }}
-                    >
-                      {(() => {
-                        const { date, time } = formatAwardedAtParts(item.awardedAt)
-                        return (
-                          <>
-                            <p style={{ color: 'var(--fg-muted)', whiteSpace: 'nowrap' }}>{date}</p>
-                            <p className="mt-0.5" style={{ color: 'var(--fg-muted)', opacity: 0.6, whiteSpace: 'nowrap' }}>{time}</p>
-                          </>
-                        )
-                      })()}
-                    </td>
-
-                    {/* 학생 */}
-                    <td className="overflow-hidden py-2 pr-3">
-                      <div className="flex min-w-0 items-baseline gap-1">
-                        <p className="truncate text-[13px] font-semibold" style={{ color: 'var(--fg)', flexShrink: 0, maxWidth: '55%' }}>
-                          {item.studentName}
-                        </p>
-                        <p className="truncate text-[11px]" style={{ color: 'var(--fg-muted)' }}>
-                          {item.grade ? `${item.grade}학년 ` : ''}{item.classNumber}반 {item.studentNumber}번
-                        </p>
-                      </div>
-                      <p className="mt-0.5 truncate text-[11px]" style={{ color: 'var(--fg-muted)' }}>
-                        {item.school ? `${getSchoolLabel(item.school)} · ` : ''}
-                        {item.studentId}
-                      </p>
-                    </td>
-
-                    {/* 점수 */}
-                    <td className="py-2 pr-3" style={{ whiteSpace: 'nowrap' }}>
-                      <MileageBadge type={item.type} score={item.score} />
-                    </td>
-
-                    {/* 규정 항목 */}
-                    <td className="overflow-hidden py-2 pr-3">
-                      <Tooltip content={`${item.ruleName} — ${item.ruleCategory}`}>
-                        <div>
-                          <p className="truncate text-[13px] font-medium" style={{ color: 'var(--fg)' }}>{item.ruleName}</p>
-                          <p className="mt-0.5 truncate text-[11px]" style={{ color: 'var(--fg-muted)' }}>{item.ruleCategory}</p>
-                        </div>
-                      </Tooltip>
-                    </td>
-
-                    {/* 사유 */}
-                    <td className="py-2 pr-3 text-[11px]">
-                      {item.reason?.trim() ? (
-                        <Tooltip content={item.reason.trim()}>
-                          <span className="block truncate" style={{ color: 'var(--fg-muted)' }}>
-                            {item.reason.trim()}
-                          </span>
-                        </Tooltip>
-                      ) : (
-                        <span style={{ color: 'var(--fg-muted)', opacity: 0.4 }}>—</span>
-                      )}
-                    </td>
-
-                    {/* 부여 교사 */}
-                    <td className="overflow-hidden py-2 pr-3 text-[11px]">
-                      <p className="truncate" style={{ color: 'var(--fg-muted)' }}>{item.teacherName}</p>
-                      <p className="mt-0.5 truncate text-[11px]" style={{ color: 'var(--fg-muted)', opacity: 0.6 }}>{item.teacherId}</p>
-                    </td>
-
-                    {/* 액션 */}
-                    <td className="py-2">
-                      {(onEdit || onDelete) && (
-                        <div className="flex items-center gap-1">
-                          {onEdit && <IconButton icon={<EditIcon />} label="편집" onClick={() => onEdit(item)} />}
-                          {onDelete && <IconButton icon={<TrashIcon />} label="삭제" variant="danger" onClick={() => onDelete(item)} />}
-                        </div>
-                      )}
-                    </td>
-                  </AnimatedTableRow>
-                ))}
-              </tbody>
-            </table>
+            <DataTable
+              columns={columns}
+              data={items}
+              rowKey={(item) => item.id}
+              emptyIcon={<SearchIcon size={20} style={{ color: 'var(--accent)' }} />}
+              emptyTitle="\uC870\uD68C \uACB0\uACFC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4"
+              emptyDescription="\uD544\uD130 \uC870\uAC74\uC744 \uBCC0\uACBD\uD574 \uBCF4\uC138\uC694."
+              animated={animated}
+            />
           </RefetchWrapper>
         )}
       </div>

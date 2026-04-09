@@ -1,6 +1,6 @@
 'use client'
 
-import RuleFormModal from './RuleFormModal'
+import SharedRuleFormModal from './SharedRuleFormModal'
 import SharedMileageRulesView from './SharedMileageRulesView'
 import type { SchoolMileageRuleSummary } from './school-mileage-types'
 
@@ -35,7 +35,13 @@ export default function SchoolMileageRules({
       createSuccessDescription="새 상벌점 항목이 추가되었습니다."
       editSuccessDescription="상벌점 항목이 수정되었습니다."
       emptyDescription="검색 조건을 변경하거나 새 항목을 추가해 보세요."
-      renderFormModal={(props) => <RuleFormModal {...props} />}
+      renderFormModal={(props) => (
+        <SharedRuleFormModal<SchoolMileageRuleSummary>
+          {...props}
+          apiPath={props.apiPath ?? '/api/teacher/school-mileage/rules'}
+          datalistId="rule-category-list"
+        />
+      )}
     />
   )
 }

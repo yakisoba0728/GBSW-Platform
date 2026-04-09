@@ -1,22 +1,12 @@
 import { spawn } from 'node:child_process';
 import path from 'node:path';
-import { loadEnv, rootDir } from './env.mjs';
+import { captureCommand, CommandError, loadEnv, rootDir, runCommand } from './env.mjs';
 
 const config = loadEnv();
 const children = new Set();
 let isShuttingDown = false;
 const apiDir = path.join(rootDir, 'apps/api');
 const webDir = path.join(rootDir, 'apps/web');
-
-class CommandError extends Error {
-  constructor(command, args, code, stderr) {
-    super(
-      stderr || `${command} ${args.join(' ')} exited with code ${code ?? 1}`,
-    );
-
-    this.code = code;
-  }
-}
 
 process.on('SIGINT', () => {
   void shutdown(0);
@@ -27,14 +17,14 @@ process.on('SIGTERM', () => {
 });
 
 try {
-  await run('node', ['scripts/prepare-db.mjs']);
+  await runCommand('node', ['scripts/prepare-db.mjs']);
   await ensurePortAvailable(config.apiPort, 'API', isStaleApiProcess);
   await ensurePortAvailable(config.webPort, 'Web', isStaleWebProcess);
 
   startProcess('API', ['start:dev'], apiDir);
   startProcess(
     'Web',
-    ['exec', 'next', 'dev', '--webpack', '--port', `${config.webPort}`],
+    ['exec', 'next', 'dev', '--port', `${config.webPort}`],
     webDir,
   );
 
@@ -76,28 +66,6 @@ function startProcess(name, args, cwd) {
   return child;
 }
 
-function run(command, args) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
-      cwd: rootDir,
-      env: process.env,
-      stdio: 'inherit',
-    });
-
-    child.once('error', reject);
-    child.once('exit', (code) => {
-      if (code === 0) {
-        resolve();
-        return;
-      }
-
-      reject(
-        new Error(`${command} ${args.join(' ')} exited with code ${code ?? 1}`),
-      );
-    });
-  });
-}
-
 async function ensurePortAvailable(port, label, isStaleProcess) {
   const listeners = await getListeningProcesses(port);
 
@@ -125,7 +93,7 @@ async function getListeningProcesses(port) {
   let stdout = '';
 
   try {
-    stdout = await capture('lsof', [
+    stdout = await captureCommand('lsof', [
       '-n',
       '-P',
       `-iTCP:${port}`,
@@ -148,7 +116,7 @@ async function getListeningProcesses(port) {
   const listeners = [];
 
   for (const pid of pids) {
-    const command = (await capture('ps', ['-p', `${pid}`, '-o', 'command=']))
+    const command = (await captureCommand('ps', ['-p', `${pid}`, '-o', 'command=']))
       .trim();
 
     if (!command) {
@@ -194,40 +162,6 @@ async function waitForPortRelease(port, timeoutMs = 5_000) {
   throw new Error(`Timed out waiting for port ${port} to become available.`);
 }
 
-function capture(command, args) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
-      cwd: rootDir,
-      env: process.env,
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-
-    let stdout = '';
-    let stderr = '';
-
-    child.stdout.setEncoding('utf8');
-    child.stderr.setEncoding('utf8');
-
-    child.stdout.on('data', (chunk) => {
-      stdout += chunk;
-    });
-
-    child.stderr.on('data', (chunk) => {
-      stderr += chunk;
-    });
-
-    child.once('error', reject);
-    child.once('exit', (code) => {
-      if (code === 0) {
-        resolve(stdout);
-        return;
-      }
-
-      reject(new CommandError(command, args, code ?? 1, stderr.trim()));
-    });
-  });
-}
-
 async function shutdown(code) {
   if (isShuttingDown) {
     return;
@@ -240,7 +174,7 @@ async function shutdown(code) {
   }
 
   try {
-    await run('docker', ['compose', 'stop', 'db', 'pgadmin']);
+    await runCommand('docker', ['compose', 'stop', 'db', 'pgadmin']);
   } catch (error) {
     console.error('Failed to stop docker containers cleanly', error);
   }

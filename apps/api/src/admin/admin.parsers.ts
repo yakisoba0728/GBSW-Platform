@@ -1,6 +1,6 @@
-import { randomBytes } from 'node:crypto';
 import { BadRequestException } from '@nestjs/common';
 import { Prisma, School } from '@prisma/client';
+import { getSuperAdminCredentials } from '../config/runtime-env';
 import {
   parseOptionalPositiveIntInput,
   parseOptionalTextInput,
@@ -92,6 +92,27 @@ export function parseTeacherId(value: unknown) {
   return teacherId;
 }
 
+export function assertTeacherIdDoesNotCollide(
+  teacherId: string,
+  options?: {
+    existingStudentId?: string | null;
+  },
+) {
+  if (options?.existingStudentId === teacherId) {
+    throw new BadRequestException(
+      '학생과 동일한 아이디는 교사 계정에 사용할 수 없습니다.',
+    );
+  }
+
+  const credentials = getSuperAdminCredentials();
+
+  if (teacherId === credentials.id) {
+    throw new BadRequestException(
+      '최고관리자와 동일한 아이디는 교사 계정에 사용할 수 없습니다.',
+    );
+  }
+}
+
 export function parseMajorSubject(value: unknown) {
   const majorSubject = toInputText(value);
 
@@ -134,8 +155,8 @@ export function buildStudentId(
   return `${prefix}${year}${pad(classNumber)}${pad(studentNumber)}`;
 }
 
-export function generateTemporaryPassword() {
-  return randomBytes(8).toString('hex');
+export function generateTemporaryPassword(accountId: string) {
+  return accountId;
 }
 
 export function parseOptionalPhone(value: unknown) {

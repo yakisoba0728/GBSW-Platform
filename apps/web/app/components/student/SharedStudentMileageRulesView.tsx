@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Card } from '@/app/components/mileage/shared'
+import { Card } from '@/app/components/ui/card'
 import {
   AnimatedListItem,
   ListEmptyState,

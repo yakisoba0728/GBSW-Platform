@@ -11,7 +11,14 @@ export default defineConfig({
     },
   },
   test: {
+    environmentMatchGlobs: [['app/**/*.test.tsx', 'jsdom']],
     environment: 'node',
-    include: ['app/**/*.test.ts', 'lib/**/*.test.ts'],
+    include: [
+      'app/**/*.test.ts',
+      'app/**/*.test.tsx',
+      'lib/**/*.test.ts',
+      'lib/**/*.test.tsx',
+    ],
+    setupFiles: ['./vitest.setup.ts'],
   },
 })

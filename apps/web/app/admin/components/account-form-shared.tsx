@@ -11,96 +11,16 @@ export const inputBaseStyle = {
   color: 'var(--fg)',
 } satisfies Record<string, string>
 
-export type School = 'GBSW' | 'BYMS'
-
-export type StudentFormState = {
-  school: School
-  admissionYear: string
-  admissionClassNumber: string
-  admissionStudentNumber: string
-  isFirstEnrollment: boolean
-  currentYear: string
-  currentClassNumber: string
-  currentStudentNumber: string
-  majorSubject: string
-  name: string
-  phone: string
-}
-
 export type TeacherFormState = {
   teacherId: string
   name: string
   phone: string
 }
 
-export const SCHOOLS: Array<{
-  id: School
-  label: string
-  prefix: string
-  full: string
-}> = [
-  {
-    id: 'GBSW',
-    label: 'GBSW',
-    prefix: 'GB',
-    full: '경북소프트웨어마이스터고등학교',
-  },
-  {
-    id: 'BYMS',
-    label: 'BYMS',
-    prefix: 'BY',
-    full: '봉양중학교',
-  },
-]
-
-export const STUDENT_INITIAL: StudentFormState = {
-  school: 'GBSW',
-  admissionYear: '',
-  admissionClassNumber: '',
-  admissionStudentNumber: '',
-  isFirstEnrollment: false,
-  currentYear: '',
-  currentClassNumber: '',
-  currentStudentNumber: '',
-  majorSubject: '',
-  name: '',
-  phone: '',
-}
-
 export const TEACHER_INITIAL: TeacherFormState = {
   teacherId: '',
   name: '',
   phone: '',
-}
-
-export function buildStudentId(
-  school: School,
-  year: string,
-  classNumber: string,
-  studentNumber: string,
-) {
-  const prefix = SCHOOLS.find((item) => item.id === school)?.prefix
-  const normalizedYear = year.trim().slice(-2)
-  const normalizedClass = classNumber.trim()
-  const normalizedStudentNumber = studentNumber.trim()
-
-  if (
-    !prefix ||
-    !normalizedYear ||
-    !normalizedClass ||
-    !normalizedStudentNumber
-  ) {
-    return null
-  }
-
-  if (
-    Number.isNaN(Number(normalizedClass)) ||
-    Number.isNaN(Number(normalizedStudentNumber))
-  ) {
-    return null
-  }
-
-  return `${prefix}${normalizedYear}${pad(normalizedClass)}${pad(normalizedStudentNumber)}`
 }
 
 export function formatPhoneNumberInput(value: string) {
@@ -115,20 +35,6 @@ export function formatPhoneNumberInput(value: string) {
   }
 
   return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
-}
-
-export function sortUniqueSubjects(subjects: string[]) {
-  return Array.from(
-    new Set(
-      subjects
-        .map((subject) => subject.trim())
-        .filter((subject) => subject.length > 0),
-    ),
-  ).sort((left, right) => left.localeCompare(right, 'ko'))
-}
-
-function pad(value: string, length = 2) {
-  return value.padStart(length, '0')
 }
 
 export function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -215,69 +121,6 @@ export function PasswordRuleBox({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
-    </div>
-  )
-}
-
-export function IdPreview({ studentId }: { studentId: string | null }) {
-  return (
-    <div
-      className="flex items-center gap-3 rounded-md border px-3.5 py-3 transition-all duration-200"
-      style={{
-        borderColor: studentId ? 'var(--accent)' : 'var(--border)',
-        backgroundColor: studentId ? 'var(--accent-subtle)' : 'transparent',
-      }}
-    >
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-        style={{
-          color: studentId ? 'var(--accent)' : 'var(--fg-muted)',
-          flexShrink: 0,
-        }}
-      >
-        <rect x="2" y="4" width="20" height="16" rx="2" />
-        <path d="M7 10h10M7 14h4" />
-      </svg>
-      <div className="flex items-baseline gap-2">
-        <span
-          className="flex-shrink-0 text-xs"
-          style={{
-            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            color: 'var(--fg-muted)',
-          }}
-        >
-          생성될 아이디
-        </span>
-        {studentId ? (
-          <span
-            className="text-sm font-semibold tracking-widest"
-            style={{
-              fontFamily: 'var(--font-space-grotesk)',
-              color: 'var(--accent)',
-            }}
-          >
-            {studentId}
-          </span>
-        ) : (
-          <span
-            className="text-xs"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              color: 'var(--fg-muted)',
-            }}
-          >
-            아이디용 년도·반·번호를 입력하면 표시됩니다
-          </span>
-        )}
-      </div>
     </div>
   )
 }

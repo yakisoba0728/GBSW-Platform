@@ -11,6 +11,7 @@ interface AnimatedCheckboxProps {
   onChange: (checked: boolean) => void
   disabled?: boolean
   size?: number
+  ariaLabel?: string
 }
 
 const checkVariants = {
@@ -23,6 +24,7 @@ export default function AnimatedCheckbox({
   onChange,
   disabled = false,
   size = 20,
+  ariaLabel,
 }: AnimatedCheckboxProps) {
   const prefersReducedMotion = useMotionPreference()
   const transition = getMicroInteractionTransition(prefersReducedMotion)
@@ -33,9 +35,12 @@ export default function AnimatedCheckbox({
       onClick={() => !disabled && onChange(!checked)}
       disabled={disabled}
       whileTap={disabled || prefersReducedMotion ? undefined : { scale: 0.9 }}
+      aria-label={ariaLabel}
+      aria-checked={checked}
+      role="checkbox"
       style={{
-        width: size,
-        height: size,
+        width: Math.max(size, 44),
+        height: Math.max(size, 44),
         borderRadius: 6,
         border: checked ? 'none' : '2px solid var(--border)',
         backgroundColor: checked ? 'var(--accent)' : 'transparent',
@@ -55,8 +60,6 @@ export default function AnimatedCheckbox({
         backgroundColor: checked ? 'var(--accent)' : 'transparent',
       }}
       transition={transition}
-      aria-checked={checked}
-      role="checkbox"
     >
       <svg
         width={size * 0.6}

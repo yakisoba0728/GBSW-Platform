@@ -1,11 +1,9 @@
 'use client'
 
-import { Badge, Card, SectionTitle, formatAwardedAtParts, formatSignedScore } from '../mileage/shared'
-import {
-  AnimatedTableRow,
-  EmptyStatePane,
-  TableRowSkeleton,
-} from '../ui/list'
+import { useMemo } from 'react'
+import { Card, SectionTitle } from '../ui/card'
+import { DataTable, type DataTableColumn } from '../ui/data-table'
+import { Badge, formatAwardedAtParts, formatSignedScore } from '../mileage/shared'
 import { Pagination } from '../ui/primitives'
 import type { SharedMileageHistoryItem } from './shared-mileage-types'
 
@@ -28,6 +26,93 @@ export default function StudentEntriesTable({
   pageCount,
   onPageChange,
 }: Props) {
+  const columns = useMemo<DataTableColumn<SharedMileageHistoryItem>[]>(
+    () => [
+      {
+        key: 'type',
+        header: '유형',
+        render: (entry) => (
+          <Badge type={entry.type}>
+            {entry.type === 'reward' ? '상점' : '벌점'}
+          </Badge>
+        ),
+      },
+      {
+        key: 'ruleCategory',
+        header: '카테고리',
+        render: (entry) => (
+          <span style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
+            {entry.ruleCategory}
+          </span>
+        ),
+      },
+      {
+        key: 'ruleName',
+        header: '항목',
+        render: (entry) => (
+          <span className="font-medium" style={{ color: 'var(--admin-text)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
+            {entry.ruleName}
+          </span>
+        ),
+      },
+      {
+        key: 'score',
+        header: '점수',
+        render: (entry) => (
+          <span
+            className="font-semibold"
+            style={{
+              fontFamily: 'var(--font-space-grotesk)',
+              color: entry.type === 'reward' ? 'var(--mileage-green)' : 'var(--mileage-red)',
+            }}
+          >
+            {formatSignedScore(entry.type, entry.score)}
+          </span>
+        ),
+      },
+      {
+        key: 'reason',
+        header: '사유',
+        render: (entry) => (
+          <span
+            className="block max-w-[180px] truncate"
+            style={{ color: 'var(--admin-text-muted)' }}
+          >
+            {entry.reason ?? '—'}
+          </span>
+        ),
+      },
+      {
+        key: 'awardedAt',
+        header: '일시',
+        render: (entry) => {
+          const { date, time } = formatAwardedAtParts(entry.awardedAt)
+          return (
+            <>
+              <span style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--admin-text-muted)' }}>
+                {date}
+              </span>
+              {time && (
+                <span
+                  style={{
+                    marginLeft: 4,
+                    fontSize: '10px',
+                    fontFamily: 'var(--font-space-grotesk)',
+                    color: 'var(--admin-text-muted)',
+                    opacity: 0.65,
+                  }}
+                >
+                  {time}
+                </span>
+              )}
+            </>
+          )
+        },
+      },
+    ],
+    [],
+  )
+
   return (
     <Card className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
       {/* 헤더 */}
@@ -47,63 +132,14 @@ export default function StudentEntriesTable({
 
       {/* 테이블 */}
       <div className="min-h-0 flex-1 overflow-x-auto">
-        {isLoading ? (
-          <TableRowSkeleton columns={6} count={5} />
-        ) : entries.length === 0 ? (
-          <EmptyStatePane
-            className="h-full"
-            title="처리 내역이 없습니다"
-            description="이 학생에게 아직 부여된 상벌점이 없습니다."
-          />
-        ) : (
-          <table className="w-full text-xs">
-            <thead className="table-header">
-              <tr>
-                {['유형', '카테고리', '항목', '점수', '사유', '일시'].map((h) => (
-                  <th key={h} className="px-3" scope="col">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {entries.map((entry, index) => {
-                const { date, time } = formatAwardedAtParts(entry.awardedAt)
-                return (
-                  <AnimatedTableRow
-                    key={entry.id}
-                    index={index}
-                    style={{ borderBottom: '1px solid var(--admin-border)' }}
-                  >
-                    <td className="px-3 py-2">
-                      <Badge type={entry.type}>
-                        {entry.type === 'reward' ? '상점' : '벌점'}
-                      </Badge>
-                    </td>
-                    <td className="px-3 py-2" style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
-                      {entry.ruleCategory}
-                    </td>
-                    <td className="px-3 py-2 font-medium" style={{ color: 'var(--admin-text)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
-                      {entry.ruleName}
-                    </td>
-                    <td className="px-3 py-2 font-semibold" style={{ fontFamily: 'var(--font-space-grotesk)', color: entry.type === 'reward' ? 'var(--mileage-green)' : 'var(--mileage-red)' }}>
-                      {formatSignedScore(entry.type, entry.score)}
-                    </td>
-                    <td className="max-w-[180px] truncate px-3 py-2" style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}>
-                      {entry.reason ?? '—'}
-                    </td>
-                    <td className="px-3 py-2" style={{ color: 'var(--admin-text-muted)' }}>
-                      <span style={{ fontFamily: 'var(--font-space-grotesk)' }}>{date}</span>
-                      {time && (
-                        <span className="ml-1 text-[10px]" style={{ fontFamily: 'var(--font-space-grotesk)', opacity: 0.65 }}>
-                          {time}
-                        </span>
-                      )}
-                    </td>
-                  </AnimatedTableRow>
-                )
-              })}
-            </tbody>
-          </table>
-        )}
+        <DataTable
+          columns={columns}
+          data={entries}
+          rowKey={(entry) => entry.id}
+          loading={isLoading}
+          emptyTitle="처리 내역이 없습니다"
+          emptyDescription="이 학생에게 아직 부여된 상벌점이 없습니다."
+        />
       </div>
 
       {/* 페이지네이션 */}

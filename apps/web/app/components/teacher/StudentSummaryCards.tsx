@@ -1,7 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Card, ScoreSummaryBar, StatCard } from '../mileage/shared'
+import { Card, StatCard } from '../ui/card'
+import { ScoreSummaryBar } from '../mileage/shared'
 import { LoadingSpinner } from '../ui/list'
 import type { SharedStudentMileageSummary } from './shared-mileage-types'
 

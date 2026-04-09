@@ -1,9 +1,4 @@
-import DormMileageClass from '@/app/components/teacher/DormMileageClass'
-
-export default function TeacherDormMileageClassesPage() {
-  return (
-    <div className="flex flex-col h-full">
-      <DormMileageClass />
-    </div>
-  )
+import { redirect } from 'next/navigation'
+export default function RedirectPage() {
+  redirect('/teacher/dorm/classes')
 }

@@ -1,7 +1,7 @@
 'use client'
 
-import EditEntryModal from './EditEntryModal'
-import HistoryFilters from './HistoryFilters'
+import SharedEditEntryModal from './SharedEditEntryModal'
+import SharedHistoryFilters from './SharedHistoryFilters'
 import SharedMileageHistoryView from './SharedMileageHistoryView'
 import type {
   PaginatedSchoolMileageHistoryResponse,
@@ -35,13 +35,22 @@ export default function SchoolMileageHistory({
       deleteCatchMessage="상벌점 내역 삭제 중 문제가 발생했습니다."
       deleteSuccessMessage="상벌점 내역이 삭제되었습니다."
       deleteConfirmMessage={(item) =>
-        `${item.studentName} 학생의 "${item.ruleName}" 내역을 삭제할까요?\n이 작업은 되돌릴 수 없습니다.`
+        `${item.studentName ?? '이름 없음'} 학생의 "${item.ruleName}" 내역을 삭제할까요?\n이 작업은 되돌릴 수 없습니다.`
       }
       renderEditModal={(props) => (
-        <EditEntryModal {...props} isOpen={props.item !== null} />
+        <SharedEditEntryModal<SchoolMileageHistoryItem>
+          {...props}
+          isOpen={props.item !== null}
+          apiPath="/api/teacher/school-mileage/entries"
+          title="상벌점 내역 편집"
+          saveErrorMessage="상벌점 내역을 수정하지 못했습니다."
+          saveSuccessMessage="상벌점 내역이 수정되었습니다."
+          submitErrorMessage="상벌점 내역 수정 중 문제가 발생했습니다."
+          showSchoolLabel
+        />
       )}
       renderFilters={({ filters, hasActiveFilters, onChange, onReset }) => (
-        <HistoryFilters
+        <SharedHistoryFilters
           filters={{
             school: filters.school ?? '',
             type: filters.type,
@@ -51,7 +60,13 @@ export default function SchoolMileageHistory({
             studentName: filters.studentName,
           }}
           hasActiveFilters={hasActiveFilters}
-          onChange={onChange}
+          hasSchoolFilter
+          onSchoolChange={(value) => onChange('school', value)}
+          onTypeChange={(value) => onChange('type', value)}
+          onYearChange={(value) => onChange('year', value)}
+          onStartDateChange={(value) => onChange('startDate', value)}
+          onEndDateChange={(value) => onChange('endDate', value)}
+          onStudentNameChange={(value) => onChange('studentName', value)}
           onReset={onReset}
         />
       )}

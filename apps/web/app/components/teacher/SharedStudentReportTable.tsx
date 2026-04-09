@@ -17,8 +17,6 @@ import type {
   SharedStudentMileageSummary,
 } from './shared-mileage-types'
 
-const DETAIL_FETCH_PAGE_SIZE = 100
-
 type CategoryStat = {
   category: string
   type: SharedMileageType
@@ -31,6 +29,7 @@ type SharedStudentReportTableProps<Student extends SharedStudentMileageSummary> 
   startDate: string
   endDate: string
   entriesApiPath: string
+  entriesExportApiPath?: string
   emptyDescription: string
 }
 
@@ -124,12 +123,14 @@ function StudentDetailPanel<Entry extends SharedMileageHistoryItem>({
   startDate,
   endDate,
   entriesApiPath,
+  entriesExportApiPath,
   emptyDescription,
 }: {
   studentId: string
   startDate: string
   endDate: string
   entriesApiPath: string
+  entriesExportApiPath?: string
   emptyDescription: string
 }) {
   const [entries, setEntries] = useState<Entry[]>([])
@@ -149,53 +150,36 @@ function StudentDetailPanel<Entry extends SharedMileageHistoryItem>({
     setMounted(false)
 
     try {
-      const allItems: Entry[] = []
-      let totalPages = 1
+      const params = new URLSearchParams({ studentId })
 
-      for (
-        let currentPage = 1;
-        currentPage <= totalPages && !ctrl.signal.aborted;
-        currentPage += 1
-      ) {
-        const params = new URLSearchParams({
-          studentId,
-          page: `${currentPage}`,
-          pageSize: `${DETAIL_FETCH_PAGE_SIZE}`,
-        })
+      if (startDate) {
+        params.set('startDate', startDate)
+      }
+      if (endDate) {
+        params.set('endDate', endDate)
+      }
 
-        if (startDate) {
-          params.set('startDate', startDate)
-        }
-        if (endDate) {
-          params.set('endDate', endDate)
-        }
-
-        const response = await fetch(`${entriesApiPath}?${params.toString()}`, {
+      const response = await fetch(
+        `${entriesExportApiPath ?? entriesApiPath}?${params.toString()}`,
+        {
           signal: ctrl.signal,
           cache: 'no-store',
-        })
-        const result = await response.json().catch(() => null)
+        },
+      )
+      const result = await response.json().catch(() => null)
 
-        if (abortRef.current !== ctrl || ctrl.signal.aborted) {
-          return
-        }
-
-        if (!response.ok) {
-          setError(result?.message ?? '데이터를 불러오지 못했습니다.')
-          return
-        }
-
-        const pageItems = Array.isArray(result?.items)
-          ? (result.items as Entry[])
-          : []
-        allItems.push(...pageItems)
-
-        const totalCount =
-          typeof result?.totalCount === 'number' && result.totalCount >= 0
-            ? result.totalCount
-            : allItems.length
-        totalPages = Math.max(1, Math.ceil(totalCount / DETAIL_FETCH_PAGE_SIZE))
+      if (abortRef.current !== ctrl || ctrl.signal.aborted) {
+        return
       }
+
+      if (!response.ok) {
+        setError(result?.message ?? '데이터를 불러오지 못했습니다.')
+        return
+      }
+
+      const allItems = Array.isArray(result?.items)
+        ? (result.items as Entry[])
+        : []
 
       if (ctrl.signal.aborted) {
         return
@@ -213,7 +197,7 @@ function StudentDetailPanel<Entry extends SharedMileageHistoryItem>({
         setIsLoading(false)
       }
     }
-  }, [endDate, entriesApiPath, startDate, studentId])
+  }, [endDate, entriesApiPath, entriesExportApiPath, startDate, studentId])
 
   useEffect(() => {
     void loadDetail()
@@ -340,9 +324,9 @@ function StudentDetailPanel<Entry extends SharedMileageHistoryItem>({
                       fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                       backgroundColor:
                         entry.type === 'reward'
-                          ? 'rgba(22,163,74,0.1)'
-                          : 'rgba(220,38,38,0.1)',
-                      color: entry.type === 'reward' ? '#16a34a' : '#dc2626',
+                          ? 'var(--reward-bg-faint)'
+                          : 'var(--penalty-bg-faint)',
+                      color: entry.type === 'reward' ? 'var(--reward)' : 'var(--penalty)',
                     }}
                   >
                     {entry.type === 'reward' ? '상점' : '벌점'}
@@ -360,7 +344,7 @@ function StudentDetailPanel<Entry extends SharedMileageHistoryItem>({
                     className="flex-shrink-0 text-[11px] font-semibold"
                     style={{
                       fontFamily: 'var(--font-space-grotesk)',
-                      color: entry.type === 'reward' ? '#16a34a' : '#dc2626',
+                      color: entry.type === 'reward' ? 'var(--reward)' : 'var(--penalty)',
                     }}
                   >
                     {formatSignedScore(entry.type, entry.score)}
@@ -392,6 +376,7 @@ export default function SharedStudentReportTable<
   startDate,
   endDate,
   entriesApiPath,
+  entriesExportApiPath,
   emptyDescription,
 }: SharedStudentReportTableProps<Student>) {
   const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null)
@@ -440,6 +425,7 @@ export default function SharedStudentReportTable<
               startDate={startDate}
               endDate={endDate}
               entriesApiPath={entriesApiPath}
+              entriesExportApiPath={entriesExportApiPath}
               emptyDescription={emptyDescription}
             />
           )
@@ -459,6 +445,7 @@ function StudentRow<
   startDate,
   endDate,
   entriesApiPath,
+  entriesExportApiPath,
   emptyDescription,
 }: {
   student: Student
@@ -467,6 +454,7 @@ function StudentRow<
   startDate: string
   endDate: string
   entriesApiPath: string
+  entriesExportApiPath?: string
   emptyDescription: string
 }) {
   const prefersReducedMotion = useMotionPreference()
@@ -547,7 +535,7 @@ function StudentRow<
           className="px-3 py-2.5 font-semibold"
           style={{
             fontFamily: 'var(--font-space-grotesk)',
-            color: '#16a34a',
+            color: 'var(--reward)',
           }}
         >
           +{student.rewardTotal}
@@ -556,7 +544,7 @@ function StudentRow<
           className="px-3 py-2.5 font-semibold"
           style={{
             fontFamily: 'var(--font-space-grotesk)',
-            color: '#dc2626',
+            color: 'var(--penalty)',
           }}
         >
           -{student.penaltyTotal}
@@ -565,7 +553,7 @@ function StudentRow<
           className="px-3 py-2.5 font-bold"
           style={{
             fontFamily: 'var(--font-space-grotesk)',
-            color: student.netScore >= 0 ? '#16a34a' : '#dc2626',
+            color: student.netScore >= 0 ? 'var(--reward)' : 'var(--penalty)',
           }}
         >
           {student.netScore >= 0 ? '+' : ''}
@@ -583,13 +571,14 @@ function StudentRow<
             className="print-expanded-row"
           >
             <td colSpan={8} style={{ padding: 0 }}>
-              <StudentDetailPanel<Entry>
-                studentId={student.studentId}
-                startDate={startDate}
-                endDate={endDate}
-                entriesApiPath={entriesApiPath}
-                emptyDescription={emptyDescription}
-              />
+                <StudentDetailPanel<Entry>
+                  studentId={student.studentId}
+                  startDate={startDate}
+                  endDate={endDate}
+                  entriesApiPath={entriesApiPath}
+                  entriesExportApiPath={entriesExportApiPath}
+                  emptyDescription={emptyDescription}
+                />
             </td>
           </motion.tr>
         )}

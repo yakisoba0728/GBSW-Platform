@@ -2,7 +2,8 @@
 
 import type { ReactNode } from 'react'
 import { Printer } from 'lucide-react'
-import { Card, NoticeBox, SectionTitle } from '@/app/components/mileage/shared'
+import { Card, SectionTitle } from '../ui/card'
+import { NoticeBox } from '../mileage/shared'
 import { Button } from '../ui/button'
 import { EmptyStatePane, ListSkeleton } from '../ui/list'
 import { FileIcon } from '../ui/icons'

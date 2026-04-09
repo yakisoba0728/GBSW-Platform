@@ -16,11 +16,13 @@ export default function LogoutButton({
   style,
 }: LogoutButtonProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [logoutError, setLogoutError] = useState<string | null>(null)
   const router = useRouter()
 
   async function handleLogout() {
     if (isLoggingOut) return
     setIsLoggingOut(true)
+    setLogoutError(null)
 
     try {
       const response = await fetch('/api/auth/logout', { method: 'POST' })
@@ -33,35 +35,44 @@ export default function LogoutButton({
       router.refresh()
     } catch {
       window.location.assign('/')
+    } finally {
+      setIsLoggingOut(false)
     }
   }
 
   return (
-    <button
-      type="button"
-      onClick={handleLogout}
-      disabled={isLoggingOut}
-      className={className}
-      style={{ position: 'relative', ...style }}
-    >
-      <span style={{ visibility: isLoggingOut ? 'hidden' : 'visible', display: 'flex', alignItems: 'center', gap: 'inherit' }}>
-        {children ?? '로그아웃'}
-      </span>
-      {isLoggingOut && (
-        <span
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'none',
-          }}
-        >
-          로그아웃 중...
+    <>
+      <button
+        type="button"
+        onClick={handleLogout}
+        disabled={isLoggingOut}
+        className={className}
+        style={{ position: 'relative', ...style }}
+      >
+        <span style={{ visibility: isLoggingOut ? 'hidden' : 'visible', display: 'flex', alignItems: 'center', gap: 'inherit' }}>
+          {children ?? '로그아웃'}
         </span>
+        {isLoggingOut && (
+          <span
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              pointerEvents: 'none',
+            }}
+          >
+            로그아웃 중...
+          </span>
+        )}
+      </button>
+      {logoutError && (
+        <p role="alert" style={{ fontSize: 12, color: 'var(--penalty)' }}>
+          {logoutError}
+        </p>
       )}
-    </button>
+    </>
   )
 }

@@ -14,6 +14,7 @@ import {
   textCellStyle,
 } from '@/app/components/admin/account-ui-shared'
 import { Button } from '@/app/components/ui/button'
+import { DataTable, type DataTableColumn } from '@/app/components/ui/data-table'
 import { EditIcon, SearchIcon, UserPlusCompactIcon } from '@/app/components/ui/icons'
 import { ListSkeleton } from '@/app/components/ui/list'
 import { Modal, ModalFooter } from '@/app/components/ui/modal'
@@ -250,6 +251,75 @@ export default function AdminTeacherList() {
     }
   }
 
+  const teacherColumns: DataTableColumn<TeacherRecord>[] = useMemo(
+    () => [
+      {
+        key: 'teacherId',
+        header: '아이디',
+        render: (teacher) => (
+          <span className="text-xs" style={monoCellStyle}>
+            {teacher.teacherId}
+          </span>
+        ),
+      },
+      {
+        key: 'name',
+        header: '이름',
+        render: (teacher) => (
+          <span className="text-[13px] font-medium" style={textCellStyle}>
+            {teacher.name}
+          </span>
+        ),
+      },
+      {
+        key: 'phone',
+        header: '전화번호',
+        render: (teacher) => (
+          <span className="text-xs" style={monoCellStyle}>
+            {formatPhoneNumberInput(teacher.phone)}
+          </span>
+        ),
+      },
+      {
+        key: 'isDormTeacher',
+        header: '사감 교사',
+        render: (teacher) => <DormBadge enabled={teacher.isDormTeacher} />,
+      },
+      {
+        key: 'isActive',
+        header: '상태',
+        render: (teacher) => <StatusBadge isActive={teacher.isActive} />,
+      },
+      {
+        key: 'actions',
+        header: '작업',
+        render: (teacher) => (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={<EditIcon />}
+              onClick={() => openEditModal(teacher)}
+            >
+              수정
+            </Button>
+            <Button
+              variant={teacher.isActive ? 'danger' : 'accent'}
+              size="sm"
+              loading={statusUpdatingId === teacher.teacherId}
+              disabled={statusUpdatingId === teacher.teacherId}
+              onClick={() => void toggleTeacherStatus(teacher)}
+            >
+              {teacher.isActive ? '비활성화' : '활성화'}
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [statusUpdatingId],
+  )
+
   return (
     <div className="space-y-6">
       <section className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
@@ -339,104 +409,28 @@ export default function AdminTeacherList() {
 
       <AdminPanel padded={false}>
         <div className="overflow-x-auto">
-          {showLoading && (
+          {showLoading ? (
             <div className="px-4 py-5">
               <ListSkeleton count={5} rowHeight="h-11" />
             </div>
+          ) : error ? (
+            <div className="px-4 py-10">
+              <NoticeBox type="error" message={error} />
+            </div>
+          ) : (
+            <RefetchWrapper
+              isFetching={isLoading && hasLoadedOnce}
+              isInitialLoad={false}
+            >
+              <DataTable
+                columns={teacherColumns}
+                data={teachers}
+                rowKey={(t) => t.teacherId}
+                emptyTitle="조건에 맞는 교사 계정이 없습니다."
+                className="min-w-[860px]"
+              />
+            </RefetchWrapper>
           )}
-          <RefetchWrapper
-            isFetching={isLoading && hasLoadedOnce}
-            isInitialLoad={showLoading}
-          >
-            <table className="min-w-[860px] w-full text-sm" style={{ borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  {['아이디', '이름', '전화번호', '사감 교사', '상태', '작업'].map((label) => (
-                    <th
-                      key={label}
-                      scope="col"
-                      className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-widest"
-                      style={{
-                        color: 'var(--fg-muted)',
-                        fontFamily: 'var(--font-space-grotesk)',
-                      }}
-                    >
-                      {label}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {error ? (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-10">
-                      <NoticeBox type="error" message={error} />
-                    </td>
-                  </tr>
-                ) : teachers.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="px-4 py-14 text-center text-sm"
-                      style={{
-                        color: 'var(--fg-muted)',
-                        fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                      }}
-                    >
-                      조건에 맞는 교사 계정이 없습니다.
-                    </td>
-                  </tr>
-                ) : (
-                  teachers.map((teacher) => (
-                    <tr
-                      key={teacher.teacherId}
-                      style={{
-                        borderBottom: '1px solid var(--border)',
-                        opacity: teacher.isActive ? 1 : 0.7,
-                      }}
-                    >
-                      <td className="px-4 py-3 text-xs" style={monoCellStyle}>
-                        {teacher.teacherId}
-                      </td>
-                      <td className="px-4 py-3 text-[13px] font-medium" style={textCellStyle}>
-                        {teacher.name}
-                      </td>
-                      <td className="px-4 py-3 text-xs" style={monoCellStyle}>
-                        {formatPhoneNumberInput(teacher.phone)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <DormBadge enabled={teacher.isDormTeacher} />
-                      </td>
-                      <td className="px-4 py-3">
-                        <StatusBadge isActive={teacher.isActive} />
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            icon={<EditIcon />}
-                            onClick={() => openEditModal(teacher)}
-                          >
-                            수정
-                          </Button>
-                          <Button
-                            variant={teacher.isActive ? 'danger' : 'accent'}
-                            size="sm"
-                            loading={statusUpdatingId === teacher.teacherId}
-                            disabled={statusUpdatingId === teacher.teacherId}
-                            onClick={() => void toggleTeacherStatus(teacher)}
-                          >
-                            {teacher.isActive ? '비활성화' : '활성화'}
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </RefetchWrapper>
         </div>
       </AdminPanel>
 

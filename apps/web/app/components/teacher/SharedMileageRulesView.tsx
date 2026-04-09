@@ -1,17 +1,17 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { Card } from '../ui/card'
 import {
   Badge,
-  Card,
   FilterRow,
   NoticeBox,
   SectionHeader,
   inputStyle,
 } from '../mileage/shared'
 import { Button } from '../ui/button'
+import { DataTable, type DataTableColumn } from '../ui/data-table'
 import { EditIcon, FileIcon, PlusIcon, SearchIcon } from '../ui/icons'
-import { AnimatedTableRow, ListEmptyState, TableRowSkeleton } from '../ui/list'
 import SuccessModal from '../ui/success-modal'
 import { koreanIncludes } from '@/lib/korean-search'
 import type {
@@ -76,7 +76,6 @@ export default function SharedMileageRulesView<
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<'' | SharedMileageType>('')
   const [categoryFilter, setCategoryFilter] = useState('')
-  const [hoveredRowId, setHoveredRowId] = useState<number | null>(null)
   const [toggleRuleId, setToggleRuleId] = useState<number | null>(null)
   const [toggleError, setToggleError] = useState<string | null>(null)
   const [formModalOpen, setFormModalOpen] = useState(false)
@@ -113,6 +112,139 @@ export default function SharedMileageRulesView<
       return true
     })
   }, [categoryFilter, rules, search, typeFilter])
+
+  const columns = useMemo<DataTableColumn<Rule>[]>(() => {
+    const cols: DataTableColumn<Rule>[] = [
+      {
+        key: 'id',
+        header: 'ID',
+        render: (rule) => (
+          <span
+            style={{
+              fontFamily: 'var(--font-space-grotesk)',
+              color: 'var(--fg-muted)',
+            }}
+          >
+            {rule.id}
+          </span>
+        ),
+      },
+      {
+        key: 'type',
+        header: '유형',
+        render: (rule) => (
+          <Badge type={rule.type}>
+            {rule.type === 'reward' ? '상점' : '벌점'}
+          </Badge>
+        ),
+      },
+      {
+        key: 'category',
+        header: '카테고리',
+        render: (rule) => (
+          <span
+            style={{
+              color: 'var(--fg-muted)',
+              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+            }}
+          >
+            {rule.category}
+          </span>
+        ),
+      },
+      {
+        key: 'name',
+        header: '항목명',
+        render: (rule) => (
+          <span
+            className="font-medium"
+            style={{
+              color: 'var(--fg)',
+              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+            }}
+          >
+            {rule.name}
+          </span>
+        ),
+      },
+      {
+        key: 'score',
+        header: '기본점수',
+        render: (rule) => (
+          <span
+            className="font-semibold"
+            style={{
+              fontFamily: 'var(--font-space-grotesk)',
+              color:
+                rule.type === 'reward' ? 'var(--reward)' : 'var(--penalty)',
+            }}
+          >
+            {formatScoreDisplay(rule)}
+          </span>
+        ),
+      },
+      {
+        key: 'order',
+        header: '순서',
+        render: (rule) => (
+          <span
+            style={{
+              fontFamily: 'var(--font-space-grotesk)',
+              color: 'var(--fg-muted)',
+            }}
+          >
+            {rule.displayOrder}
+          </span>
+        ),
+      },
+      {
+        key: 'status',
+        header: '상태',
+        render: (rule) => (
+          <button
+            type="button"
+            className="rounded-full px-2 py-0.5 text-[11px] transition-opacity"
+            disabled={readOnly || toggleRuleId === rule.id}
+            onClick={() => void handleToggle(rule)}
+            style={{
+              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+              backgroundColor: rule.isActive
+                ? 'var(--reward-subtle)'
+                : 'var(--border)',
+              color: rule.isActive ? 'var(--reward)' : 'var(--fg-muted)',
+              opacity: toggleRuleId === rule.id || readOnly ? 0.6 : 1,
+              cursor: readOnly ? 'default' : 'pointer',
+            }}
+          >
+            {toggleRuleId === rule.id
+              ? '변경 중'
+              : rule.isActive
+                ? '사용 중'
+                : '비활성'}
+          </button>
+        ),
+      },
+    ]
+
+    if (!readOnly) {
+      cols.push({
+        key: 'actions',
+        header: '작업',
+        render: (rule) => (
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={<EditIcon />}
+            onClick={() => handleEdit(rule)}
+          >
+            수정
+          </Button>
+        ),
+      })
+    }
+
+    return cols
+  }, [readOnly, formatScoreDisplay, toggleRuleId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleCreate() {
     setFormMode('create')
@@ -285,161 +417,22 @@ export default function SharedMileageRulesView<
 
       <Card className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
         <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto">
-          <table className="w-full text-xs">
-            <thead className="table-header">
-              <tr>
-                {[
-                  'ID',
-                  '유형',
-                  '카테고리',
-                  '항목명',
-                  '기본점수',
-                  '순서',
-                  '상태',
-                  ...(readOnly ? [] : ['작업']),
-                ].map((header) => (
-                  <th key={header} className="px-3" scope="col">
-                    {header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {isRulesLoading ? (
-                <TableRowSkeleton columns={readOnly ? 7 : 8} count={6} />
-              ) : rulesError ? (
-                <tr>
-                  <td colSpan={readOnly ? 7 : 8} className="p-0">
-                    <div className="flex min-h-[320px] items-center justify-center p-4">
-                      <NoticeBox type="error" message={rulesError} />
-                    </div>
-                  </td>
-                </tr>
-              ) : filteredRules.length === 0 ? (
-                <tr>
-                  <td colSpan={readOnly ? 7 : 8} className="p-0">
-                    <div className="flex min-h-[320px]">
-                      <ListEmptyState
-                        fill
-                        icon={<FileIcon style={{ color: 'var(--accent)' }} />}
-                        title="규칙이 없습니다"
-                        description={emptyDescription}
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                filteredRules.map((rule, index) => (
-                  <AnimatedTableRow
-                    key={rule.id}
-                    index={index}
-                    className="transition-colors"
-                    style={{
-                      borderBottom: '1px solid var(--border)',
-                      backgroundColor:
-                        hoveredRowId === rule.id
-                          ? 'var(--admin-row-hover)'
-                          : 'transparent',
-                    }}
-                    onMouseEnter={() => setHoveredRowId(rule.id)}
-                    onMouseLeave={() => setHoveredRowId(null)}
-                  >
-                    <td
-                      className="px-3 py-2"
-                      style={{
-                        color: 'var(--fg-muted)',
-                        fontFamily: 'var(--font-space-grotesk)',
-                      }}
-                    >
-                      {rule.id}
-                    </td>
-                    <td className="px-3 py-2">
-                      <Badge type={rule.type}>
-                        {rule.type === 'reward' ? '상점' : '벌점'}
-                      </Badge>
-                    </td>
-                    <td
-                      className="px-3 py-2"
-                      style={{
-                        color: 'var(--fg-muted)',
-                        fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                      }}
-                    >
-                      {rule.category}
-                    </td>
-                    <td
-                      className="px-3 py-2 font-medium"
-                      style={{
-                        color: 'var(--fg)',
-                        fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                      }}
-                    >
-                      {rule.name}
-                    </td>
-                    <td
-                      className="px-3 py-2 font-semibold"
-                      style={{
-                        fontFamily: 'var(--font-space-grotesk)',
-                        color:
-                          rule.type === 'reward'
-                            ? 'var(--reward)'
-                            : 'var(--penalty)',
-                      }}
-                    >
-                      {formatScoreDisplay(rule)}
-                    </td>
-                    <td
-                      className="px-3 py-2"
-                      style={{
-                        color: 'var(--fg-muted)',
-                        fontFamily: 'var(--font-space-grotesk)',
-                      }}
-                    >
-                      {rule.displayOrder}
-                    </td>
-                    <td className="px-3 py-2">
-                      <button
-                        type="button"
-                        className="rounded-full px-2 py-0.5 text-[11px] transition-opacity"
-                        disabled={readOnly || toggleRuleId === rule.id}
-                        onClick={() => void handleToggle(rule)}
-                        style={{
-                          fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                          backgroundColor: rule.isActive
-                            ? 'var(--reward-subtle)'
-                            : 'var(--border)',
-                          color: rule.isActive
-                            ? 'var(--reward)'
-                            : 'var(--fg-muted)',
-                          opacity:
-                            toggleRuleId === rule.id || readOnly ? 0.6 : 1,
-                          cursor: readOnly ? 'default' : 'pointer',
-                        }}
-                      >
-                        {toggleRuleId === rule.id
-                          ? '변경 중'
-                          : rule.isActive
-                            ? '사용 중'
-                            : '비활성'}
-                      </button>
-                    </td>
-                    {!readOnly && (
-                      <td className="px-3 py-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={<EditIcon />}
-                          onClick={() => handleEdit(rule)}
-                        >
-                          수정
-                        </Button>
-                      </td>
-                    )}
-                  </AnimatedTableRow>
-                ))
-              )}
-            </tbody>
-          </table>
+          {rulesError ? (
+            <div className="flex min-h-[320px] items-center justify-center p-4">
+              <NoticeBox type="error" message={rulesError} />
+            </div>
+          ) : (
+            <DataTable
+              columns={columns}
+              data={filteredRules}
+              rowKey={(rule) => rule.id}
+              loading={isRulesLoading}
+              emptyIcon={<FileIcon style={{ color: 'var(--accent)' }} />}
+              emptyTitle="규칙이 없습니다"
+              emptyDescription={emptyDescription}
+              className="[&_tbody_tr]:transition-colors [&_tbody_tr:hover]:bg-[var(--admin-row-hover)]"
+            />
+          )}
         </div>
       </Card>
     </div>

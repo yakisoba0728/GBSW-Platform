@@ -80,6 +80,8 @@ function SuccessModalContent({
     () => preloadLottie(type),
   )
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const panelRef = useRef<HTMLDivElement | null>(null)
+  const previousFocusedElementRef = useRef<HTMLElement | null>(null)
 
   // Lottie JSON 로드 (캐시 우선)
   useEffect(() => {
@@ -118,11 +120,20 @@ function SuccessModalContent({
   }, [autoCloseMs, onClose])
 
   useEffect(() => {
+    previousFocusedElementRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    const focusTimer = window.setTimeout(() => {
+      panelRef.current?.focus()
+    }, 0)
+    return () => {
+      window.clearTimeout(focusTimer)
+      window.removeEventListener('keydown', handleKeyDown)
+      previousFocusedElementRef.current?.focus?.()
+    }
   }, [onClose])
 
   useEffect(() => {
@@ -164,7 +175,11 @@ function SuccessModalContent({
         }}
       >
         <div
+          ref={panelRef}
           onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+          tabIndex={-1}
           style={{
             pointerEvents: 'auto',
             width: '100%',

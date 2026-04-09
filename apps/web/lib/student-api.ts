@@ -3,10 +3,14 @@ import { createRoleProxyRequest } from './api-proxy'
 
 type StudentPath =
   | '/school-mileage/my/summary'
+  | '/school-mileage/my/stats'
   | '/school-mileage/my/entries'
+  | '/school-mileage/my/entries/export'
   | '/school-mileage/my/rules'
   | '/dorm-mileage/my/summary'
+  | '/dorm-mileage/my/stats'
   | '/dorm-mileage/my/entries'
+  | '/dorm-mileage/my/entries/export'
   | '/dorm-mileage/my/rules'
 
 export async function proxyStudentGetRequest(

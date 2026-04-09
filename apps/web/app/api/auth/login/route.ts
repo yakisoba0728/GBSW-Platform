@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {
+  getResponseMessage,
+  readJsonRequestBody,
+  readResponseBody,
+} from '@/lib/api-proxy'
+import {
   AUTH_SESSION_COOKIE,
   getRedirectPathForSession,
   getSessionCookieMaxAge,
@@ -8,7 +13,16 @@ import {
 import { getApiBaseUrl } from '@/lib/api-base-url'
 
 export async function POST(request: NextRequest) {
-  const body = await request.json().catch(() => null)
+  const bodyResult = await readJsonRequestBody(request)
+
+  if (!bodyResult.ok) {
+    return NextResponse.json(
+      { message: '요청 본문이 올바르지 않습니다.' },
+      { status: 400 },
+    )
+  }
+
+  const body = bodyResult.body as Record<string, unknown> | null
   const id = typeof body?.id === 'string' ? body.id.trim() : ''
   const password = typeof body?.password === 'string' ? body.password : ''
 
@@ -21,6 +35,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const realIp = forwardHeaderValue('x-real-ip', request)
+    const xForwardedFor = forwardHeaderValue('x-forwarded-for', request)
     const upstreamResponse = await fetch(`${getApiBaseUrl()}/auth/login`, {
       method: 'POST',
       headers: {
@@ -28,20 +43,27 @@ export async function POST(request: NextRequest) {
         ...(realIp && {
           'x-real-ip': realIp,
         }),
+        ...(xForwardedFor && {
+          'x-forwarded-for': xForwardedFor,
+        }),
       },
       body: JSON.stringify({ id, password }),
       cache: 'no-store',
     })
 
-    const payload = await upstreamResponse.json().catch(() => null)
+    const responseBody = await readResponseBody(upstreamResponse)
 
     if (!upstreamResponse.ok) {
       return NextResponse.json(
-        { message: getErrorMessage(payload, '로그인에 실패했습니다.') },
+        { message: getResponseMessage(responseBody, '로그인에 실패했습니다.') },
         { status: upstreamResponse.status },
       )
     }
 
+    const payload =
+      responseBody.kind === 'json'
+        ? (responseBody.body as Record<string, unknown> | null)
+        : null
     const session = parseAuthSession(payload?.session)
 
     if (!session) {
@@ -75,24 +97,10 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function forwardHeaderValue(name: 'x-real-ip', request: NextRequest) {
+function forwardHeaderValue(name: 'x-real-ip' | 'x-forwarded-for', request: NextRequest) {
   const value = request.headers.get(name)?.trim()
 
   return value && value.length > 0 ? value : null
-}
-
-function getErrorMessage(payload: unknown, fallback: string) {
-  if (
-    payload &&
-    typeof payload === 'object' &&
-    'message' in payload &&
-    typeof payload.message === 'string' &&
-    payload.message.trim().length > 0
-  ) {
-    return payload.message.trim()
-  }
-
-  return fallback
 }
 
 function parseAuthSession(value: unknown): {
@@ -100,6 +108,8 @@ function parseAuthSession(value: unknown): {
   accountId: string
   role: 'super-admin' | 'student' | 'teacher'
   mustChangePassword: boolean
+  hasLinkedEmail: boolean
+  hasLinkedPhone: boolean
   expiresAt: string
   school?: 'GBSW' | 'BYMS'
 } | null {
@@ -118,6 +128,8 @@ function parseAuthSession(value: unknown): {
       session.role !== 'student' &&
       session.role !== 'teacher') ||
     typeof session.mustChangePassword !== 'boolean' ||
+    typeof session.hasLinkedEmail !== 'boolean' ||
+    typeof session.hasLinkedPhone !== 'boolean' ||
     typeof session.expiresAt !== 'string'
   ) {
     return null
@@ -142,6 +154,8 @@ function parseAuthSession(value: unknown): {
     accountId: session.accountId.trim(),
     role: session.role,
     mustChangePassword: session.mustChangePassword,
+    hasLinkedEmail: session.hasLinkedEmail,
+    hasLinkedPhone: session.hasLinkedPhone,
     expiresAt: session.expiresAt,
     ...(session.school ? { school: session.school } : {}),
   }

@@ -1,7 +1,7 @@
 'use client'
 
+import { Card } from '../ui/card'
 import {
-  Card,
   FilterRow,
   SCHOOL_OPTIONS,
   SectionHeader,

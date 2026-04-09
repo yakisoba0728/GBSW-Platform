@@ -4,10 +4,11 @@ import {
   AUTH_SESSION_COOKIE,
   type AuthRole,
   type AuthSession,
-  getDefaultRedirectPathForRole,
   getRedirectPathForSession,
+  getOnboardingStepRedirectPath,
   readAuthSessionId,
   resolveAuthSession,
+  type OnboardingStep,
 } from './auth-session'
 
 export async function getServerAuthSession() {
@@ -37,27 +38,31 @@ export async function requireRoleSession(expectedRole: AuthRole) {
     redirect(getRedirectPathForSession(session))
   }
 
-  if (session.role !== 'super-admin' && session.mustChangePassword) {
-    redirect('/change-password')
+  if (session.role !== 'super-admin') {
+    if (session.mustChangePassword) {
+      redirect('/onboarding/change-password')
+    }
   }
 
   return session
 }
 
-export async function requireChangePasswordSession() {
+export async function requireOnboardingSession(step: OnboardingStep) {
   const session = await getServerAuthSession()
 
-  if (!session) {
+  if (!session || session.role === 'super-admin') {
     redirect('/')
   }
 
-  if (session.role === 'super-admin') {
-    redirect(getDefaultRedirectPathForRole(session.role))
-  }
+  const redirectPath = getOnboardingStepRedirectPath(session, step)
 
-  if (!session.mustChangePassword) {
-    redirect(getDefaultRedirectPathForRole(session.role))
+  if (redirectPath) {
+    redirect(redirectPath)
   }
 
   return session as AuthSession & { role: 'student' | 'teacher' }
+}
+
+export async function requireChangePasswordSession() {
+  return requireOnboardingSession('change-password')
 }

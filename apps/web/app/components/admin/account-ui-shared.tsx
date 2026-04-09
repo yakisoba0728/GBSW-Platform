@@ -159,7 +159,7 @@ export function StatusBadge({ isActive }: { isActive: boolean }) {
       style={{
         fontFamily: 'var(--font-noto-sans-kr), sans-serif',
         backgroundColor: isActive
-          ? 'rgba(34,197,94,0.12)'
+          ? 'var(--reward-bg-muted)'
           : 'rgba(148,163,184,0.18)',
         color: isActive ? '#15803d' : 'var(--fg-muted)',
       }}

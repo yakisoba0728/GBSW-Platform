@@ -1,20 +1,4 @@
-'use client'
-
-import DormMileageRules from '@/app/components/teacher/DormMileageRules'
-import { useDormRulesContext } from '@/app/components/dorm-mileage/dorm-rules-context'
-
-export default function TeacherDormMileageRulesPage() {
-  const { rules, isRulesLoading, rulesError, loadRules } = useDormRulesContext()
-
-  return (
-    <div className="flex flex-col h-full">
-      <DormMileageRules
-        rules={rules}
-        isRulesLoading={isRulesLoading}
-        rulesError={rulesError}
-        loadRules={loadRules}
-        readOnly={true}
-      />
-    </div>
-  )
+import { redirect } from 'next/navigation'
+export default function RedirectPage() {
+  redirect('/teacher/dorm/rules')
 }

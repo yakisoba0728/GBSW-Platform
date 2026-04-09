@@ -2,7 +2,8 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Card, StatCard, ScoreSummaryBar, formatAwardedAtParts } from '@/app/components/mileage/shared'
+import { Card, StatCard } from '@/app/components/ui/card'
+import { ScoreSummaryBar, formatAwardedAtParts } from '@/app/components/mileage/shared'
 import { MileageBadge } from '@/app/components/ui/primitives'
 import {
   getSectionMotion,

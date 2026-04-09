@@ -19,13 +19,13 @@ export function NoticeBox({
   return (
     <div
       className="animate-fade-in rounded-xl border px-4 py-3 text-sm"
-      role="status"
-      aria-live="polite"
+      role={isSuccess ? 'status' : 'alert'}
+      aria-live={isSuccess ? 'polite' : 'assertive'}
       style={{
         fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-        borderColor: isSuccess ? 'rgba(34,197,94,0.35)' : 'rgba(239,68,68,0.35)',
-        backgroundColor: isSuccess ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)',
-        color: isSuccess ? '#166534' : '#991b1b',
+        borderColor: isSuccess ? 'var(--reward-border)' : 'var(--penalty-border)',
+        backgroundColor: isSuccess ? 'var(--reward-bg-faint)' : 'var(--penalty-bg-faint)',
+        color: isSuccess ? 'var(--reward-text)' : 'var(--penalty-text)',
       }}
     >
       <div className="flex items-start gap-2.5">

@@ -1,7 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { Card } from '../mileage/shared'
+import { Card } from '../ui/card'
 import { AnimatedListItem } from '../ui/list'
 import {
   getMicroInteractionTransition,

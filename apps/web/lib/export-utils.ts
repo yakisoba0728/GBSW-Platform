@@ -1,12 +1,10 @@
-import * as XLSX from 'xlsx'
-
 export interface ExportColumn<T> {
   header: string
   accessor: (row: T) => string | number
   width?: number
 }
 
-export function exportToExcel<T>({
+export async function exportToExcel<T>({
   data,
   columns,
   filename,
@@ -16,23 +14,37 @@ export function exportToExcel<T>({
   columns: ExportColumn<T>[]
   filename: string
   sheetName?: string
-}): void {
-  const headers = columns.map((col) => col.header)
-  const rows = data.map((row) => columns.map((col) => col.accessor(row)))
+}): Promise<void> {
+  const ExcelJS = await import('exceljs')
+  const workbook = new ExcelJS.Workbook()
+  const worksheet = workbook.addWorksheet(sheetName)
 
-  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows])
-
-  worksheet['!cols'] = columns.map((col, i) => {
-    if (col.width) return { wch: col.width }
-    const headerLen = col.header.length
-    const maxDataLen = rows.reduce((max, row) => {
-      const val = row[i]
-      return Math.max(max, String(val ?? '').length)
-    }, 0)
-    return { wch: Math.max(headerLen, maxDataLen) + 2 }
+  worksheet.columns = columns.map((col) => {
+    const rows = data.map((row) => String(col.accessor(row) ?? ''))
+    const maxDataLen = rows.reduce((max, val) => Math.max(max, val.length), 0)
+    return {
+      header: col.header,
+      key: col.header,
+      width: col.width ?? Math.max(col.header.length, maxDataLen) + 2,
+    }
   })
 
-  const workbook = XLSX.utils.book_new()
-  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName)
-  XLSX.writeFile(workbook, `${filename}.xlsx`)
+  for (const row of data) {
+    const values: Record<string, string | number> = {}
+    for (const col of columns) {
+      values[col.header] = col.accessor(row)
+    }
+    worksheet.addRow(values)
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer()
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  })
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = `${filename}.xlsx`
+  anchor.click()
+  URL.revokeObjectURL(url)
 }

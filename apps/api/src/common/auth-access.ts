@@ -1,8 +1,9 @@
-import { UnauthorizedException } from '@nestjs/common';
-import { AuthRole } from '@prisma/client';
+import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import { AuthRole, MileageScope } from '@prisma/client';
 import { getSuperAdminCredentials } from '../config/runtime-env';
 import { PrismaService } from '../prisma/prisma.service';
 import { parseRequiredTextInput } from './parsers';
+import { createHash } from 'node:crypto';
 
 export async function assertTeacherExists(
   prisma: PrismaService,
@@ -33,6 +34,37 @@ export async function assertTeacherExists(
 
   if (!teacher) {
     throw new UnauthorizedException('유효한 교사 계정이 아닙니다.');
+  }
+
+  return teacher;
+}
+
+export async function assertTeacherReadAccess(
+  prisma: PrismaService,
+  scope: MileageScope,
+  actorTeacherId: string | undefined,
+  actorSessionId: string | undefined,
+) {
+  const teacher = await assertTeacherExists(
+    prisma,
+    actorTeacherId,
+    actorSessionId,
+  );
+
+  if (scope === MileageScope.DORM) {
+    const dormTeacher = await prisma.teacher.findFirst({
+      where: {
+        teacherId: teacher.teacherId,
+        isActive: true,
+      },
+      select: { isDormTeacher: true },
+    });
+
+    if (!dormTeacher?.isDormTeacher) {
+      throw new ForbiddenException(
+        '사감 교사만 기숙사 정보를 조회할 수 있습니다.',
+      );
+    }
   }
 
   return teacher;
@@ -86,6 +118,7 @@ export async function assertSuperAdmin(
     },
     select: {
       id: true,
+      credentialFingerprint: true,
     },
   });
 
@@ -96,6 +129,23 @@ export async function assertSuperAdmin(
   const credentials = getSuperAdminCredentials();
 
   if (superAdminId !== credentials.id) {
+    throw new UnauthorizedException('유효한 최고관리자 계정이 아닙니다.');
+  }
+
+  const expectedFingerprint = createHash('sha256')
+    .update(`${credentials.id}:${credentials.password}`)
+    .digest('hex');
+
+  if (session.credentialFingerprint !== expectedFingerprint) {
+    await prisma.authSession.updateMany({
+      where: {
+        id: sessionId,
+        revokedAt: null,
+      },
+      data: {
+        revokedAt: new Date(),
+      },
+    });
     throw new UnauthorizedException('유효한 최고관리자 계정이 아닙니다.');
   }
 

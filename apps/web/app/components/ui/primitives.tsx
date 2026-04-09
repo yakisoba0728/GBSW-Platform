@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
-import type { SharedMileageType as MileageType } from '../teacher/shared-mileage-types'
+import type { SharedMileageType as MileageType } from '../mileage/shared-types'
 import { formatSignedScore } from '../mileage/shared'
 
 // ─── MileageBadge ─────────────────────────────────────────────────────────────
@@ -46,14 +46,14 @@ export function FetchingOverlay({ visible }: { visible: boolean }) {
       <div
         className="flex items-center gap-2 rounded-md border px-3 py-1.5"
         style={{
-          backgroundColor: 'var(--admin-sidebar-bg)',
-          borderColor: 'var(--admin-border)',
+          backgroundColor: 'var(--bg-subtle)',
+          borderColor: 'var(--border)',
         }}
       >
         <Spinner size="sm" />
         <span
           className="text-xs"
-          style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
+          style={{ color: 'var(--fg-muted)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
         >
           조회 중
         </span>
@@ -153,10 +153,10 @@ export function Pagination({
       {totalCount !== undefined ? (
         <p
           className="text-xs"
-          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--admin-text-muted)' }}
+          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg-muted)' }}
         >
           총{' '}
-          <span style={{ color: 'var(--admin-text)', fontWeight: 600, fontFamily: 'var(--font-space-grotesk)' }}>
+          <span style={{ color: 'var(--fg)', fontWeight: 600, fontFamily: 'var(--font-space-grotesk)' }}>
             {totalCount.toLocaleString()}
           </span>
           건
@@ -186,14 +186,14 @@ export function Pagination({
               style={
                 p === page
                   ? {
-                      backgroundColor: 'var(--admin-accent)',
+                      backgroundColor: 'var(--accent)',
                       color: '#fff',
-                      borderColor: 'var(--admin-accent)',
+                      borderColor: 'var(--accent)',
                       fontFamily: 'var(--font-space-grotesk)',
                     }
                   : {
-                      color: 'var(--admin-text-muted)',
-                      borderColor: 'var(--admin-border)',
+                      color: 'var(--fg-muted)',
+                      borderColor: 'var(--border)',
                       fontFamily: 'var(--font-space-grotesk)',
                     }
               }

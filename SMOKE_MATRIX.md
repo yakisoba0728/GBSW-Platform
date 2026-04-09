@@ -7,9 +7,9 @@ This file tracks the manual smoke checks that gate the current refactor waves.
 | Scenario | Expected Result |
 |---|---|
 | Super-admin login succeeds with `SUPER_ADMIN_ID` / `SUPER_ADMIN_PASSWORD` | Redirects to `/admin/students/create` |
-| Student first login | Redirects to `/change-password` |
-| Teacher first login | Redirects to `/change-password` |
-| Super-admin opens `/change-password` | Redirects back to admin home |
+| Student first login | Redirects to `/onboarding/change-password` |
+| Teacher first login | Redirects to `/onboarding/change-password` |
+| Super-admin opens `/change-password` | Redirects back to `/admin/teachers` |
 
 ## Dorm Mileage Policy
 
@@ -34,3 +34,6 @@ This file tracks the manual smoke checks that gate the current refactor waves.
 | `NEXT_PUBLIC_API_URL` points to a direct Nest origin | Requests resolve normally |
 | `NEXT_PUBLIC_API_URL` points to a Next.js `/api` path | Startup/request path fails fast with a config error |
 | Docker production config | `API_INTERNAL_URL` remains `http://api:3001` for server-side calls |
+| Production `pgAdmin` startup | Uses explicit env credentials and stays bound to `127.0.0.1:${PGADMIN_PORT}` |
+| Production deploy flow | Runs Prisma migrate deploy explicitly before `api` starts |
+| Production web exposure | `web` binds to loopback and is fronted by reverse proxy |

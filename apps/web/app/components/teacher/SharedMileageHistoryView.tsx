@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Card, NoticeBox } from '../mileage/shared'
+import { Card } from '../ui/card'
+import { NoticeBox } from '../mileage/shared'
 import { EmptyStatePane } from '../ui/list'
 import { ConfirmModal } from '../ui/modal'
 import SuccessModal from '../ui/success-modal'
@@ -162,15 +163,6 @@ export default function SharedMileageHistoryView<
       if (!fetchResponse.ok) {
         setEntriesError(result?.message ?? loadErrorMessage)
         setShowEntriesErrorModal(true)
-        setResponse(
-          (previousResponse) =>
-            ({
-              ...previousResponse,
-              items: [],
-              totalCount: 0,
-              page,
-            }) as Response,
-        )
         return
       }
 
@@ -196,15 +188,6 @@ export default function SharedMileageHistoryView<
 
       setEntriesError(loadCatchMessage)
       setShowEntriesErrorModal(true)
-      setResponse(
-        (previousResponse) =>
-          ({
-            ...previousResponse,
-            items: [],
-            totalCount: 0,
-            page,
-          }) as Response,
-      )
     } finally {
       if (fetchAbortControllerRef.current === abortController) {
         hasLoadedOnceRef.current = true

@@ -52,7 +52,7 @@ export default function TeacherCreateForm() {
         body: JSON.stringify({
           teacherId: teacher.teacherId,
           name: teacher.name,
-          phone: teacher.phone,
+          phone: teacher.phone || undefined,
         }),
       })
 
@@ -137,7 +137,7 @@ export default function TeacherCreateForm() {
                   style={{ ...inputBaseStyle, fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
                 />
               </FieldBlock>
-              <FieldBlock label="전화번호" htmlFor="t-phone">
+              <FieldBlock label="전화번호 (선택)" htmlFor="t-phone">
                 <input
                   id="t-phone"
                   type="tel"

@@ -4,7 +4,7 @@ server {
 
     client_max_body_size 20m;
 
-    # Proxy only the Next.js web app. The Nest API stays on the internal Docker network.
+    # Proxy only the loopback-bound Next.js web app. The Nest API and pgAdmin stay internal.
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;

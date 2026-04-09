@@ -1,74 +1,52 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { resetApiRuntimeEnvCache } from '../config/runtime-env';
 import { PrismaService } from '../prisma/prisma.service';
 import { AdminService } from './admin.service';
 
-type StudentCreateArgs = {
-  data: {
-    studentId: string;
-    school: string;
-    currentYear: number;
-    currentClass: number;
-    currentNumber: number;
-    phone: string;
-    mustChangePassword: boolean;
-    isActive: boolean;
-    passwordHash: string;
-  };
+const originalEnv = {
+  INTERNAL_API_SECRET: process.env.INTERNAL_API_SECRET,
+  SUPER_ADMIN_ID: process.env.SUPER_ADMIN_ID,
+  SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD,
 };
 
-describe('AdminService.createStudent', () => {
-  it('returns a one-time temporary password payload for new students', async () => {
-    let createArgs: StudentCreateArgs | null = null;
+afterEach(() => {
+  resetApiRuntimeEnvCache();
+  for (const [key, value] of Object.entries(originalEnv)) {
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = value;
+  }
+});
+
+describe('AdminService.createTeacher', () => {
+  it('returns a one-time temporary password payload for new teachers', async () => {
+    process.env.INTERNAL_API_SECRET = 'test-secret';
+    process.env.SUPER_ADMIN_ID = 'super-admin';
+    process.env.SUPER_ADMIN_PASSWORD = 'super-admin-password';
+
     const prisma = {
       student: {
-        create: (args: StudentCreateArgs) => {
-          createArgs = args;
-
+        findUnique: () => Promise.resolve(null),
+      },
+      teacher: {
+        create: () => {
           return Promise.resolve({
-            studentId: 'GB240102',
-            school: 'GBSW',
-            currentYear: 2024,
-            currentClass: 1,
-            currentNumber: 2,
-            majorSubject: 'AI',
+            teacherId: 'teacher01',
             name: '홍길동',
-            phone: '01012345678',
+            phone: null,
+            isDormTeacher: false,
             isActive: true,
           });
         },
       },
-    } as Pick<PrismaService, 'student'>;
+    } as unknown as PrismaService;
 
     const service = new AdminService(prisma as PrismaService);
-    const result = await service.createStudent({
-      school: 'GBSW',
-      admissionYear: 2024,
-      classNumber: 1,
-      studentNumber: 2,
-      isFirstEnrollment: true,
-      majorSubject: 'AI',
+    const result = await service.createTeacher({
+      teacherId: 'teacher01',
       name: '홍길동',
-      phone: '010-1234-5678',
     });
 
-    expect(createArgs).not.toBeNull();
-
-    if (createArgs === null) {
-      throw new Error('student.create should be called exactly once');
-    }
-
-    const { data } = createArgs;
-
-    expect(data.studentId).toBe('GB240102');
-    expect(data.school).toBe('GBSW');
-    expect(data.currentYear).toBe(2024);
-    expect(data.currentClass).toBe(1);
-    expect(data.currentNumber).toBe(2);
-    expect(data.phone).toBe('01012345678');
-    expect(data.mustChangePassword).toBe(true);
-    expect(data.isActive).toBe(true);
-    expect(typeof data.passwordHash).toBe('string');
-    expect(result.student.mustChangePassword).toBe(true);
-    expect(result.student.temporaryPassword).toMatch(/^[0-9a-f]{16}$/);
+    expect(result.teacher.mustChangePassword).toBe(true);
+    expect(result.teacher.temporaryPassword).toBe('teacher01');
   });
 });

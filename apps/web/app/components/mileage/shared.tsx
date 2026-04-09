@@ -3,9 +3,15 @@ import type {
   SharedMileageRuleSummary as MileageRuleSummary,
   SharedMileageType as MileageType,
   SharedSchoolCode as SchoolCode,
-} from '../teacher/shared-mileage-types'
+} from './shared-types'
 
 export { NoticeBox } from '../ui/notice'
+
+// Re-export design system components for backward compatibility.
+// New code should import directly from '../ui/card'.
+export { Card, SectionTitle, StatCard } from '../ui/card'
+
+export const KST_TIME_ZONE = 'Asia/Seoul'
 
 export const SCHOOL_OPTIONS: Array<{ value: SchoolCode; label: string }> = [
   { value: 'GBSW', label: '경북소프트웨어마이스터고등학교' },
@@ -14,9 +20,9 @@ export const SCHOOL_OPTIONS: Array<{ value: SchoolCode; label: string }> = [
 
 export const inputStyle: CSSProperties = {
   fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-  backgroundColor: 'var(--admin-bg)',
-  borderColor: 'var(--admin-border)',
-  color: 'var(--admin-text)',
+  backgroundColor: 'var(--bg)',
+  borderColor: 'var(--border)',
+  color: 'var(--fg)',
   fontSize: '0.8rem',
 }
 
@@ -36,6 +42,7 @@ export function formatAwardedAt(value: string) {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
   return new Intl.DateTimeFormat('ko-KR', {
+    timeZone: KST_TIME_ZONE,
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -52,11 +59,13 @@ export function formatAwardedAtParts(value: string): {
   if (Number.isNaN(d.getTime())) return { date: value, time: '' }
   return {
     date: new Intl.DateTimeFormat('ko-KR', {
+      timeZone: KST_TIME_ZONE,
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
     }).format(d),
     time: new Intl.DateTimeFormat('ko-KR', {
+      timeZone: KST_TIME_ZONE,
       hour: '2-digit',
       minute: '2-digit',
     }).format(d),
@@ -66,36 +75,39 @@ export function formatAwardedAtParts(value: string): {
 export function toDateTimeLocalValue(value: string) {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return ''
-  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-  return localDate.toISOString().slice(0, 16)
-}
 
-export function Card({
-  children,
-  className = '',
-}: {
-  children: ReactNode
-  className?: string
-}) {
-  return (
-    <div
-      className={`rounded-xl border p-5 ${className}`}
-      style={{ backgroundColor: 'var(--bg-subtle)', borderColor: 'var(--border)' }}
-    >
-      {children}
-    </div>
-  )
-}
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: KST_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(date)
 
-export function SectionTitle({ children }: { children: ReactNode }) {
-  return (
-    <h2
-      className="mb-3 text-[13px] font-semibold"
-      style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg)' }}
-    >
-      {children}
-    </h2>
+  const parsedParts = parts.reduce<Partial<Record<'year' | 'month' | 'day' | 'hour' | 'minute', string>>>(
+    (acc, part) => {
+      if (part.type !== 'literal') {
+        acc[part.type as 'year' | 'month' | 'day' | 'hour' | 'minute'] = part.value
+      }
+
+      return acc
+    },
+    {},
   )
+
+  if (
+    !parsedParts.year ||
+    !parsedParts.month ||
+    !parsedParts.day ||
+    !parsedParts.hour ||
+    !parsedParts.minute
+  ) {
+    return ''
+  }
+
+  return `${parsedParts.year}-${parsedParts.month}-${parsedParts.day}T${parsedParts.hour}:${parsedParts.minute}`
 }
 
 export function Badge({
@@ -106,53 +118,6 @@ export function Badge({
   children: ReactNode
 }) {
   return <span className={type === 'reward' ? 'badge-reward' : 'badge-penalty'}>{children}</span>
-}
-
-export function StatCard({
-  label,
-  value,
-  subValue,
-  colorToken = 'default',
-}: {
-  label: string
-  value: string | number
-  subValue?: string
-  colorToken?: 'green' | 'red' | 'default'
-}) {
-  const valueColor =
-    colorToken === 'green'
-      ? 'var(--reward)'
-      : colorToken === 'red'
-        ? 'var(--penalty)'
-        : 'var(--fg)'
-
-  return (
-    <div
-      className="rounded-xl border p-4"
-      style={{ backgroundColor: 'var(--bg-subtle)', borderColor: 'var(--border)' }}
-    >
-      <p
-        className="text-[11px] uppercase tracking-wider"
-        style={{ fontFamily: 'var(--font-space-grotesk)', color: 'var(--fg-muted)' }}
-      >
-        {label}
-      </p>
-      <p
-        className="mt-2 text-2xl font-semibold leading-none"
-        style={{ fontFamily: 'var(--font-space-grotesk)', color: valueColor }}
-      >
-        {value}
-      </p>
-      {subValue && (
-        <p
-          className="mt-1.5 text-xs"
-          style={{ fontFamily: 'var(--font-noto-sans-kr), sans-serif', color: 'var(--fg-muted)' }}
-        >
-          {subValue}
-        </p>
-      )}
-    </div>
-  )
 }
 
 export function FilterRow({ children }: { children: ReactNode }) {

@@ -129,7 +129,7 @@ export default function ChangePasswordForm({
             <p style={{ fontSize: 14, color: 'var(--fg-muted)', lineHeight: 1.6 }}>
               {`${role === 'student' ? '학생' : '교사'} 계정 `}
               <span style={{ fontWeight: 600, color: 'var(--fg)' }}>{accountId}</span>
-              는 임시 비밀번호 상태입니다. 새 비밀번호를 설정한 뒤 계속 진행할 수 있습니다.
+              는 임시 비밀번호 상태입니다. 새 비밀번호를 설정한 뒤 이메일과 전화번호 연동을 이어서 할 수 있습니다.
             </p>
             <div style={{
               marginTop: 12,
@@ -142,7 +142,7 @@ export default function ChangePasswordForm({
             }}>
               {requireCurrentPassword
                 ? '보안을 위해 현재 비밀번호를 먼저 확인합니다.'
-                : '임시 비밀번호 변경 상태에서만 현재 비밀번호 입력이 생략됩니다.'}
+                : '비밀번호 변경이 끝나면 이메일과 전화번호 연동은 건너뛸 수 있습니다.'}
             </div>
           </div>
 
@@ -223,7 +223,7 @@ export default function ChangePasswordForm({
           {/* 로그아웃 */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 20, fontSize: 13, color: 'var(--fg-muted)' }}>
             <span>
-              {embedded ? '변경 후에도 현재 세션은 새로 발급됩니다.' : '다른 계정으로 다시 로그인하려면'}
+              {embedded ? '변경 후에는 연락처 연동을 건너뛰고 계속 진행할 수 있습니다.' : '다른 계정으로 다시 로그인하려면'}
             </span>
             <LogoutButton
               style={{

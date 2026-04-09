@@ -2,30 +2,18 @@ import { NextRequest } from 'next/server'
 import { createRoleProxyRequest } from './api-proxy'
 
 type AdminPath =
-  | '/admin/students'
-  | `/admin/students/${string}`
-  | `/admin/students/${string}/status`
-  | `/admin/students/${string}/deactivate`
   | '/admin/teachers'
   | `/admin/teachers/${string}`
   | `/admin/teachers/${string}/status`
-  | `/admin/teachers/${string}/deactivate`
-  | '/admin/students/major-subjects'
 
-type AdminCreatePath = '/admin/students' | '/admin/teachers'
+type AdminCreatePath = '/admin/teachers'
 
 type AdminGetPath =
-  | '/admin/students'
-  | '/admin/students/major-subjects'
   | '/admin/teachers'
 
 type AdminWritePath =
-  | `/admin/students/${string}`
-  | `/admin/students/${string}/status`
-  | `/admin/students/${string}/deactivate`
   | `/admin/teachers/${string}`
   | `/admin/teachers/${string}/status`
-  | `/admin/teachers/${string}/deactivate`
 
 type AdminMileageGetPath = '/school-mileage/rules' | '/dorm-mileage/rules'
 
@@ -36,6 +24,14 @@ type AdminMileageWritePath =
   | '/dorm-mileage/rules'
   | `/dorm-mileage/rules/${string}`
   | `/dorm-mileage/rules/${string}/toggle`
+
+type AdminDbGetPath =
+  | '/admin/db/tables'
+  | `/admin/db/tables/${string}`
+
+type AdminDbWritePath =
+  | `/admin/db/tables/${string}/${string}`
+  | '/admin/db/query'
 
 export async function proxyAdminCreateRequest(
   request: NextRequest,
@@ -72,6 +68,21 @@ export async function proxyAdminMileageWriteRequest(
   method: 'POST' | 'PATCH',
 ) {
   return proxyAdminMileageRequest(request, pathname, method)
+}
+
+export async function proxyAdminDbGetRequest(
+  request: NextRequest,
+  pathname: AdminDbGetPath,
+) {
+  return proxyAdminRoleRequest(request, pathname, 'GET')
+}
+
+export async function proxyAdminDbWriteRequest(
+  request: NextRequest,
+  pathname: AdminDbWritePath,
+  method: 'POST' | 'PATCH' | 'DELETE',
+) {
+  return proxyAdminRoleRequest(request, pathname, method)
 }
 
 export async function proxyAdminRequest(

@@ -1,9 +1,9 @@
 'use client'
 
-import DormEditEntryModal from './DormEditEntryModal'
-import DormHistoryFilters from './DormHistoryFilters'
+import SharedEditEntryModal from './SharedEditEntryModal'
+import SharedHistoryFilters from './SharedHistoryFilters'
 import SharedMileageHistoryView from './SharedMileageHistoryView'
-import { useDormRulesContext } from '../dorm-mileage/dorm-rules-context'
+import { useDormRulesContext } from '../mileage/rules-context'
 import type {
   DormMileageHistoryItem,
   PaginatedDormMileageHistoryResponse,
@@ -38,13 +38,21 @@ export default function DormMileageHistory({
       deleteCatchMessage="기숙사 상벌점 내역 삭제 중 문제가 발생했습니다."
       deleteSuccessMessage="기숙사 상벌점 내역이 삭제되었습니다."
       deleteConfirmMessage={(item) =>
-        `${item.studentName} 학생의 "${item.ruleName}" 내역을 삭제할까요?\n이 작업은 되돌릴 수 없습니다.`
+        `${item.studentName ?? '이름 없음'} 학생의 "${item.ruleName}" 내역을 삭제할까요?\n이 작업은 되돌릴 수 없습니다.`
       }
       renderEditModal={(props) => (
-        <DormEditEntryModal {...props} isOpen={props.item !== null} />
+        <SharedEditEntryModal<DormMileageHistoryItem>
+          {...props}
+          isOpen={props.item !== null}
+          apiPath="/api/teacher/dorm-mileage/entries"
+          title="기숙사 상벌점 내역 편집"
+          saveErrorMessage="기숙사 상벌점 내역을 수정하지 못했습니다."
+          saveSuccessMessage="기숙사 상벌점 내역이 수정되었습니다."
+          submitErrorMessage="기숙사 상벌점 내역 수정 중 문제가 발생했습니다."
+        />
       )}
       renderFilters={({ filters, hasActiveFilters, onChange, onReset }) => (
-        <DormHistoryFilters
+        <SharedHistoryFilters
           filters={{
             type: filters.type,
             year: filters.year,
@@ -53,7 +61,11 @@ export default function DormMileageHistory({
             studentName: filters.studentName,
           }}
           hasActiveFilters={hasActiveFilters}
-          onChange={onChange}
+          onTypeChange={(value) => onChange('type', value)}
+          onYearChange={(value) => onChange('year', value)}
+          onStartDateChange={(value) => onChange('startDate', value)}
+          onEndDateChange={(value) => onChange('endDate', value)}
+          onStudentNameChange={(value) => onChange('studentName', value)}
           onReset={onReset}
         />
       )}

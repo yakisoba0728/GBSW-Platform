@@ -1,8 +1,20 @@
 import { BadRequestException } from '@nestjs/common';
 import { parseRequiredTextInput } from '../common/parsers';
 
-export function parseRequiredText(value: unknown, label: string) {
-  return parseRequiredTextInput(value, `${label}를 입력해주세요.`);
+export function parseRequiredText(
+  value: unknown,
+  label: string,
+  maxLength?: number,
+): string {
+  const result = parseRequiredTextInput(value, `${label}를 입력해주세요.`);
+
+  if (maxLength !== undefined && result.length > maxLength) {
+    throw new BadRequestException(
+      `${label}은(는) ${maxLength}자 이하여야 합니다.`,
+    );
+  }
+
+  return result;
 }
 
 export function parseRequiredPassword(value: unknown, label: string) {

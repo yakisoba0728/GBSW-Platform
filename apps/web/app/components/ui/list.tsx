@@ -1,8 +1,9 @@
 'use client'
 
-import type { CSSProperties, ReactNode } from 'react'
+import type { CSSProperties, KeyboardEvent, ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { getItemMotion, useMotionPreference } from './motion'
+import { Spinner } from './primitives'
 
 // ─── 공유 리스트 애니메이션 시스템 ────────────────────────────────────────────
 // 학생 탭, 교사 탭 등 모든 탭에서 사용 가능한 범용 리스트 UI 컴포넌트.
@@ -71,6 +72,8 @@ export function AnimatedTableRow({
   onMouseEnter,
   onMouseLeave,
   onClick,
+  tabIndex,
+  onKeyDown,
   animated = true,
 }: {
   index: number
@@ -80,6 +83,8 @@ export function AnimatedTableRow({
   onMouseEnter?: () => void
   onMouseLeave?: () => void
   onClick?: () => void
+  tabIndex?: number
+  onKeyDown?: (e: KeyboardEvent<HTMLTableRowElement>) => void
   animated?: boolean
 }) {
   const prefersReducedMotion = useMotionPreference()
@@ -94,6 +99,8 @@ export function AnimatedTableRow({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onClick={onClick}
+      tabIndex={tabIndex}
+      onKeyDown={onKeyDown}
     >
       {children}
     </motion.tr>
@@ -120,11 +127,11 @@ export function ListSkeleton({
         <div
           key={i}
           className={`relative overflow-hidden rounded-lg ${rowHeight}`}
-          style={{ backgroundColor: 'var(--admin-border)' }}
+          style={{ backgroundColor: 'var(--border)' }}
         >
           <div
             className="absolute inset-0 animate-shimmer"
-            style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)' }}
+            style={{ background: 'linear-gradient(90deg, transparent 0%, var(--shimmer-highlight) 50%, transparent 100%)' }}
           />
         </div>
       ))}
@@ -154,7 +161,7 @@ export function CardListSkeleton({
             className="absolute inset-0 animate-shimmer"
             style={{
               background:
-                'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)',
+                'linear-gradient(90deg, transparent 0%, var(--shimmer-highlight) 50%, transparent 100%)',
             }}
           />
         </div>
@@ -179,7 +186,7 @@ export function StatCardSkeleton() {
       >
         <div
           className="absolute inset-0 animate-shimmer"
-          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)' }}
+          style={{ background: 'linear-gradient(90deg, transparent 0%, var(--shimmer-highlight) 50%, transparent 100%)' }}
         />
       </div>
       <div
@@ -188,7 +195,7 @@ export function StatCardSkeleton() {
       >
         <div
           className="absolute inset-0 animate-shimmer"
-          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)' }}
+          style={{ background: 'linear-gradient(90deg, transparent 0%, var(--shimmer-highlight) 50%, transparent 100%)' }}
         />
       </div>
       <div
@@ -197,7 +204,7 @@ export function StatCardSkeleton() {
       >
         <div
           className="absolute inset-0 animate-shimmer"
-          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)' }}
+          style={{ background: 'linear-gradient(90deg, transparent 0%, var(--shimmer-highlight) 50%, transparent 100%)' }}
         />
       </div>
     </div>
@@ -242,7 +249,7 @@ export function TableRowSkeleton({
               >
                 <div
                   className="absolute inset-0 animate-shimmer"
-                  style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)' }}
+                  style={{ background: 'linear-gradient(90deg, transparent 0%, var(--shimmer-highlight) 50%, transparent 100%)' }}
                 />
               </div>
             </td>
@@ -255,29 +262,18 @@ export function TableRowSkeleton({
 
 // ─── LoadingSpinner ───────────────────────────────────────────────────────────
 // 섹션·모달 로딩 중 중앙 표시하는 스피너.
+// 내부적으로 primitives.tsx 의 Spinner 를 사용하되, 중앙 정렬 래퍼를 유지.
 //
 // 사용 예:
 //   {isLoading && <LoadingSpinner />}
 //   {isLoading && <LoadingSpinner size="sm" />}
 
+const spinnerSizeMap = { sm: 'xs', md: 'sm', lg: 'md' } as const
+
 export function LoadingSpinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
-  const dim = size === 'sm' ? 16 : size === 'lg' ? 36 : 24
   return (
     <div className="flex items-center justify-center py-6">
-      <svg
-        width={dim}
-        height={dim}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        className="animate-spin"
-        style={{ color: 'var(--admin-accent)' }}
-        aria-label="로딩 중"
-      >
-        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-      </svg>
+      <Spinner size={spinnerSizeMap[size]} />
     </div>
   )
 }

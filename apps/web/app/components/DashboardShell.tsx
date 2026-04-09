@@ -70,7 +70,7 @@ export default function DashboardShell({ roleLabel, navItems, children }: Props)
     navigationTimeoutRef.current = setTimeout(() => {
       navigationTimeoutRef.current = null
       setIsNavigating(false)
-    }, 10000)
+    }, 5000)
   }, [])
 
   useEffect(() => {
@@ -160,7 +160,7 @@ export default function DashboardShell({ roleLabel, navItems, children }: Props)
           flexDirection: 'column',
           borderRight: '1px solid var(--border)',
           backgroundColor: 'var(--bg-subtle)',
-          height: '100vh',
+          height: '100dvh',
         }}
       >
         <NavSidebar {...navProps} inDrawer={false} footer={navFooter} />
@@ -186,9 +186,9 @@ export default function DashboardShell({ roleLabel, navItems, children }: Props)
             zIndex: 20,
           }}
         >
-          <h1 style={{ fontSize: 16, fontWeight: 600, color: 'var(--fg)', letterSpacing: '-0.01em' }}>
+          <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--fg)', letterSpacing: '-0.01em', margin: 0 }}>
             {activeLabel}
-          </h1>
+          </p>
         </header>
 
         {/* 모바일 헤더 (<1024px) */}
@@ -298,7 +298,7 @@ export default function DashboardShell({ roleLabel, navItems, children }: Props)
         <main className="flex flex-col flex-1 min-h-0 overflow-hidden">
           <div
             className="flex-1 min-h-0 overflow-auto px-4 py-4 pb-6 lg:px-6 lg:py-6"
-            style={{ maxWidth: 1280, width: '100%', margin: '0 auto' }}
+            style={{ maxWidth: 1280, width: '100%', margin: '0 auto', paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}
           >
             <AnimatePresence mode="wait" initial={false}>
               <RouteTransition key={locationKey} style={{ height: '100%' }}>

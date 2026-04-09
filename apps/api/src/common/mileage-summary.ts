@@ -18,6 +18,10 @@ type MileageEntry = {
 };
 
 export function calculateStudentGrade(studentId: string, currentYear: number) {
+  if (currentYear >= 1 && currentYear <= 3) {
+    return currentYear;
+  }
+
   const match = /^[A-Za-z]{2}(\d{2})/.exec(studentId);
 
   if (!match) {
@@ -123,8 +127,7 @@ export function buildClassMileageSummary<TSummary extends MileageSummary>(
     netScore,
     avgNetScore,
     topStudents: sortedByNetScore.slice(0, 3),
-    bottomStudents:
-      sortedByNetScore.length > 3 ? sortedByNetScore.slice(-3).reverse() : [],
+    bottomStudents: sortedByNetScore.slice(3).slice(-3).reverse(),
   };
 }
 

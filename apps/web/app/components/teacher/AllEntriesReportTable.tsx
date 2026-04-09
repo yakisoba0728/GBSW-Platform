@@ -1,5 +1,8 @@
 'use client'
 
+import { useMemo } from 'react'
+import { DataTable, type DataTableColumn } from '../ui/data-table'
+import { formatAwardedAtParts } from '../mileage/shared'
 import type { SharedReportHistoryItem } from './shared-mileage-types'
 
 export default function AllEntriesReportTable({
@@ -7,128 +10,126 @@ export default function AllEntriesReportTable({
 }: {
   entries: SharedReportHistoryItem[]
 }) {
-  return (
-    <table className="w-full text-xs">
-      <thead>
-        <tr
-          style={{
-            borderBottom: '1px solid var(--admin-border)',
-            backgroundColor: 'var(--admin-bg)',
-          }}
-        >
-          {['반', '번호', '이름', '유형', '카테고리', '항목', '점수', '일시', '담당교사'].map(
-            (header) => (
-              <th
-                key={header}
-                scope="col"
-                className="px-3 py-3 text-left font-semibold"
-                style={{
-                  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                  color: 'var(--admin-text-muted)',
-                }}
-              >
-                {header}
-              </th>
-            ),
-          )}
-        </tr>
-      </thead>
-      <tbody>
-        {entries.map((entry) => (
-          <tr
-            key={entry.id}
-            style={{ borderBottom: '1px solid var(--admin-border)' }}
+  const columns = useMemo<DataTableColumn<SharedReportHistoryItem>[]>(
+    () => [
+      {
+        key: 'classNumber',
+        header: '반',
+        render: (row) => (
+          <span style={{ fontFamily: 'var(--font-space-grotesk)' }}>
+            {row.classNumber}
+          </span>
+        ),
+      },
+      {
+        key: 'studentNumber',
+        header: '번호',
+        render: (row) => (
+          <span style={{ fontFamily: 'var(--font-space-grotesk)' }}>
+            {row.studentNumber}
+          </span>
+        ),
+      },
+      {
+        key: 'studentName',
+        header: '이름',
+        render: (row) => (
+          <span
+            style={{
+              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+              fontWeight: 500,
+            }}
           >
-            <td
-              className="px-3 py-2"
-              style={{
-                fontFamily: 'var(--font-space-grotesk)',
-                color: 'var(--admin-text-muted)',
-              }}
-            >
-              {entry.classNumber}
-            </td>
-            <td
-              className="px-3 py-2"
-              style={{
-                fontFamily: 'var(--font-space-grotesk)',
-                color: 'var(--admin-text-muted)',
-              }}
-            >
-              {entry.studentNumber}
-            </td>
-            <td
-              className="px-3 py-2 font-medium"
-              style={{
-                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                color: 'var(--admin-text)',
-              }}
-            >
-              {entry.studentName}
-            </td>
-            <td className="px-3 py-2">
-              <span
-                className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium"
-                style={{
-                  backgroundColor:
-                    entry.type === 'reward'
-                      ? 'rgba(34,197,94,0.12)'
-                      : 'rgba(239,68,68,0.12)',
-                  color: entry.type === 'reward' ? '#16a34a' : '#dc2626',
-                }}
-              >
-                {entry.type === 'reward' ? '상점' : '벌점'}
-              </span>
-            </td>
-            <td
-              className="px-3 py-2"
-              style={{
-                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                color: 'var(--admin-text-muted)',
-              }}
-            >
-              {entry.ruleCategory}
-            </td>
-            <td
-              className="max-w-[120px] truncate px-3 py-2"
-              style={{
-                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                color: 'var(--admin-text)',
-              }}
-            >
-              {entry.ruleName}
-            </td>
-            <td
-              className="px-3 py-2 font-semibold"
-              style={{
-                fontFamily: 'var(--font-space-grotesk)',
-                color: entry.type === 'reward' ? '#16a34a' : '#dc2626',
-              }}
-            >
-              {entry.type === 'reward' ? '+' : '-'}
-              {entry.score}
-            </td>
-            <td
-              className="whitespace-nowrap px-3 py-2"
-              style={{
-                fontFamily: 'var(--font-space-grotesk)',
-                color: 'var(--admin-text-muted)',
-              }}
-            >
-              {new Date(entry.awardedAt).toLocaleDateString('ko-KR')}
-            </td>
-            <td
-              className="px-3 py-2"
-              style={{
-                fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                color: 'var(--admin-text-muted)',
-              }}
-            >
-              {entry.teacherName}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+            {row.studentName}
+          </span>
+        ),
+      },
+      {
+        key: 'type',
+        header: '유형',
+        render: (row) => (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              borderRadius: '9999px',
+              padding: '2px 8px',
+              fontSize: '10px',
+              fontWeight: 500,
+              backgroundColor:
+                row.type === 'reward'
+                  ? 'var(--reward-bg-muted)'
+                  : 'var(--penalty-bg-muted)',
+              color:
+                row.type === 'reward' ? 'var(--reward)' : 'var(--penalty)',
+            }}
+          >
+            {row.type === 'reward' ? '상점' : '벌점'}
+          </span>
+        ),
+      },
+      {
+        key: 'ruleCategory',
+        header: '카테고리',
+        render: (row) => <span>{row.ruleCategory}</span>,
+      },
+      {
+        key: 'ruleName',
+        header: '항목',
+        render: (row) => (
+          <span
+            style={{
+              display: 'block',
+              maxWidth: '120px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {row.ruleName}
+          </span>
+        ),
+      },
+      {
+        key: 'score',
+        header: '점수',
+        render: (row) => (
+          <span
+            style={{
+              fontFamily: 'var(--font-space-grotesk)',
+              fontWeight: 600,
+              color:
+                row.type === 'reward' ? 'var(--reward)' : 'var(--penalty)',
+            }}
+          >
+            {row.type === 'reward' ? '+' : '-'}
+            {row.score}
+          </span>
+        ),
+      },
+      {
+        key: 'awardedAt',
+        header: '일시',
+        render: (row) => (
+          <span style={{ fontFamily: 'var(--font-space-grotesk)' }}>
+            {formatAwardedAtParts(row.awardedAt).date}
+          </span>
+        ),
+      },
+      {
+        key: 'teacherName',
+        header: '담당교사',
+        render: (row) => <span>{row.teacherName}</span>,
+      },
+    ],
+    [],
+  )
+
+  return (
+    <DataTable
+      columns={columns}
+      data={entries}
+      rowKey={(row) => row.id}
+    />
   )
 }

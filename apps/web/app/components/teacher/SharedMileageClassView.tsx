@@ -2,12 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { Card, StatCard } from '../ui/card'
 import {
-  Card,
   FilterRow,
   NoticeBox,
   SectionHeader,
-  StatCard,
   inputStyle,
 } from '../mileage/shared'
 import SuccessModal from '../ui/success-modal'

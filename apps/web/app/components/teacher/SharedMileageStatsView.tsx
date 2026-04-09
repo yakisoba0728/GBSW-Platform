@@ -3,14 +3,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
+import { Card, SectionTitle, StatCard } from '../ui/card'
 import {
   Badge,
-  Card,
   FilterRow,
   NoticeBox,
   SectionHeader,
-  SectionTitle,
-  StatCard,
   inputStyle,
 } from '../mileage/shared'
 import SuccessModal from '../ui/success-modal'

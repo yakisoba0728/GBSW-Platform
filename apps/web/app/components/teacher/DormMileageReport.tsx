@@ -1,8 +1,8 @@
 'use client'
 
 import { formatAwardedAt, formatSignedScore } from '../mileage/shared'
-import DormStudentReportTable from './DormStudentReportTable'
-import DormStudentSelectionModal from './DormStudentSelectionModal'
+import SharedStudentReportTable from './SharedStudentReportTable'
+import SharedStudentSelectionModal from './SharedStudentSelectionModal'
 import SharedMileageReportView from './SharedMileageReportView'
 import type {
   DormClassMileageAnalyticsResponse,
@@ -28,6 +28,7 @@ export default function DormMileageReport() {
       studentAnalyticsPath="/api/teacher/dorm-mileage/analytics/students"
       classAnalyticsPath="/api/teacher/dorm-mileage/analytics/classes"
       entriesPath="/api/teacher/dorm-mileage/entries"
+      entriesExportPath="/api/teacher/dorm-mileage/entries/export"
       emptyStudentReport={{
         students: [],
         totalCount: 0,
@@ -95,7 +96,7 @@ export default function DormMileageReport() {
       ]}
       exportAllEntryColumns={[
         { header: '부여 일시', accessor: (entry) => formatAwardedAt(entry.awardedAt) },
-        { header: '학생', accessor: (entry) => entry.studentName },
+        { header: '학생', accessor: (entry) => entry.studentName ?? '' },
         {
           header: '학년/반/번호',
           accessor: (entry) =>
@@ -109,10 +110,13 @@ export default function DormMileageReport() {
         { header: '부여 교사', accessor: (entry) => entry.teacherName },
       ]}
       renderStudentReportTable={({ students, startDate, endDate }) => (
-        <DormStudentReportTable
+        <SharedStudentReportTable<DormStudentMileageSummary, DormMileageHistoryItem>
           students={students}
           startDate={startDate}
           endDate={endDate}
+          entriesApiPath="/api/teacher/dorm-mileage/entries"
+          entriesExportApiPath="/api/teacher/dorm-mileage/entries/export"
+          emptyDescription="이 학생에게 아직 기숙사 상벌점 내역이 없습니다."
         />
       )}
       renderStudentSelectionModal={({
@@ -121,11 +125,17 @@ export default function DormMileageReport() {
         onClose,
         onConfirm,
       }) => (
-        <DormStudentSelectionModal
+        <SharedStudentSelectionModal<DormMileageStudentOption>
           isOpen={isOpen}
           addedStudentIds={addedStudentIds}
           onClose={onClose}
           onConfirm={(students: DormMileageStudentOption[]) => onConfirm(students)}
+          apiPath="/api/teacher/dorm-mileage/students"
+          title="대상 학생 추가"
+          description="학년·반 조건으로 기숙사 학생을 찾아 추가하세요."
+          emptyDescription="학년·반 조건을 바꿔 다시 찾아보세요."
+          loadErrorMessage="학생 목록을 불러오지 못했습니다."
+          fetchErrorMessage="학생 목록을 불러오는 중 문제가 발생했습니다."
         />
       )}
     />

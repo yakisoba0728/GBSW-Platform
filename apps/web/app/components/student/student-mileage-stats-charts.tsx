@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Card, SectionTitle } from '@/app/components/mileage/shared'
+import { Card, SectionTitle } from '@/app/components/ui/card'
 import {
   CHART_LANE_OFFSET,
   getChartRevealTransition,

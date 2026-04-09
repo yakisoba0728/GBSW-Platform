@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 export type DashboardNavMatch = 'exact' | 'prefix'
+export type DashboardContentWidth = 'normal' | 'wide' | 'full'
 
 export type DashboardNavChildItem = {
   href: string
@@ -15,5 +16,6 @@ export type DashboardNavItem = {
   href?: string
   section?: string
   match?: DashboardNavMatch
+  contentWidth?: DashboardContentWidth
   children?: DashboardNavChildItem[]
 }

@@ -11,12 +11,12 @@ describe('api-route-handlers', () => {
     const response = new Response(null, { status: 204 })
     const proxy = vi.fn().mockResolvedValue(response)
     const request = {} as never
-    const handler = createStaticProxyHandler(proxy, '/admin/students')
+    const handler = createStaticProxyHandler(proxy, '/admin/teachers')
 
     const result = await handler(request)
 
     expect(result).toBe(response)
-    expect(proxy).toHaveBeenCalledWith(request, '/admin/students')
+    expect(proxy).toHaveBeenCalledWith(request, '/admin/teachers')
   })
 
   it('builds method proxy handlers', async () => {

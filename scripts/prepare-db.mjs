@@ -1,26 +1,28 @@
+import path from 'node:path';
 import net from 'node:net';
-import { spawn } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
-import { loadEnv, rootDir } from './env.mjs';
+import {
+  captureCommand,
+  loadEnv,
+  rootDir,
+  runCommand,
+  CommandError,
+} from './env.mjs';
 
 const config = loadEnv();
-const composeNetworkName = 'gbsw-platform_default';
-const composeContainerNames = ['gbsw-platform-db', 'gbsw-platform-pgadmin'];
+const composeProjectName =
+  process.env.COMPOSE_PROJECT_NAME?.trim() ||
+  path.basename(rootDir).toLowerCase().replace(/[^a-z0-9_-]/g, '');
+const composeNetworkName = `${composeProjectName}_default`;
+const composeContainerNames = [
+  'gbsw-platform-db',
+  'gbsw-platform-pgadmin',
+];
 const pgAdminContainerName = 'gbsw-platform-pgadmin';
-const pgAdminDataVolumeName = 'gbsw-platform_pgadmin-data';
-
-class CommandError extends Error {
-  constructor(command, args, code, stderr) {
-    super(
-      stderr || `${command} ${args.join(' ')} exited with code ${code ?? 1}`,
-    );
-
-    this.code = code;
-  }
-}
+const pgAdminDataVolumeName = `${composeProjectName}_pgadmin-data`;
 
 try {
-  await run('docker', ['info'], { stdio: 'ignore' });
+  await runCommand('docker', ['info'], { stdio: 'ignore' });
 } catch {
   console.error('Docker daemon is not running. Start Docker Desktop and run `pnpm dev` again.');
   process.exit(1);
@@ -30,7 +32,7 @@ try {
   await repairStaleComposeContainers();
 
   try {
-    await run('docker', ['compose', 'up', '-d', 'db', 'pgadmin']);
+    await runCommand('docker', ['compose', 'up', '-d', 'db', 'pgadmin']);
   } catch (error) {
     const removedStaleContainers = await repairStaleComposeContainers();
 
@@ -41,7 +43,7 @@ try {
     console.warn(
       'Detected stale Docker container metadata. Recreating development containers...',
     );
-    await run('docker', ['compose', 'up', '-d', 'db', 'pgadmin']);
+    await runCommand('docker', ['compose', 'up', '-d', 'db', 'pgadmin']);
   }
 
   console.log(
@@ -53,7 +55,7 @@ try {
   await writePgAdminPasswordFile();
   await delay(1_000);
   await ensurePgAdminServersLoaded();
-  await run('pnpm', [
+  await runCommand('pnpm', [
     '--filter',
     '@gbsw/api',
     'exec',
@@ -62,7 +64,7 @@ try {
     '--schema',
     'prisma/schema.prisma',
   ]);
-  await run('pnpm', [
+  await runCommand('pnpm', [
     '--filter',
     '@gbsw/api',
     'exec',
@@ -115,7 +117,7 @@ async function ensurePgAdminServersLoaded() {
 }
 
 async function loadPgAdminServers() {
-  const output = await capture('docker', [
+  const output = await captureCommand('docker', [
     'exec',
     pgAdminContainerName,
     '/venv/bin/python',
@@ -135,18 +137,18 @@ async function loadPgAdminServers() {
 }
 
 async function recreatePgAdminData() {
-  await run('docker', ['rm', '-f', pgAdminContainerName], { stdio: 'ignore' });
-  await run('docker', ['volume', 'rm', '-f', pgAdminDataVolumeName], {
+  await runCommand('docker', ['rm', '-f', pgAdminContainerName], { stdio: 'ignore' });
+  await runCommand('docker', ['volume', 'rm', '-f', pgAdminDataVolumeName], {
     stdio: 'ignore',
   });
-  await run('docker', ['compose', 'up', '-d', 'pgadmin']);
+  await runCommand('docker', ['compose', 'up', '-d', 'pgadmin']);
 }
 
 async function writePgAdminPasswordFile() {
   const pgAdminStorageUser = toPgAdminStorageUserName(config.pgAdminEmail);
   const pgPassFilePath = `/var/lib/pgadmin/storage/${pgAdminStorageUser}/.pgpass`;
 
-  await run('docker', [
+  await runCommand('docker', [
     'exec',
     pgAdminContainerName,
     'sh',
@@ -178,64 +180,6 @@ function tryConnect(host, port) {
   });
 }
 
-function run(command, args, options = {}) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
-      cwd: rootDir,
-      env: process.env,
-      stdio: options.stdio ?? 'inherit',
-    });
-
-    child.once('error', reject);
-    child.once('exit', (code) => {
-      if (code === 0) {
-        resolve();
-        return;
-      }
-
-      reject(
-        new Error(`${command} ${args.join(' ')} exited with code ${code ?? 1}`),
-      );
-    });
-  });
-}
-
-function capture(command, args) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
-      cwd: rootDir,
-      env: process.env,
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-
-    let stdout = '';
-    let stderr = '';
-
-    child.stdout.setEncoding('utf8');
-    child.stderr.setEncoding('utf8');
-
-    child.stdout.on('data', (chunk) => {
-      stdout += chunk;
-    });
-
-    child.stderr.on('data', (chunk) => {
-      stderr += chunk;
-    });
-
-    child.once('error', reject);
-    child.once('exit', (code) => {
-      if (code === 0) {
-        resolve(stdout.trim());
-        return;
-      }
-
-      reject(
-        new CommandError(command, args, code ?? 1, (stderr || stdout).trim()),
-      );
-    });
-  });
-}
-
 async function repairStaleComposeContainers() {
   const currentNetworkId = await getCurrentComposeNetworkId();
   let removedStaleContainers = false;
@@ -263,7 +207,7 @@ async function repairStaleComposeContainers() {
     }
 
     console.log(`Removing stale Docker container ${containerName}...`);
-    await run('docker', ['rm', '-f', containerName], { stdio: 'ignore' });
+    await runCommand('docker', ['rm', '-f', containerName], { stdio: 'ignore' });
     removedStaleContainers = true;
   }
 
@@ -272,7 +216,7 @@ async function repairStaleComposeContainers() {
 
 async function getCurrentComposeNetworkId() {
   try {
-    return await capture('docker', [
+    return await captureCommand('docker', [
       'network',
       'inspect',
       composeNetworkName,
@@ -291,13 +235,13 @@ async function getCurrentComposeNetworkId() {
 async function getContainerMetadata(containerName) {
   try {
     const [networkId, stateError] = await Promise.all([
-      capture('docker', [
+      captureCommand('docker', [
         'inspect',
         containerName,
         '--format',
         `{{with index .NetworkSettings.Networks "${composeNetworkName}"}}{{.NetworkID}}{{end}}`,
       ]),
-      capture('docker', [
+      captureCommand('docker', [
         'inspect',
         containerName,
         '--format',

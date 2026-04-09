@@ -22,12 +22,21 @@ import {
 
 type ReportType = 'student' | 'class' | 'all'
 
-const ALL_ENTRIES_FETCH_PAGE_SIZE = 100
-
 const REPORT_TYPE_LABELS: Record<ReportType, string> = {
   student: '학생별 보고서',
   class: '학급별 보고서',
   all: '전체 내역',
+}
+
+function getSeoulDateStamp() {
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  })
+
+  return formatter.format(new Date())
 }
 
 function normalizeReportType(value: string): ReportType {
@@ -53,6 +62,7 @@ type SharedMileageReportViewProps<
   studentAnalyticsPath: string
   classAnalyticsPath: string
   entriesPath: string
+  entriesExportPath?: string
   emptyStudentReport: StudentResponse
   emptyClassReport: ClassResponse
   emptyAllEntriesReport: HistoryResponse
@@ -94,6 +104,7 @@ export default function SharedMileageReportView<
   studentAnalyticsPath,
   classAnalyticsPath,
   entriesPath,
+  entriesExportPath,
   emptyStudentReport,
   emptyClassReport,
   emptyAllEntriesReport,
@@ -176,58 +187,35 @@ export default function SharedMileageReportView<
       if (endDate) params.set('endDate', endDate)
 
       if (reportType === 'all') {
-        const allItems: Item[] = []
-        let totalCount = 0
-        let totalPages = 1
-
-        for (let currentPage = 1; currentPage <= totalPages; currentPage += 1) {
-          if (ctrl.signal.aborted) {
-            return
-          }
-
-          const pageParams = new URLSearchParams(params)
-          pageParams.set('page', `${currentPage}`)
-          pageParams.set('pageSize', `${ALL_ENTRIES_FETCH_PAGE_SIZE}`)
-
-          const res = await fetch(`${entriesPath}?${pageParams.toString()}`, {
+        const res = await fetch(
+          `${entriesExportPath ?? entriesPath}?${params.toString()}`,
+          {
             signal: ctrl.signal,
             cache: 'no-store',
-          })
-          const data = await res.json().catch(() => null)
-
-          if (abortRef.current !== ctrl || ctrl.signal.aborted) {
-            return
-          }
-
-          if (!res.ok) {
-            setPreviewError(data?.message ?? '데이터를 불러오지 못했습니다.')
-            setShowPreviewErrorModal(true)
-
-            if (!hasPreviewData) {
-              resetReports()
-            }
-
-            return
-          }
-
-          const pageItems = Array.isArray(data?.items)
-            ? (data.items as Item[])
-            : []
-
-          allItems.push(...pageItems)
-          totalCount =
-            typeof data?.totalCount === 'number' && data.totalCount >= 0
-              ? data.totalCount
-              : allItems.length
-          totalPages = Math.max(
-            1,
-            Math.ceil(totalCount / ALL_ENTRIES_FETCH_PAGE_SIZE),
-          )
-        }
+          },
+        )
+        const data = await res.json().catch(() => null)
 
         if (abortRef.current !== ctrl || ctrl.signal.aborted) {
           return
         }
+
+        if (!res.ok) {
+          setPreviewError(data?.message ?? '데이터를 불러오지 못했습니다.')
+          setShowPreviewErrorModal(true)
+
+          if (!hasPreviewData) {
+            resetReports()
+          }
+
+          return
+        }
+
+        const allItems = Array.isArray(data?.items) ? (data.items as Item[]) : []
+        const totalCount =
+          typeof data?.totalCount === 'number' && data.totalCount >= 0
+            ? data.totalCount
+            : allItems.length
 
         setAllEntriesReport({
           items: allItems,
@@ -296,6 +284,7 @@ export default function SharedMileageReportView<
     classAnalyticsPath,
     emptyClassReport.overall,
     endDate,
+    entriesExportPath,
     entriesPath,
     filterGrade,
     filterSchool,
@@ -321,13 +310,8 @@ export default function SharedMileageReportView<
     window.print()
   }, [])
 
-  const handleExport = useCallback(() => {
-    const now = new Date()
-    const dateStr = [
-      now.getFullYear(),
-      `${now.getMonth() + 1}`.padStart(2, '0'),
-      `${now.getDate()}`.padStart(2, '0'),
-    ].join('-')
+  const handleExport = useCallback(async () => {
+    const dateStr = getSeoulDateStamp()
     const filename = `${filenamePrefix}_${REPORT_TYPE_LABELS[reportType]}_${dateStr}`
 
     if (reportType === 'student') {
@@ -338,7 +322,7 @@ export default function SharedMileageReportView<
             )
           : studentReport.students
 
-      exportToExcel({
+      await exportToExcel({
         data: exportStudents,
         columns: exportStudentColumns,
         filename,
@@ -348,7 +332,7 @@ export default function SharedMileageReportView<
     }
 
     if (reportType === 'class') {
-      exportToExcel({
+      await exportToExcel({
         data: classReport.classes,
         columns: exportClassColumns,
         filename,
@@ -357,7 +341,7 @@ export default function SharedMileageReportView<
       return
     }
 
-    exportToExcel({
+    await exportToExcel({
       data: allEntriesReport.items,
       columns: exportAllEntryColumns,
       filename,
@@ -486,7 +470,9 @@ export default function SharedMileageReportView<
           void loadReport()
         }}
         onPrint={handlePrint}
-        onExport={handleExport}
+        onExport={() => {
+          void handleExport()
+        }}
         canPrint={!isLoading && hasPreview}
         canExport={!isLoading && hasPreview}
         isLoading={isLoading}

@@ -108,6 +108,39 @@ export function createRoleProxyRequest({
   }
 }
 
+export async function buildProxyResponse(
+  upstreamResponse: Response,
+): Promise<Response> {
+  const upstreamContentType =
+    upstreamResponse.headers.get('content-type') ?? 'application/octet-stream'
+
+  if (upstreamContentType.includes('application/json')) {
+    const payload = await upstreamResponse.json().catch(() => null)
+    return NextResponse.json(
+      payload ?? { message: '서버 응답을 처리하지 못했습니다.' },
+      { status: upstreamResponse.status },
+    )
+  }
+
+  const headers = new Headers()
+  headers.set('content-type', upstreamContentType)
+
+  const contentDisposition = upstreamResponse.headers.get('content-disposition')
+  if (contentDisposition) {
+    headers.set('content-disposition', contentDisposition)
+  }
+
+  const contentLength = upstreamResponse.headers.get('content-length')
+  if (contentLength) {
+    headers.set('content-length', contentLength)
+  }
+
+  return new Response(upstreamResponse.body, {
+    status: upstreamResponse.status,
+    headers,
+  })
+}
+
 function buildProxyHeaders(
   session: AuthSession,
   actorHeaders: ProxyApiRequestOptions['actorHeaders'],

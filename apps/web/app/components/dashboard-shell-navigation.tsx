@@ -4,7 +4,11 @@ import type { ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import type { DashboardNavItem, DashboardNavMatch } from './dashboard-nav'
+import type {
+  DashboardContentWidth,
+  DashboardNavItem,
+  DashboardNavMatch,
+} from './dashboard-nav'
 import { ChevronRightIcon } from './ui/icons'
 import {
   getAccordionTransitionCss,
@@ -29,6 +33,57 @@ export function hasActiveChild(pathname: string, item: DashboardNavItem) {
     item.children?.some((child) => matchesPath(pathname, child.href, child.match)) ??
     false
   )
+}
+
+const DENSE_WIDTH_RULES: Array<{
+  href: string
+  match?: DashboardNavMatch
+  width: DashboardContentWidth
+}> = [
+  { href: '/admin/db', width: 'full' },
+  { href: '/teacher/mileage/report', width: 'full' },
+  { href: '/teacher/dorm-mileage/report', width: 'full' },
+  { href: '/teacher/students', width: 'wide' },
+  { href: '/teacher/mileage/history', width: 'wide' },
+  { href: '/teacher/mileage/students', width: 'wide' },
+  { href: '/teacher/mileage/stats', width: 'wide' },
+  { href: '/teacher/mileage/classes', width: 'wide' },
+  { href: '/teacher/dorm-mileage/history', width: 'wide' },
+  { href: '/teacher/dorm-mileage/students', width: 'wide' },
+  { href: '/teacher/dorm-mileage/stats', width: 'wide' },
+  { href: '/teacher/dorm-mileage/classes', width: 'wide' },
+  { href: '/admin/teachers', width: 'wide' },
+  { href: '/admin/dorm-mileage/teachers', width: 'wide' },
+  { href: '/student/mileage/history', width: 'wide' },
+  { href: '/student/mileage/stats', width: 'wide' },
+  { href: '/student/dorm-mileage/history', width: 'wide' },
+  { href: '/student/dorm-mileage/stats', width: 'wide' },
+]
+
+export function getDashboardContentWidth(
+  pathname: string,
+  navItems: DashboardNavItem[],
+): DashboardContentWidth {
+  for (const item of navItems) {
+    const itemMatches = item.href
+      ? matchesPath(pathname, item.href, item.match)
+      : false
+    const childMatches = item.children?.some((child) =>
+      matchesPath(pathname, child.href, child.match),
+    )
+
+    if ((itemMatches || childMatches) && item.contentWidth) {
+      return item.contentWidth
+    }
+  }
+
+  for (const rule of DENSE_WIDTH_RULES) {
+    if (matchesPath(pathname, rule.href, rule.match)) {
+      return rule.width
+    }
+  }
+
+  return 'normal'
 }
 
 export function getActiveLabel(pathname: string, navItems: DashboardNavItem[]) {
@@ -203,7 +258,7 @@ export function NavSidebar({
           const isChildActive = hasActiveChild(pathname, item)
           const hasChildren = Boolean(item.children?.length)
           const isOpen = hasChildren
-            ? (item.id in openMenus ? Boolean(openMenus[item.id]) : isChildActive)
+            ? Boolean(openMenus[item.id]) || isChildActive
             : false
 
           return (
@@ -229,6 +284,8 @@ export function NavSidebar({
                 <motion.button
                   type="button"
                   onClick={() => toggleMenu(item.id, isOpen)}
+                  aria-expanded={isOpen}
+                  aria-controls={`nav-submenu-${item.id}`}
                   whileTap={{ scale: 0.98 }}
                   style={{
                     display: 'flex',
@@ -333,6 +390,8 @@ export function NavSidebar({
 
               {hasChildren && (
                 <div
+                  id={`nav-submenu-${item.id}`}
+                  aria-hidden={!isOpen}
                   style={{
                     display: 'grid',
                     gridTemplateRows: isOpen ? '1fr' : '0fr',
