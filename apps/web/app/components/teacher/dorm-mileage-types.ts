@@ -1,141 +1,64 @@
-export type MileageType = 'reward' | 'penalty'
+import type {
+  SharedCategoryStat,
+  SharedClassMileageAnalyticsOverall,
+  SharedClassMileageAnalyticsResponse,
+  SharedClassMileageSummary,
+  SharedCreateMileageEntriesPayload,
+  SharedMileageHistoryItem,
+  SharedMileageOverviewResponse,
+  SharedMileageOverviewSummary,
+  SharedMileageRuleSummary,
+  SharedMileageStudentOption,
+  SharedMileageType,
+  SharedPaginatedMileageHistoryResponse,
+  SharedStudentMileageAnalyticsResponse,
+  SharedStudentMileageSummary,
+  SharedStudentMileageSummaryResponse,
+  SharedTopRuleStat,
+  SharedUpdateMileageEntryPayload,
+} from './shared-mileage-types'
 
-export type DormMileageRuleSummary = {
-  id: number
-  type: MileageType
-  category: string
-  name: string
-  defaultScore: number
+export type MileageType = SharedMileageType
+
+export type DormMileageRuleSummary = Omit<
+  SharedMileageRuleSummary,
+  'minScore' | 'maxScore'
+> & {
   minScore: number | null
   maxScore: number | null
-  displayOrder: number
-  isActive: boolean
 }
 
-export type DormMileageStudentOption = {
-  studentId: string
-  name: string
-  grade: number | null
-  classNumber: number
-  studentNumber: number
-}
+export type DormMileageStudentOption = Omit<SharedMileageStudentOption, 'school'>
 
-export type DormMileageHistoryItem = {
-  id: number
-  type: MileageType
-  score: number
-  reason: string | null
-  awardedAt: string
-  createdAt: string
-  updatedAt: string
-  ruleId: number
-  ruleCategory: string
-  ruleName: string
-  ruleDefaultScore: number
-  studentId: string
-  studentName: string
-  grade: number | null
-  classNumber: number
-  studentNumber: number
-  teacherId: string
-  teacherName: string
-}
+export type DormMileageHistoryItem = Omit<SharedMileageHistoryItem, 'school'>
 
-export type PaginatedDormMileageHistoryResponse = {
-  items: DormMileageHistoryItem[]
-  page: number
-  pageSize: number
-  totalCount: number
-}
+export type PaginatedDormMileageHistoryResponse =
+  SharedPaginatedMileageHistoryResponse<DormMileageHistoryItem>
 
-export type CreateDormMileageEntriesPayload = {
-  entries: Array<{
-    studentId: string
-    ruleId: number
-    score: number
-    reason?: string
-  }>
-}
+export type CreateDormMileageEntriesPayload = SharedCreateMileageEntriesPayload
 
-export type UpdateDormMileageEntryPayload = {
-  ruleId?: number
-  score?: number
-  reason?: string
-  awardedAt?: string
-}
+export type UpdateDormMileageEntryPayload = SharedUpdateMileageEntryPayload
 
-export type DormStudentMileageSummary = {
-  studentId: string
-  name: string
-  grade: number | null
-  classNumber: number
-  studentNumber: number
-  rewardTotal: number
-  penaltyTotal: number
-  netScore: number
-  entryCount: number
-}
+export type DormStudentMileageSummary = Omit<SharedStudentMileageSummary, 'school'>
 
-export type DormClassMileageSummary = {
-  classNumber: number
-  studentCount: number
-  rewardTotal: number
-  penaltyTotal: number
-  netScore: number
-  avgNetScore: number
-  topStudents: DormStudentMileageSummary[]
-  bottomStudents: DormStudentMileageSummary[]
-}
+export type DormClassMileageSummary =
+  SharedClassMileageSummary<DormStudentMileageSummary>
 
-export type DormCategoryStat = {
-  category: string
-  type: MileageType
-  count: number
-  totalScore: number
-}
+export type DormCategoryStat = SharedCategoryStat
 
-export type DormTopRuleStat = {
-  ruleId: number
-  ruleName: string
-  category: string
-  type: MileageType
-  count: number
-  totalScore: number
-}
+export type DormTopRuleStat = SharedTopRuleStat
 
-export type DormMileageOverviewSummary = {
-  rewardCount: number
-  penaltyCount: number
-  rewardSum: number
-  penaltySum: number
-  uniqueStudents: number
-  totalCount: number
-}
+export type DormMileageOverviewSummary = SharedMileageOverviewSummary
 
-export type DormMileageOverviewResponse = {
-  summary: DormMileageOverviewSummary
-  categoryStats: DormCategoryStat[]
-  topRules: DormTopRuleStat[]
-}
+export type DormMileageOverviewResponse = SharedMileageOverviewResponse
 
-export type DormStudentMileageAnalyticsResponse = {
-  students: DormStudentMileageSummary[]
-  totalCount: number
-}
+export type DormStudentMileageAnalyticsResponse =
+  SharedStudentMileageAnalyticsResponse<DormStudentMileageSummary>
 
-export type DormClassMileageAnalyticsOverall = {
-  classCount: number
-  totalStudents: number
-  rewardTotal: number
-  penaltyTotal: number
-  netScore: number
-}
+export type DormClassMileageAnalyticsOverall = SharedClassMileageAnalyticsOverall
 
-export type DormClassMileageAnalyticsResponse = {
-  classes: DormClassMileageSummary[]
-  overall: DormClassMileageAnalyticsOverall
-}
+export type DormClassMileageAnalyticsResponse =
+  SharedClassMileageAnalyticsResponse<DormClassMileageSummary>
 
-export type DormStudentMileageSummaryResponse = {
-  summary: DormStudentMileageSummary
-}
+export type DormStudentMileageSummaryResponse =
+  SharedStudentMileageSummaryResponse<DormStudentMileageSummary>

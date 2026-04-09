@@ -18,7 +18,7 @@ pnpm lint             # Lint both apps
 pnpm test             # Test both apps
 pnpm db:up            # Start PostgreSQL and pgAdmin
 pnpm db:down          # Stop DB containers
-pnpm db:prepare       # Run migrations and seed super admin
+pnpm db:prepare       # Run migrations and prepare DB services
 pnpm deploy:production # Deploy with Docker Compose
 ```
 
@@ -69,11 +69,11 @@ The API uses standard NestJS module architecture. Each domain has a dedicated mo
 - **`dorm-mileage/`** — Dormitory points system; mirrors school-mileage structure
 - **`prisma/`** — `PrismaService` (global singleton, injected across modules)
 - **`config/runtime-env.ts`** — Environment variable validation at startup
-- **`common/`** — `internal-api-auth.ts` (shared auth guard for Next.js → NestJS calls), `parsers.ts`
+- **`common/`** — shared auth/session guards, mileage analytics helpers, shared parsers, and rule conflict helpers
 
 **Auth flow**: Sessions are stored in the `AuthSession` DB table (not JWT). The web app calls `/api/*` Next.js route handlers which proxy to the NestJS API using `INTERNAL_API_SECRET` for server-to-server auth.
 
-**Roles**: `Student`, `Teacher`, `Admin` (super admin credentials stored in `SuperAdminCredential` table, seeded by `db:prepare`).
+**Roles**: `Student`, `Teacher`, `Admin` (super admin credentials are read from `SUPER_ADMIN_ID` / `SUPER_ADMIN_PASSWORD` runtime env vars).
 
 ### Web (`apps/web/app/`)
 
@@ -95,7 +95,6 @@ Key tables:
 - `SchoolMileageRule`, `SchoolMileageEntry` — School points events
 - `DormMileageRule`, `DormMileageEntry` — Dorm points events
 - `LoginThrottle` — Failed login rate limiting
-- `SuperAdminCredential` — Single-row super admin password
 
 ### Environment Variables
 
@@ -105,9 +104,9 @@ Copy `.env.example` to `.env` for development. Key variables:
 |----------|---------|
 | `DATABASE_URL` | PostgreSQL connection string |
 | `INTERNAL_API_SECRET` | Shared secret for Next.js → NestJS server calls |
-| `SUPER_ADMIN_ID` / `SUPER_ADMIN_PASSWORD` | Seeded by `db:prepare` |
-| `NEXT_PUBLIC_API_URL` | API URL exposed to browser |
-| `API_INTERNAL_URL` | API URL for server-side Next.js calls (Docker: `http://api:3001`) |
+| `SUPER_ADMIN_ID` / `SUPER_ADMIN_PASSWORD` | Runtime-managed super admin credentials |
+| `API_INTERNAL_URL` | Primary API URL for server-side Next.js calls (Docker: `http://api:3001`) |
+| `NEXT_PUBLIC_API_URL` | Public direct Nest API URL fallback. Do not point this to Next.js `/api`. |
 
 ### Styling Conventions
 
@@ -118,4 +117,4 @@ Copy `.env.example` to `.env` for development. Key variables:
 
 ### Production Deployment
 
-Docker Compose (`docker-compose.production.yml`) runs all services. The `scripts/deploy-production.mjs` script handles DB password sync between `.env.production` and the running container, health checks, and migration runs. Nginx example config in `deploy/nginx/` terminates TLS and proxies to web (port 3000) and API (port 3001).
+Docker Compose (`docker-compose.production.yml`) runs all services. The `scripts/deploy-production.mjs` script validates the env file and `NEXT_PUBLIC_API_URL`, checks the Compose config, syncs the DB password, and waits for health checks. Nginx example config in `deploy/nginx/` terminates TLS in front of the web app; the API stays on the internal Docker network by default.

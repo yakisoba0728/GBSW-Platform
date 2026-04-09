@@ -8,23 +8,25 @@ import {
 } from '../ui/list'
 import { EditIcon, SearchIcon, TrashIcon } from '../ui/icons'
 import { IconButton, MileageBadge, RefetchWrapper } from '../ui/primitives'
-import type { SchoolMileageHistoryItem } from './school-mileage-types'
+import type { SharedMileageHistoryItem } from './shared-mileage-types'
 
-export default function HistoryMobileList({
+type Props<T extends SharedMileageHistoryItem> = {
+  items: T[]
+  isLoading: boolean
+  isFetching: boolean
+  onEdit?: (item: T) => void
+  onDelete?: (item: T) => void
+  animated?: boolean
+}
+
+export default function HistoryMobileList<T extends SharedMileageHistoryItem>({
   items,
   isLoading,
   isFetching,
   onEdit,
   onDelete,
   animated = true,
-}: {
-  items: SchoolMileageHistoryItem[]
-  isLoading: boolean
-  isFetching: boolean
-  onEdit?: (item: SchoolMileageHistoryItem) => void
-  onDelete?: (item: SchoolMileageHistoryItem) => void
-  animated?: boolean
-  }) {
+}: Props<T>) {
   return (
     <div className="relative min-h-0 flex-1 pr-0.5 md:hidden">
       {isLoading ? (
@@ -74,7 +76,8 @@ export default function HistoryMobileList({
                       className="mt-0.5 text-[11px]"
                       style={{ color: 'var(--admin-text-muted)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
                     >
-                      {getSchoolLabel(item.school)} · {item.studentId}
+                      {item.school ? `${getSchoolLabel(item.school)} · ` : ''}
+                      {item.studentId}
                     </p>
                   </div>
                   {(onEdit || onDelete) && (

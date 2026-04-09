@@ -1,10 +1,8 @@
-import { NextRequest } from 'next/server'
+import { createStaticProxyHandler } from '@/lib/api-route-handlers'
 import { proxyAdminCreateRequest, proxyAdminGetRequest } from '@/lib/admin-api'
 
-export async function GET(request: NextRequest) {
-  return proxyAdminGetRequest(request, '/admin/teachers')
-}
-
-export async function POST(request: NextRequest) {
-  return proxyAdminCreateRequest(request, '/admin/teachers')
-}
+export const GET = createStaticProxyHandler(proxyAdminGetRequest, '/admin/teachers')
+export const POST = createStaticProxyHandler(
+  proxyAdminCreateRequest,
+  '/admin/teachers',
+)

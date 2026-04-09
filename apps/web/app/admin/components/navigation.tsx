@@ -50,6 +50,6 @@ export const ADMIN_NAV_ITEMS: DashboardNavItem[] = [
     label: '보안',
     section: '운영',
     icon: <LockIcon />,
-    children: [{ href: '/admin/security', label: '비밀번호 변경' }],
+    children: [{ href: '/admin/security', label: '관리자 보안' }],
   },
 ]

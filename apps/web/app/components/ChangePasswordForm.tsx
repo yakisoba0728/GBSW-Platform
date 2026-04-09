@@ -20,7 +20,7 @@ const ThemeToggle = dynamic(() => import('./ThemeToggle'), {
 
 type ChangePasswordFormProps = {
   accountId: string
-  role: 'super-admin' | 'student' | 'teacher'
+  role: 'student' | 'teacher'
   requireCurrentPassword?: boolean
   successRedirectTo?: string
   embedded?: boolean
@@ -124,18 +124,12 @@ export default function ChangePasswordForm({
               Password Update
             </p>
             <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--fg)', lineHeight: 1.2, letterSpacing: '-0.02em', marginBottom: 10 }}>
-              {role === 'super-admin'
-                ? '최고관리자 비밀번호를 변경하세요'
-                : '첫 로그인 비밀번호를 바꿔주세요'}
+              첫 로그인 비밀번호를 바꿔주세요
             </h1>
             <p style={{ fontSize: 14, color: 'var(--fg-muted)', lineHeight: 1.6 }}>
-              {role === 'super-admin'
-                ? '최고관리자 계정 '
-                : `${role === 'student' ? '학생' : '교사'} 계정 `}
+              {`${role === 'student' ? '학생' : '교사'} 계정 `}
               <span style={{ fontWeight: 600, color: 'var(--fg)' }}>{accountId}</span>
-              {role === 'super-admin'
-                ? '의 비밀번호를 제품 안에서 바로 교체할 수 있습니다.'
-                : '는 임시 비밀번호 상태입니다. 새 비밀번호를 설정한 뒤 계속 진행할 수 있습니다.'}
+              는 임시 비밀번호 상태입니다. 새 비밀번호를 설정한 뒤 계속 진행할 수 있습니다.
             </p>
             <div style={{
               marginTop: 12,

@@ -1,17 +1,18 @@
-import { NextRequest } from 'next/server'
+import {
+  createMethodProxyHandler,
+  createStaticProxyHandler,
+} from '@/lib/api-route-handlers'
 import {
   proxyTeacherGetRequest,
   proxyTeacherWriteRequest,
 } from '@/lib/teacher-api'
 
-export async function GET(request: NextRequest) {
-  return proxyTeacherGetRequest(request, '/school-mileage/entries')
-}
-
-export async function POST(request: NextRequest) {
-  return proxyTeacherWriteRequest(
-    request,
-    '/school-mileage/entries/batch',
-    'POST',
-  )
-}
+export const GET = createStaticProxyHandler(
+  proxyTeacherGetRequest,
+  '/school-mileage/entries',
+)
+export const POST = createMethodProxyHandler(
+  proxyTeacherWriteRequest,
+  '/school-mileage/entries/batch',
+  'POST',
+)

@@ -37,7 +37,7 @@ const CHANGE_PWD_LOCK_MS = 1000 * 60 * 10; // 10분 잠금
 export class AuthService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async login(body: Record<string, unknown>, clientIpHeaders: ClientIpHeaders) {
+  async login(body: Record<string, unknown>, clientIpHeaders: ClientIpHeaders = {}) {
     const id = parseRequiredText(body.id, '아이디');
     const password = parseRequiredPassword(body.password, '비밀번호');
     const clientIp = normalizeClientIp(clientIpHeaders);
@@ -529,66 +529,24 @@ export class AuthService {
 
   private async getRemainingLoginCooldownSecondsForKeys(keys: string[]) {
     const cooldowns = await Promise.all(
-      keys.map((key) => this.getRemainingLoginCooldownSeconds(key)),
+      uniqueKeys(keys).map((key) => this.getRemainingLoginCooldownSeconds(key)),
     );
 
     return Math.max(0, ...cooldowns);
   }
 
   private async registerFailedLoginAttempt(key: string) {
-    const now = new Date();
-    const existing = await this.prisma.loginThrottle.findUnique({
-      where: {
-        key,
-      },
-      select: {
-        failedCount: true,
-        windowStartedAt: true,
-      },
-    });
-
-    if (
-      !existing ||
-      now.getTime() - existing.windowStartedAt.getTime() > LOGIN_WINDOW_MS
-    ) {
-      await this.prisma.loginThrottle.upsert({
-        where: {
-          key,
-        },
-        update: {
-          failedCount: 1,
-          windowStartedAt: now,
-          lockedUntil: null,
-        },
-        create: {
-          key,
-          failedCount: 1,
-          windowStartedAt: now,
-          lockedUntil: null,
-        },
-      });
-      return;
-    }
-
-    const failedCount = existing.failedCount + 1;
-    const lockedUntil =
-      failedCount >= MAX_LOGIN_ATTEMPTS
-        ? new Date(existing.windowStartedAt.getTime() + LOGIN_WINDOW_MS)
-        : null;
-
-    await this.prisma.loginThrottle.update({
-      where: {
-        key,
-      },
-      data: {
-        failedCount,
-        lockedUntil,
-      },
-    });
+    await this.recordThrottleFailure(key, LOGIN_WINDOW_MS, (context) =>
+      context.failedCount >= MAX_LOGIN_ATTEMPTS
+        ? new Date(context.windowStartedAt.getTime() + LOGIN_WINDOW_MS)
+        : null,
+    );
   }
 
   private async registerFailedLoginAttemptForKeys(keys: string[]) {
-    await Promise.all(keys.map((key) => this.registerFailedLoginAttempt(key)));
+    await Promise.all(
+      uniqueKeys(keys).map((key) => this.registerFailedLoginAttempt(key)),
+    );
   }
 
   private async clearFailedLoginAttempts(key: string) {
@@ -600,7 +558,9 @@ export class AuthService {
   }
 
   private async clearFailedLoginAttemptsForKeys(keys: string[]) {
-    await Promise.all(keys.map((key) => this.clearFailedLoginAttempts(key)));
+    await Promise.all(
+      uniqueKeys(keys).map((key) => this.clearFailedLoginAttempts(key)),
+    );
   }
 
   private async getChangePasswordCooldownSeconds(key: string): Promise<number> {
@@ -626,44 +586,84 @@ export class AuthService {
   }
 
   private async recordChangePasswordFailure(key: string): Promise<void> {
-    const now = new Date();
-    const existing = await this.prisma.loginThrottle.findUnique({
-      where: { key },
-      select: { failedCount: true, windowStartedAt: true },
-    });
+    await this.recordThrottleFailure(key, CHANGE_PWD_LOCK_MS, (context) =>
+      context.failedCount >= CHANGE_PWD_MAX_ATTEMPTS
+        ? new Date(context.now.getTime() + CHANGE_PWD_LOCK_MS)
+        : null,
+    );
+  }
 
-    if (
-      !existing ||
-      now.getTime() - existing.windowStartedAt.getTime() > CHANGE_PWD_LOCK_MS
-    ) {
-      await this.prisma.loginThrottle.upsert({
+  private async recordThrottleFailure(
+    key: string,
+    lockWindowMs: number,
+    resolveLockedUntil: (context: {
+      failedCount: number;
+      now: Date;
+      windowStartedAt: Date;
+    }) => Date | null,
+  ): Promise<void> {
+    const now = new Date();
+    let didUpdate = false;
+
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const existing = await this.prisma.loginThrottle.findUnique({
         where: { key },
-        update: {
-          failedCount: 1,
-          windowStartedAt: now,
-          lockedUntil: null,
-        },
-        create: {
+        select: { failedCount: true, windowStartedAt: true },
+      });
+
+      if (
+        !existing ||
+        now.getTime() - existing.windowStartedAt.getTime() > lockWindowMs
+      ) {
+        await this.resetThrottleFailureWindow(key, now);
+        return;
+      }
+
+      const failedCount = existing.failedCount + 1;
+      const lockedUntil = resolveLockedUntil({
+        failedCount,
+        now,
+        windowStartedAt: existing.windowStartedAt,
+      });
+      const result = await this.prisma.loginThrottle.updateMany({
+        where: {
           key,
-          failedCount: 1,
-          windowStartedAt: now,
-          lockedUntil: null,
+          failedCount: existing.failedCount,
+          windowStartedAt: existing.windowStartedAt,
+        },
+        data: {
+          failedCount,
+          lockedUntil,
         },
       });
-      return;
+
+      if (result.count > 0) {
+        didUpdate = true;
+        break;
+      }
     }
 
-    const failedCount = existing.failedCount + 1;
-    const lockedUntil =
-      failedCount >= CHANGE_PWD_MAX_ATTEMPTS
-        ? new Date(now.getTime() + CHANGE_PWD_LOCK_MS)
-        : null;
+    if (!didUpdate) {
+      await this.resetThrottleFailureWindow(key, now);
+    }
+  }
 
-    await this.prisma.loginThrottle.update({
+  private async resetThrottleFailureWindow(
+    key: string,
+    now: Date,
+  ): Promise<void> {
+    await this.prisma.loginThrottle.upsert({
       where: { key },
-      data: {
-        failedCount,
-        lockedUntil,
+      update: {
+        failedCount: 1,
+        windowStartedAt: now,
+        lockedUntil: null,
+      },
+      create: {
+        key,
+        failedCount: 1,
+        windowStartedAt: now,
+        lockedUntil: null,
       },
     });
   }
@@ -727,4 +727,8 @@ function buildLoginThrottleKeys(accountId: string, clientIp: string | null) {
   return clientIp
     ? [`account:${accountId}`, `ip:${clientIp}`]
     : [`account:${accountId}`];
+}
+
+function uniqueKeys(keys: string[]) {
+  return [...new Set(keys)];
 }

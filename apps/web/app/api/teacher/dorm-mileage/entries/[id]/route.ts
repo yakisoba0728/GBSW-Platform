@@ -1,28 +1,16 @@
-import { NextRequest } from 'next/server'
+import { createParamMethodProxyHandler } from '@/lib/api-route-handlers'
 import { proxyTeacherWriteRequest } from '@/lib/teacher-api'
 
-type RouteContext = {
-  params: Promise<{
-    id: string
-  }>
-}
+export const PATCH = createParamMethodProxyHandler(
+  'id',
+  (id) => `/dorm-mileage/entries/${id}`,
+  proxyTeacherWriteRequest,
+  'PATCH',
+)
 
-export async function PATCH(request: NextRequest, context: RouteContext) {
-  const { id } = await context.params
-
-  return proxyTeacherWriteRequest(
-    request,
-    `/dorm-mileage/entries/${encodeURIComponent(id)}`,
-    'PATCH',
-  )
-}
-
-export async function DELETE(request: NextRequest, context: RouteContext) {
-  const { id } = await context.params
-
-  return proxyTeacherWriteRequest(
-    request,
-    `/dorm-mileage/entries/${encodeURIComponent(id)}`,
-    'DELETE',
-  )
-}
+export const DELETE = createParamMethodProxyHandler(
+  'id',
+  (id) => `/dorm-mileage/entries/${id}`,
+  proxyTeacherWriteRequest,
+  'DELETE',
+)

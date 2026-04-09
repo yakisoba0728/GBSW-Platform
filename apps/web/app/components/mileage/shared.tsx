@@ -1,9 +1,9 @@
 import type { CSSProperties, ReactNode } from 'react'
 import type {
-  MileageType,
-  SchoolCode,
-  SchoolMileageRuleSummary,
-} from '../teacher/school-mileage-types'
+  SharedMileageRuleSummary as MileageRuleSummary,
+  SharedMileageType as MileageType,
+  SharedSchoolCode as SchoolCode,
+} from '../teacher/shared-mileage-types'
 
 export { NoticeBox } from '../ui/notice'
 
@@ -24,7 +24,7 @@ export function getSchoolLabel(school: SchoolCode) {
   return SCHOOL_OPTIONS.find((option) => option.value === school)?.label ?? school
 }
 
-export function getRuleLabel(rule: SchoolMileageRuleSummary) {
+export function getRuleLabel(rule: MileageRuleSummary) {
   return `[${rule.category}] ${rule.name}`
 }
 

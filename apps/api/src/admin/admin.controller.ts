@@ -8,9 +8,9 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { assertSuperAdmin } from '../common/auth-access';
 import { assertInternalApiRequest } from '../common/internal-api-auth';
 import { PrismaService } from '../prisma/prisma.service';
-import { assertSuperAdmin } from '../school-mileage/school-mileage.access';
 import { AdminService } from './admin.service';
 
 @Controller('admin')

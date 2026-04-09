@@ -3,7 +3,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import dotenv from 'dotenv';
-import { rootDir } from './env.mjs';
+import { readRequiredDirectApiOrigin, rootDir } from './env.mjs';
 
 const envFileArgument = process.argv[2] ?? process.env.ENV_FILE ?? '.env.production';
 const envFilePath = path.resolve(rootDir, envFileArgument);
@@ -17,6 +17,15 @@ dotenv.config({ path: envFilePath, quiet: true });
 
 const postgresUser = requireEnv('POSTGRES_USER');
 const postgresPassword = requireEnv('POSTGRES_PASSWORD');
+const postgresDatabase = requireEnv('POSTGRES_DB');
+const webPort = requirePort('WEB_PORT');
+const publicApiUrl = readRequiredDirectApiOrigin(
+  'NEXT_PUBLIC_API_URL',
+  envFilePath,
+);
+requireEnv('INTERNAL_API_SECRET');
+requireEnv('SUPER_ADMIN_ID');
+requireEnv('SUPER_ADMIN_PASSWORD');
 const composeArgs = [
   'compose',
   '--env-file',
@@ -26,6 +35,10 @@ const composeArgs = [
 ];
 
 try {
+  console.log(`Using production env file: ${path.relative(rootDir, envFilePath)}`);
+  console.log(`Validated NEXT_PUBLIC_API_URL: ${publicApiUrl}`);
+
+  await run('docker', [...composeArgs, 'config', '--quiet'], { stdio: 'ignore' });
   await run('docker', [...composeArgs, 'up', '-d', 'db']);
 
   const dbContainerId = await capture('docker', [...composeArgs, 'ps', '-q', 'db']);
@@ -46,7 +59,7 @@ try {
     '-U',
     postgresUser,
     '-d',
-    process.env.POSTGRES_DB ?? 'postgres',
+    postgresDatabase,
     '-c',
     sql,
   ]);
@@ -63,6 +76,7 @@ try {
   console.log(
     `Inspect services with: docker ${composeArgs.join(' ')} ps`,
   );
+  console.log(`Web port: ${webPort}`);
 } catch (error) {
   console.error(getErrorMessage(error));
   process.exit(1);
@@ -113,6 +127,17 @@ function requireEnv(name) {
   }
 
   return value;
+}
+
+function requirePort(name) {
+  const value = requireEnv(name);
+  const port = Number.parseInt(value, 10);
+
+  if (!Number.isInteger(port) || port <= 0) {
+    throw new Error(`${name} must be a valid port number in ${envFilePath}`);
+  }
+
+  return port;
 }
 
 function getErrorMessage(error) {

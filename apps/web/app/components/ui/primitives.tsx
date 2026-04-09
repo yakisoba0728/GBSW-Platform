@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
-import type { MileageType } from '../teacher/school-mileage-types'
+import type { SharedMileageType as MileageType } from '../teacher/shared-mileage-types'
 import { formatSignedScore } from '../mileage/shared'
 
 // ─── MileageBadge ─────────────────────────────────────────────────────────────

@@ -13,14 +13,17 @@ import {
   formatPhoneNumberInput,
   TEACHER_INITIAL,
 } from './account-form-shared'
-import SuccessModal from '@/app/components/ui/success-modal'
+import {
+  AccountPageIntro,
+  AccountResultModal,
+  buildCreationResultDescription,
+  CLOSED_ACCOUNT_MODAL,
+} from '@/app/components/admin/account-ui-shared'
 
 export default function TeacherCreateForm() {
   const [teacher, setTeacher] = useState<TeacherFormState>(TEACHER_INITIAL)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [modal, setModal] = useState<{
-    open: boolean; type: 'success' | 'error'; title: string; description: string
-  }>({ open: false, type: 'success', title: '', description: '' })
+  const [modal, setModal] = useState(CLOSED_ACCOUNT_MODAL)
 
   function setTeacherField<K extends keyof TeacherFormState>(key: K) {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,11 +76,11 @@ export default function TeacherCreateForm() {
         open: true,
         type: 'success',
         title: '교사 계정 생성 완료',
-        description: [
-          payload?.message ?? '교사 계정이 생성되었습니다.',
-          `아이디: ${createdTeacherId}`,
-          `임시 비밀번호: ${payload?.teacher?.temporaryPassword ?? ''}`,
-        ].join('\n'),
+        description: buildCreationResultDescription({
+          message: payload?.message ?? '교사 계정이 생성되었습니다.',
+          accountId: createdTeacherId,
+          temporaryPassword: payload?.teacher?.temporaryPassword ?? '',
+        }),
       })
     } catch {
       setModal({
@@ -94,25 +97,10 @@ export default function TeacherCreateForm() {
   return (
     <div className="max-w-[640px]">
       <div className="mb-7">
-        <h2
-          className="text-base font-semibold"
-          style={{
-            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            color: 'var(--fg)',
-          }}
-        >
-          교사 계정 생성
-        </h2>
-        <p
-          className="mt-1 text-xs"
-          style={{
-            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            color: 'var(--fg-muted)',
-          }}
-        >
-          새 교사 계정의 정보를 입력하세요. 임시 비밀번호는 계정 생성 직후
-          한 번만 표시되므로 반드시 복사해 두세요.
-        </p>
+        <AccountPageIntro
+          title="교사 계정 생성"
+          description="새 교사 계정의 정보를 입력하세요. 임시 비밀번호는 계정 생성 직후 한 번만 표시되므로 반드시 복사해 두세요."
+        />
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -189,13 +177,9 @@ export default function TeacherCreateForm() {
         />
       </form>
 
-      <SuccessModal
-        open={modal.open}
+      <AccountResultModal
+        modal={modal}
         onClose={() => setModal((prev) => ({ ...prev, open: false }))}
-        type={modal.type}
-        title={modal.title}
-        description={modal.description}
-        autoCloseMs={modal.type === 'success' ? 0 : 3000}
       />
     </div>
   )

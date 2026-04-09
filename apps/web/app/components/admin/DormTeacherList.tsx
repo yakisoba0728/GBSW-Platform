@@ -1,9 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import {
+  DormBadge,
+  monoCellStyle,
+  textCellStyle,
+} from '@/app/components/admin/account-ui-shared'
 import { RefetchWrapper } from '@/app/components/ui/primitives'
 import { useLoadingGate } from '@/app/components/ui/useLoadingGate'
 import { ListSkeleton } from '@/app/components/ui/list'
+import { NoticeBox } from '@/app/components/ui/notice'
 
 type Teacher = {
   teacherId: string
@@ -90,31 +96,15 @@ export default function DormTeacherList() {
   return (
     <div className="space-y-3">
       {toggleError && (
-        <div
-          className="rounded-lg border px-3 py-2 text-sm"
-          style={{
-            borderColor: 'var(--penalty-border)',
-            backgroundColor: 'var(--penalty-subtle)',
-            color: 'var(--penalty)',
-            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-          }}
-        >
-          {toggleError}
-        </div>
+        <NoticeBox
+          type="error"
+          message={toggleError}
+          onDismiss={() => setToggleError(null)}
+        />
       )}
 
       {error ? (
-        <div
-          style={{
-            padding: '40px 0',
-            textAlign: 'center',
-            fontSize: 13,
-            color: 'var(--penalty)',
-            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-          }}
-        >
-          {error}
-        </div>
+        <NoticeBox type="error" message={error} />
       ) : (
         <div className="overflow-x-auto">
           {showLoading && (
@@ -149,49 +139,59 @@ export default function DormTeacherList() {
                   >
                     <td
                       className="py-3 text-xs"
-                      style={{ color: 'var(--fg-muted)', fontFamily: 'var(--font-space-grotesk)' }}
+                      style={monoCellStyle}
                     >
                       {teacher.teacherId}
                     </td>
                     <td
                       className="py-3 text-[13px] font-medium"
-                      style={{ color: 'var(--fg)', fontFamily: 'var(--font-noto-sans-kr), sans-serif' }}
+                      style={textCellStyle}
                     >
                       {teacher.name}
                     </td>
                     <td className="py-3">
-                      <button
-                        type="button"
-                        role="switch"
-                        aria-checked={teacher.isDormTeacher}
-                        disabled={updatingId === teacher.teacherId}
-                        onClick={() => void toggleDormTeacher(teacher)}
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          width: 36,
-                          height: 20,
-                          borderRadius: 10,
-                          padding: '2px',
-                          backgroundColor: teacher.isDormTeacher ? 'var(--accent)' : 'var(--border)',
-                          border: 'none',
-                          cursor: updatingId === teacher.teacherId ? 'not-allowed' : 'pointer',
-                          opacity: updatingId === teacher.teacherId ? 0.6 : 1,
-                          transition: 'background-color 0.15s',
-                        }}
-                      >
-                        <span
+                      <div className="flex items-center gap-3">
+                        <DormBadge enabled={teacher.isDormTeacher} />
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={teacher.isDormTeacher}
+                          disabled={updatingId === teacher.teacherId}
+                          onClick={() => void toggleDormTeacher(teacher)}
                           style={{
-                            display: 'block',
-                            width: 16,
-                            height: 16,
-                            borderRadius: '50%',
-                            backgroundColor: '#fff',
-                            transform: teacher.isDormTeacher ? 'translateX(16px)' : 'translateX(0)',
-                            transition: 'transform 0.15s',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            width: 36,
+                            height: 20,
+                            borderRadius: 10,
+                            padding: '2px',
+                            backgroundColor: teacher.isDormTeacher
+                              ? 'var(--accent)'
+                              : 'var(--border)',
+                            border: 'none',
+                            cursor:
+                              updatingId === teacher.teacherId
+                                ? 'not-allowed'
+                                : 'pointer',
+                            opacity: updatingId === teacher.teacherId ? 0.6 : 1,
+                            transition: 'background-color 0.15s',
                           }}
-                        />
-                      </button>
+                        >
+                          <span
+                            style={{
+                              display: 'block',
+                              width: 16,
+                              height: 16,
+                              borderRadius: '50%',
+                              backgroundColor: '#fff',
+                              transform: teacher.isDormTeacher
+                                ? 'translateX(16px)'
+                                : 'translateX(0)',
+                              transition: 'transform 0.15s',
+                            }}
+                          />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

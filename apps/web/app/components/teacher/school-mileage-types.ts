@@ -1,143 +1,74 @@
-export type SchoolCode = 'GBSW' | 'BYMS'
-export type MileageType = 'reward' | 'penalty'
+import type {
+  SharedCategoryStat,
+  SharedClassMileageAnalyticsOverall,
+  SharedClassMileageAnalyticsResponse,
+  SharedClassMileageSummary,
+  SharedCreateMileageEntriesPayload,
+  SharedMileageHistoryItem,
+  SharedMileageOverviewResponse,
+  SharedMileageOverviewSummary,
+  SharedMileageRuleSummary,
+  SharedMileageStudentOption,
+  SharedMileageType,
+  SharedPaginatedMileageHistoryResponse,
+  SharedSchoolCode,
+  SharedStudentMileageAnalyticsResponse,
+  SharedStudentMileageSummary,
+  SharedStudentMileageSummaryResponse,
+  SharedTopRuleStat,
+  SharedUpdateMileageEntryPayload,
+} from './shared-mileage-types'
 
-export type SchoolMileageRuleSummary = {
-  id: number
-  type: MileageType
-  category: string
-  name: string
-  defaultScore: number
-  displayOrder: number
-  isActive: boolean
-}
+export type SchoolCode = SharedSchoolCode
+export type MileageType = SharedMileageType
 
-export type SchoolMileageStudentOption = {
-  studentId: string
-  name: string
+export type SchoolMileageRuleSummary = Omit<
+  SharedMileageRuleSummary,
+  'minScore' | 'maxScore'
+>
+
+export type SchoolMileageStudentOption = Omit<
+  SharedMileageStudentOption,
+  'school'
+> & {
   school: SchoolCode
-  grade: number | null
-  classNumber: number
-  studentNumber: number
 }
 
-export type SchoolMileageHistoryItem = {
-  id: number
-  type: MileageType
-  score: number
-  reason: string | null
-  awardedAt: string
-  createdAt: string
-  updatedAt: string
-  ruleId: number
-  ruleCategory: string
-  ruleName: string
-  ruleDefaultScore: number
-  studentId: string
-  studentName: string
+export type SchoolMileageHistoryItem = Omit<
+  SharedMileageHistoryItem,
+  'school'
+> & {
   school: SchoolCode
-  grade: number | null
-  classNumber: number
-  studentNumber: number
-  teacherId: string
-  teacherName: string
 }
 
-export type PaginatedSchoolMileageHistoryResponse = {
-  items: SchoolMileageHistoryItem[]
-  page: number
-  pageSize: number
-  totalCount: number
-}
+export type PaginatedSchoolMileageHistoryResponse =
+  SharedPaginatedMileageHistoryResponse<SchoolMileageHistoryItem>
 
-export type CreateSchoolMileageEntriesPayload = {
-  entries: Array<{
-    studentId: string
-    ruleId: number
-    score: number
-    reason?: string
-  }>
-}
+export type CreateSchoolMileageEntriesPayload = SharedCreateMileageEntriesPayload
 
-export type UpdateSchoolMileageEntryPayload = {
-  ruleId?: number
-  score?: number
-  reason?: string
-  awardedAt?: string
-}
+export type UpdateSchoolMileageEntryPayload = SharedUpdateMileageEntryPayload
 
-export type StudentMileageSummary = {
-  studentId: string
-  name: string
+export type StudentMileageSummary = Omit<SharedStudentMileageSummary, 'school'> & {
   school: SchoolCode
-  grade: number | null
-  classNumber: number
-  studentNumber: number
-  rewardTotal: number
-  penaltyTotal: number
-  netScore: number
-  entryCount: number
 }
 
-export type ClassMileageSummary = {
-  classNumber: number
-  studentCount: number
-  rewardTotal: number
-  penaltyTotal: number
-  netScore: number
-  avgNetScore: number
-  topStudents: StudentMileageSummary[]
-  bottomStudents: StudentMileageSummary[]
-}
+export type ClassMileageSummary = SharedClassMileageSummary<StudentMileageSummary>
 
-export type CategoryStat = {
-  category: string
-  type: MileageType
-  count: number
-  totalScore: number
-}
+export type CategoryStat = SharedCategoryStat
 
-export type TopRuleStat = {
-  ruleId: number
-  ruleName: string
-  category: string
-  type: MileageType
-  count: number
-  totalScore: number
-}
+export type TopRuleStat = SharedTopRuleStat
 
-export type SchoolMileageOverviewSummary = {
-  rewardCount: number
-  penaltyCount: number
-  rewardSum: number
-  penaltySum: number
-  uniqueStudents: number
-  totalCount: number
-}
+export type SchoolMileageOverviewSummary = SharedMileageOverviewSummary
 
-export type SchoolMileageOverviewResponse = {
-  summary: SchoolMileageOverviewSummary
-  categoryStats: CategoryStat[]
-  topRules: TopRuleStat[]
-}
+export type SchoolMileageOverviewResponse = SharedMileageOverviewResponse
 
-export type StudentMileageAnalyticsResponse = {
-  students: StudentMileageSummary[]
-  totalCount: number
-}
+export type StudentMileageAnalyticsResponse =
+  SharedStudentMileageAnalyticsResponse<StudentMileageSummary>
 
-export type ClassMileageAnalyticsOverall = {
-  classCount: number
-  totalStudents: number
-  rewardTotal: number
-  penaltyTotal: number
-  netScore: number
-}
+export type ClassMileageAnalyticsOverall = SharedClassMileageAnalyticsOverall
 
-export type ClassMileageAnalyticsResponse = {
-  classes: ClassMileageSummary[]
-  overall: ClassMileageAnalyticsOverall
-}
+export type ClassMileageAnalyticsResponse =
+  SharedClassMileageAnalyticsResponse<ClassMileageSummary>
 
-export type StudentMileageSummaryResponse = {
-  summary: StudentMileageSummary
-}
+export type StudentMileageSummaryResponse =
+  SharedStudentMileageSummaryResponse<StudentMileageSummary>

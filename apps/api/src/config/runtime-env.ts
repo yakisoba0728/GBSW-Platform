@@ -33,6 +33,10 @@ export function getInternalApiSecret() {
   return getApiRuntimeEnv().INTERNAL_API_SECRET;
 }
 
+export function resetApiRuntimeEnvCache() {
+  cachedRuntimeEnv = null;
+}
+
 export function getSuperAdminCredentials() {
   const { SUPER_ADMIN_ID, SUPER_ADMIN_PASSWORD } = getApiRuntimeEnv();
 

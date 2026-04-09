@@ -10,6 +10,15 @@ import {
   inputBaseStyle,
   type School,
 } from '@/app/admin/components/account-form-shared'
+import {
+  AccountPageIntro,
+  AdminPanel,
+  MetricChip,
+  StatusBadge,
+  filterLabelStyle,
+  monoCellStyle,
+  textCellStyle,
+} from '@/app/components/admin/account-ui-shared'
 import { Button } from '@/app/components/ui/button'
 import { EditIcon, SearchIcon, UserPlusCompactIcon } from '@/app/components/ui/icons'
 import { ListSkeleton } from '@/app/components/ui/list'
@@ -272,26 +281,10 @@ export default function AdminStudentList() {
   return (
     <div className="space-y-6">
       <section className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <h2
-            className="text-base font-semibold"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              color: 'var(--fg)',
-            }}
-          >
-            학생 관리
-          </h2>
-          <p
-            className="mt-1 text-xs"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              color: 'var(--fg-muted)',
-            }}
-          >
-            학생 계정을 검색하고, 정보 수정과 활성 상태를 관리할 수 있습니다.
-          </p>
-        </div>
+        <AccountPageIntro
+          title="학생 관리"
+          description="학생 계정을 검색하고, 정보 수정과 활성 상태를 관리할 수 있습니다."
+        />
 
         <div className="flex flex-wrap items-center gap-2">
           <MetricChip label="전체" value={students.length} />
@@ -316,13 +309,7 @@ export default function AdminStudentList() {
         />
       )}
 
-      <section
-        className="rounded-2xl border p-4"
-        style={{
-          borderColor: 'var(--border)',
-          backgroundColor: 'var(--bg)',
-        }}
-      >
+      <AdminPanel>
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.6fr)_160px_160px_auto]">
           <div>
             <label className={filterLabelStyle}>검색</label>
@@ -395,15 +382,9 @@ export default function AdminStudentList() {
             </Button>
           </div>
         </div>
-      </section>
+      </AdminPanel>
 
-      <section
-        className="overflow-hidden rounded-2xl border"
-        style={{
-          borderColor: 'var(--border)',
-          backgroundColor: 'var(--bg)',
-        }}
-      >
+      <AdminPanel padded={false}>
         <div className="overflow-x-auto">
           {showLoading && (
             <div className="px-4 py-5">
@@ -510,7 +491,7 @@ export default function AdminStudentList() {
             </table>
           </RefetchWrapper>
         </div>
-      </section>
+      </AdminPanel>
 
       <Modal
         open={editingStudent !== null && editForm !== null}
@@ -628,48 +609,6 @@ export default function AdminStudentList() {
   )
 }
 
-function MetricChip({
-  label,
-  value,
-  accent = false,
-}: {
-  label: string
-  value: number
-  accent?: boolean
-}) {
-  return (
-    <div
-      className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs"
-      style={{
-        borderColor: accent ? 'var(--accent-border)' : 'var(--border)',
-        backgroundColor: accent ? 'var(--accent-subtle)' : 'var(--bg)',
-        color: accent ? 'var(--accent)' : 'var(--fg-muted)',
-        fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-      }}
-    >
-      <span>{label}</span>
-      <strong style={{ color: 'var(--fg)' }}>{value}</strong>
-    </div>
-  )
-}
-
-function StatusBadge({ isActive }: { isActive: boolean }) {
-  return (
-    <span
-      className="inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold"
-      style={{
-        fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-        backgroundColor: isActive
-          ? 'rgba(34,197,94,0.12)'
-          : 'rgba(148,163,184,0.18)',
-        color: isActive ? '#15803d' : 'var(--fg-muted)',
-      }}
-    >
-      {isActive ? '활성' : '비활성'}
-    </span>
-  )
-}
-
 function numericOnly(value: string, maxLength: number) {
   return value.replaceAll(/\D/g, '').slice(0, maxLength)
 }
@@ -677,16 +616,3 @@ function numericOnly(value: string, maxLength: number) {
 function formatPhoneNumber(phone: string) {
   return formatPhoneNumberInput(phone)
 }
-
-const filterLabelStyle =
-  'mb-1.5 block text-xs font-medium text-[var(--fg-muted)]'
-
-const monoCellStyle = {
-  color: 'var(--fg-muted)',
-  fontFamily: 'var(--font-space-grotesk)',
-} satisfies React.CSSProperties
-
-const textCellStyle = {
-  color: 'var(--fg)',
-  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-} satisfies React.CSSProperties

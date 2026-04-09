@@ -1,5 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, SchoolMileageType } from '@prisma/client';
+import {
+  buildMileageEntryWhere,
+  buildMileageEntryWhereSql,
+  buildMileageOverviewSummary,
+  buildMileageSummaryFromTotals,
+  buildStudentTotalsByStudentId,
+  emptyMileageClassAnalytics,
+  emptyMileageOverview,
+  mapMileageCategoryStat,
+  mapMileageTopRuleStat,
+  type MileageCategoryAggregateRow,
+  type MileageOverviewSummary,
+  type MileageStudentTotals,
+  type MileageStudentAggregateRow,
+  type MileageTopRuleAggregateRow,
+} from '../common/mileage-analytics';
 import { PrismaService } from '../prisma/prisma.service';
 import { assertTeacherExists } from './school-mileage.access';
 import {
@@ -9,55 +25,12 @@ import {
 } from './school-mileage.mappers';
 import { parseAnalyticsFilters } from './school-mileage.parsers';
 import { findStudentsByFilters } from './school-mileage.students.data';
-import type {
-  OverviewSummary,
-  StudentMileageSummary,
-} from './school-mileage.types';
+import type { StudentMileageSummary } from './school-mileage.types';
 
-type OverviewAggregateRow = {
-  rewardCount: number;
-  penaltyCount: number;
-  rewardSum: number;
-  penaltySum: number;
-  uniqueStudents: number;
-};
-
-type CategoryAggregateRow = {
-  category: string;
-  type: SchoolMileageType;
-  count: number;
-  totalScore: number;
-};
-
-type TopRuleAggregateRow = {
-  ruleId: number;
-  ruleName: string;
-  category: string;
-  type: SchoolMileageType;
-  count: number;
-  totalScore: number;
-};
-
-function buildOverviewWhereSql(
-  filters: ReturnType<typeof parseAnalyticsFilters>,
-  studentIds: string[] | undefined,
-) {
-  const conditions: Prisma.Sql[] = [Prisma.sql`e.deleted_at IS NULL`];
-
-  if (filters.startDate) {
-    conditions.push(Prisma.sql`e.awarded_at >= ${filters.startDate}`);
-  }
-
-  if (filters.endDate) {
-    conditions.push(Prisma.sql`e.awarded_at <= ${filters.endDate}`);
-  }
-
-  if (studentIds && studentIds.length > 0) {
-    conditions.push(Prisma.sql`e.student_id IN (${Prisma.join(studentIds)})`);
-  }
-
-  return Prisma.sql`WHERE ${Prisma.join(conditions, ' AND ')}`;
-}
+type OverviewAggregateRow = MileageOverviewSummary;
+type CategoryAggregateRow = MileageCategoryAggregateRow<SchoolMileageType>;
+type TopRuleAggregateRow = MileageTopRuleAggregateRow<SchoolMileageType>;
+type StudentAggregateRow = MileageStudentAggregateRow<SchoolMileageType>;
 
 @Injectable()
 export class SchoolMileageAnalyticsService {
@@ -74,14 +47,10 @@ export class SchoolMileageAnalyticsService {
     const studentIds = await this.resolveStudentIds(filters);
 
     if (studentIds && studentIds.length === 0) {
-      return {
-        summary: emptyOverviewSummary(),
-        categoryStats: [],
-        topRules: [],
-      };
+      return emptyMileageOverview();
     }
 
-    const whereSql = buildOverviewWhereSql(filters, studentIds);
+    const whereSql = buildMileageEntryWhereSql(filters, studentIds);
 
     const [summaryRows, categoryStats, topRules] = await Promise.all([
       this.prisma.$queryRaw<OverviewAggregateRow[]>(Prisma.sql`
@@ -126,27 +95,13 @@ export class SchoolMileageAnalyticsService {
     const row = summaryRows[0];
 
     return {
-      summary: buildOverviewSummary(
-        row?.rewardCount ?? 0,
-        row?.penaltyCount ?? 0,
-        row?.rewardSum ?? 0,
-        row?.penaltySum ?? 0,
-        row?.uniqueStudents ?? 0,
+      summary: buildMileageOverviewSummary(row),
+      categoryStats: categoryStats.map((row) =>
+        mapMileageCategoryStat(row, toApiMileageType),
       ),
-      categoryStats: categoryStats.map((stat) => ({
-        category: stat.category,
-        type: toApiMileageType(stat.type),
-        count: stat.count,
-        totalScore: stat.totalScore,
-      })),
-      topRules: topRules.map((rule) => ({
-        ruleId: rule.ruleId,
-        ruleName: rule.ruleName,
-        category: rule.category,
-        type: toApiMileageType(rule.type),
-        count: rule.count,
-        totalScore: rule.totalScore,
-      })),
+      topRules: topRules.map((row) =>
+        mapMileageTopRuleStat(row, toApiMileageType),
+      ),
     };
   }
 
@@ -170,21 +125,23 @@ export class SchoolMileageAnalyticsService {
       return { students: [], totalCount: 0 };
     }
 
-    const totalsByStudentId = await this.getEntryTotalsByStudentId(
+    const aggregateRows = await this.getEntryTotalsByStudentId(
       filters,
       students.map((student) => student.studentId),
     );
+    const totalsByStudentId = buildStudentTotalsByStudentId(
+      aggregateRows,
+      SchoolMileageType.REWARD,
+    );
 
     const summaries = students
-      .map((student) => {
-        const totals = totalsByStudentId.get(student.studentId);
-
-        if (!totals || totals.entryCount === 0) {
-          return null;
-        }
-
-        return toStudentMileageSummary(student, totals);
-      })
+      .filter((student) => totalsByStudentId.has(student.studentId))
+      .map((student) =>
+        toStudentMileageSummary(
+          student,
+          totalsByStudentId.get(student.studentId),
+        ),
+      )
       .filter((summary): summary is StudentMileageSummary => summary !== null)
       .sort(compareStudentMileageSummary);
 
@@ -211,21 +168,16 @@ export class SchoolMileageAnalyticsService {
     });
 
     if (students.length === 0) {
-      return {
-        classes: [],
-        overall: {
-          classCount: 0,
-          totalStudents: 0,
-          rewardTotal: 0,
-          penaltyTotal: 0,
-          netScore: 0,
-        },
-      };
+      return emptyMileageClassAnalytics();
     }
 
-    const totalsByStudentId = await this.getEntryTotalsByStudentId(
+    const aggregateRows = await this.getEntryTotalsByStudentId(
       filters,
       students.map((student) => student.studentId),
+    );
+    const totalsByStudentId = buildStudentTotalsByStudentId(
+      aggregateRows,
+      SchoolMileageType.REWARD,
     );
 
     const studentsByClassNumber = new Map<number, StudentMileageSummary[]>();
@@ -277,11 +229,11 @@ export class SchoolMileageAnalyticsService {
     studentIds: string[],
   ) {
     if (studentIds.length === 0) {
-      return new Map<string, StudentMileageTotals>();
+      return [] as StudentAggregateRow[];
     }
 
-    const aggregatedEntries = await this.prisma.schoolMileageEntry.groupBy({
-      where: buildEntryWhere(filters, studentIds),
+    const groupedEntries = await this.prisma.schoolMileageEntry.groupBy({
+      where: buildMileageEntryWhere(filters, studentIds),
       by: ['studentId', 'type'],
       _count: {
         _all: true,
@@ -291,29 +243,12 @@ export class SchoolMileageAnalyticsService {
       },
     });
 
-    const totalsByStudentId = new Map<string, StudentMileageTotals>();
-
-    for (const aggregate of aggregatedEntries) {
-      const nextTotals = totalsByStudentId.get(aggregate.studentId) ?? {
-        rewardTotal: 0,
-        penaltyTotal: 0,
-        entryCount: 0,
-      };
-
-      const count = aggregate._count._all;
-      const totalScore = aggregate._sum.score ?? 0;
-
-      nextTotals.entryCount += count;
-      if (aggregate.type === 'REWARD') {
-        nextTotals.rewardTotal += totalScore;
-      } else {
-        nextTotals.penaltyTotal += totalScore;
-      }
-
-      totalsByStudentId.set(aggregate.studentId, nextTotals);
-    }
-
-    return totalsByStudentId;
+    return groupedEntries.map((row) => ({
+      studentId: row.studentId,
+      type: row.type,
+      count: row._count._all,
+      totalScore: row._sum.score ?? 0,
+    }));
   }
 
   private async resolveStudentIds(
@@ -342,27 +277,6 @@ export class SchoolMileageAnalyticsService {
   }
 }
 
-function buildEntryWhere(
-  filters: ReturnType<typeof parseAnalyticsFilters>,
-  studentIds?: string[],
-) {
-  return {
-    deletedAt: null,
-    awardedAt:
-      filters.startDate || filters.endDate
-        ? {
-            gte: filters.startDate ?? undefined,
-            lte: filters.endDate ?? undefined,
-          }
-        : undefined,
-    studentId: studentIds
-      ? {
-          in: studentIds,
-        }
-      : undefined,
-  };
-}
-
 function toStudentMileageSummary(
   student: {
     studentId: string;
@@ -372,51 +286,7 @@ function toStudentMileageSummary(
     classNumber: number;
     studentNumber: number;
   },
-  totals: StudentMileageTotals | undefined,
+  totals: MileageStudentTotals | undefined,
 ): StudentMileageSummary {
-  const nextTotals = totals ?? {
-    rewardTotal: 0,
-    penaltyTotal: 0,
-    entryCount: 0,
-  };
-
-  return {
-    studentId: student.studentId,
-    name: student.name,
-    school: student.school,
-    grade: student.grade,
-    classNumber: student.classNumber,
-    studentNumber: student.studentNumber,
-    rewardTotal: nextTotals.rewardTotal,
-    penaltyTotal: nextTotals.penaltyTotal,
-    netScore: nextTotals.rewardTotal - nextTotals.penaltyTotal,
-    entryCount: nextTotals.entryCount,
-  };
+  return buildMileageSummaryFromTotals(student, totals);
 }
-
-function buildOverviewSummary(
-  rewardCount: number,
-  penaltyCount: number,
-  rewardSum: number,
-  penaltySum: number,
-  uniqueStudents: number,
-): OverviewSummary {
-  return {
-    rewardCount,
-    penaltyCount,
-    rewardSum,
-    penaltySum,
-    uniqueStudents,
-    totalCount: rewardCount + penaltyCount,
-  };
-}
-
-function emptyOverviewSummary(): OverviewSummary {
-  return buildOverviewSummary(0, 0, 0, 0, 0);
-}
-
-type StudentMileageTotals = {
-  rewardTotal: number;
-  penaltyTotal: number;
-  entryCount: number;
-};

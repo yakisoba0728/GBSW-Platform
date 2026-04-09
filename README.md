@@ -23,6 +23,7 @@ pnpm dev
 - `INTERNAL_API_SECRET`
 - `SUPER_ADMIN_ID`
 - `SUPER_ADMIN_PASSWORD`
+- `API_INTERNAL_URL`은 기본값이 이미 들어 있으므로 보통 수정할 필요가 없습니다.
 
 ## 기본 포트
 
@@ -46,6 +47,7 @@ pnpm db:prepare
 pnpm db:down
 pnpm lint
 pnpm build
+pnpm test
 ```
 
 ## Docker 이미지 빌드 예시
@@ -66,12 +68,19 @@ cp .env.production.example .env.production
 ```
 
 - `POSTGRES_PASSWORD`
+- `POSTGRES_DB`
+- `WEB_PORT`
 - `INTERNAL_API_SECRET`
 - `NEXT_PUBLIC_API_URL`
 - `SUPER_ADMIN_ID`
 - `SUPER_ADMIN_PASSWORD`
 
 위 값은 반드시 운영용으로 변경하세요.
+
+- `SUPER_ADMIN_ID`, `SUPER_ADMIN_PASSWORD`는 런타임 환경변수로 읽히며 앱 안에서 별도로 생성되지 않습니다.
+- `API_INTERNAL_URL`은 운영 Compose가 자동으로 `http://api:3001`을 주입하므로 `.env.production`에 따로 넣지 않습니다.
+- `NEXT_PUBLIC_API_URL`은 공개 설정으로 노출되는 Nest API 원본 주소이며, 필요 시 서버 측 fallback에도 사용됩니다.
+- `NEXT_PUBLIC_API_URL`을 `https://example.com/api`처럼 Next.js의 `/api` 경로로 지정하면 안 됩니다.
 
 ### 2. 운영 컨테이너 기동
 
@@ -87,10 +96,14 @@ node scripts/deploy-production.mjs .env
 
 이 스크립트는 다음 순서로 진행됩니다.
 
+- `.env.production` 필수값과 `NEXT_PUBLIC_API_URL` 형식을 먼저 검증
+- `docker compose config --quiet`로 Compose 구성을 먼저 검증
 - `db` 컨테이너를 먼저 기동
 - `.env`의 `POSTGRES_PASSWORD`를 현재 DB 사용자 비밀번호로 동기화
 - `api`, `web`을 `--build`로 재기동
 - healthcheck가 통과할 때까지 대기
+
+`web` 이미지는 `NEXT_PUBLIC_API_URL`을 빌드 인자로도 받아서, 공개 API 원본 주소가 빌드 산출물과 런타임 설정에 함께 반영되도록 맞춥니다.
 
 기존 PostgreSQL 볼륨이 남아 있어도 `.env`의 DB 비밀번호를 기준으로 다시 맞춰 주기 때문에, `P1000: Authentication failed` 같은 재배포 오류를 줄일 수 있습니다.
 
@@ -119,3 +132,10 @@ docker compose --env-file .env.production -f docker-compose.production.yml logs 
 ```
 
 `/health` 엔드포인트는 Prisma로 데이터베이스 연결까지 확인하므로, DB 장애가 나면 API healthcheck도 함께 실패합니다.
+
+## 인증/구성 메모
+
+- 최고관리자 인증은 현재 데이터베이스 테이블이 아니라 `SUPER_ADMIN_ID`, `SUPER_ADMIN_PASSWORD` 환경변수로 관리합니다.
+- `pnpm db:prepare`는 데이터베이스와 pgAdmin을 준비하고 Prisma 마이그레이션을 적용하지만, 최고관리자 계정을 따로 시드하지 않습니다.
+- 서버 사이드 Next.js 호출은 `API_INTERNAL_URL`을 우선 사용하고, Docker Compose 운영 구성에서는 `http://api:3001`로 자동 설정됩니다.
+- `NEXT_PUBLIC_API_URL`, `API_INTERNAL_URL`은 모두 절대 URL이어야 하며 `/api` 같은 경로를 포함할 수 없습니다.

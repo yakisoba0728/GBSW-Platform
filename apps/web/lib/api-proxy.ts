@@ -12,12 +12,16 @@ import { getInternalApiSecret } from './runtime-env'
 
 type ProxyApiRequestOptions = {
   pathname: string
-  method: 'GET' | 'POST' | 'PATCH' | 'DELETE'
+  method: ProxyRequestMethod
   allowedRole: AuthRole
   unauthorizedMessage: string
   proxyFailureMessage: string
   actorHeaders?: (session: AuthSession) => Record<string, string | undefined>
 }
+
+export type ProxyRequestMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE'
+
+type RoleProxyRequestOptions = Omit<ProxyApiRequestOptions, 'pathname' | 'method'>
 
 export async function proxyApiRequest(
   request: NextRequest,
@@ -79,6 +83,28 @@ export async function proxyApiRequest(
       { message: proxyFailureMessage },
       { status: 502 },
     )
+  }
+}
+
+export function createRoleProxyRequest({
+  allowedRole,
+  unauthorizedMessage,
+  proxyFailureMessage,
+  actorHeaders,
+}: RoleProxyRequestOptions) {
+  return function proxyRoleRequest<Pathname extends string>(
+    request: NextRequest,
+    pathname: Pathname,
+    method: ProxyRequestMethod,
+  ) {
+    return proxyApiRequest(request, {
+      pathname,
+      method,
+      allowedRole,
+      unauthorizedMessage,
+      proxyFailureMessage,
+      actorHeaders,
+    })
   }
 }
 

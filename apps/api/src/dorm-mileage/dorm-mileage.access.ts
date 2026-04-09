@@ -4,7 +4,7 @@ import {
   assertSuperAdmin,
   assertStudentExists,
   assertTeacherExists,
-} from '../school-mileage/school-mileage.access';
+} from '../common/auth-access';
 
 export { assertSuperAdmin, assertStudentExists, assertTeacherExists };
 

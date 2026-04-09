@@ -304,10 +304,6 @@ export class AdminService {
     }
   }
 
-  async updateTeacherDormAccess(id: string, body: Record<string, unknown>) {
-    return this.updateTeacher(id, body);
-  }
-
   async updateTeacherStatus(id: string, body: Record<string, unknown>) {
     const isActive = parseBoolean(body.isActive);
 

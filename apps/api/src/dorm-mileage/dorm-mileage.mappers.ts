@@ -1,4 +1,11 @@
 import { DormMileageType, type Prisma } from '@prisma/client';
+import {
+  buildClassMileageSummary as buildSharedClassMileageSummary,
+  buildStudentMileageSummary as buildSharedStudentMileageSummary,
+  calculateStudentGrade as calculateSharedStudentGrade,
+  compareStudentIdentity,
+  compareStudentMileageSummary as compareSharedStudentMileageSummary,
+} from '../common/mileage-summary';
 import type {
   ClassMileageSummary,
   DormMileageApiType,
@@ -18,32 +25,7 @@ export function toPrismaDormMileageType(type: DormMileageApiType) {
 }
 
 export function calculateStudentGrade(studentId: string, currentYear: number) {
-  const match = /^[A-Za-z]{2}(\d{2})/.exec(studentId);
-
-  if (!match) {
-    return null;
-  }
-
-  const admissionYearSuffix = Number.parseInt(match[1], 10);
-
-  if (Number.isNaN(admissionYearSuffix)) {
-    return null;
-  }
-
-  const currentCentury = Math.floor(currentYear / 100) * 100;
-  let admissionYear = currentCentury + admissionYearSuffix;
-
-  if (admissionYear > currentYear) {
-    admissionYear -= 100;
-  }
-
-  const grade = currentYear - admissionYear + 1;
-
-  if (grade < 1 || grade > 3) {
-    return null;
-  }
-
-  return grade;
+  return calculateSharedStudentGrade(studentId, currentYear);
 }
 
 export function mapStudentSummary(student: {
@@ -66,19 +48,14 @@ export function compareStudentSummary(
   left: StudentSummary,
   right: StudentSummary,
 ) {
-  return (
-    compareNullableNumber(left.grade, right.grade) ||
-    left.classNumber - right.classNumber ||
-    left.studentNumber - right.studentNumber ||
-    left.name.localeCompare(right.name, 'ko')
-  );
+  return compareStudentIdentity(left, right);
 }
 
 export function compareStudentMileageSummary(
   left: StudentMileageSummary,
   right: StudentMileageSummary,
 ) {
-  return compareStudentSummary(left, right);
+  return compareSharedStudentMileageSummary(left, right);
 }
 
 export function mapHistoryEntry(entry: HistoryEntryRecord) {
@@ -144,63 +121,14 @@ export function buildStudentMileageSummary(
   student: StudentSummary,
   entries: Array<{ type: DormMileageType; score: number }>,
 ): StudentMileageSummary {
-  let rewardTotal = 0;
-  let penaltyTotal = 0;
-
-  for (const entry of entries) {
-    if (entry.type === 'REWARD') {
-      rewardTotal += entry.score;
-    } else {
-      penaltyTotal += entry.score;
-    }
-  }
-
-  return {
-    ...student,
-    rewardTotal,
-    penaltyTotal,
-    netScore: rewardTotal - penaltyTotal,
-    entryCount: entries.length,
-  };
+  return buildSharedStudentMileageSummary(student, entries);
 }
 
 export function buildClassMileageSummary(
   classNumber: number,
   studentSummaries: StudentMileageSummary[],
 ): ClassMileageSummary {
-  const rewardTotal = studentSummaries.reduce(
-    (acc, student) => acc + student.rewardTotal,
-    0,
-  );
-  const penaltyTotal = studentSummaries.reduce(
-    (acc, student) => acc + student.penaltyTotal,
-    0,
-  );
-  const netScore = rewardTotal - penaltyTotal;
-  const avgNetScore =
-    studentSummaries.length > 0
-      ? Math.round((netScore / studentSummaries.length) * 10) / 10
-      : 0;
-  const rankedStudents = studentSummaries.filter(
-    (student) => student.entryCount > 0,
-  );
-  const sortedByNetScore = [...rankedStudents].sort(
-    (left, right) =>
-      right.netScore - left.netScore ||
-      compareStudentMileageSummary(left, right),
-  );
-
-  return {
-    classNumber,
-    studentCount: studentSummaries.length,
-    rewardTotal,
-    penaltyTotal,
-    netScore,
-    avgNetScore,
-    topStudents: sortedByNetScore.slice(0, 3),
-    bottomStudents:
-      sortedByNetScore.length > 3 ? sortedByNetScore.slice(-3).reverse() : [],
-  };
+  return buildSharedClassMileageSummary(classNumber, studentSummaries);
 }
 
 export const dormMileageEntrySelect = {
@@ -237,19 +165,3 @@ export const dormMileageEntrySelect = {
     },
   },
 } satisfies Prisma.DormMileageEntrySelect;
-
-function compareNullableNumber(left: number | null, right: number | null) {
-  if (left === right) {
-    return 0;
-  }
-
-  if (left === null) {
-    return 1;
-  }
-
-  if (right === null) {
-    return -1;
-  }
-
-  return left - right;
-}

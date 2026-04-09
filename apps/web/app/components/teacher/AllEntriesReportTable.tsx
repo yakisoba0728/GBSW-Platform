@@ -1,22 +1,11 @@
 'use client'
 
-type SharedHistoryItem = {
-  id: number
-  type: 'reward' | 'penalty'
-  score: number
-  awardedAt: string
-  ruleCategory: string
-  ruleName: string
-  studentName: string
-  classNumber: number
-  studentNumber: number
-  teacherName: string
-}
+import type { SharedReportHistoryItem } from './shared-mileage-types'
 
 export default function AllEntriesReportTable({
   entries,
 }: {
-  entries: SharedHistoryItem[]
+  entries: SharedReportHistoryItem[]
 }) {
   return (
     <table className="w-full text-xs">

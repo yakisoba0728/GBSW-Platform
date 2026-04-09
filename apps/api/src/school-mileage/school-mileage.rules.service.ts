@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { throwMileageRuleConflictIfNeeded } from '../common/rule-conflicts';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   assertSuperAdmin,
@@ -128,7 +129,7 @@ export class SchoolMileageRulesService {
         },
       });
     } catch (error) {
-      throwRuleConflictIfNeeded(error);
+      throwMileageRuleConflictIfNeeded(error);
       throw error;
     }
 
@@ -229,7 +230,7 @@ export class SchoolMileageRulesService {
           continue;
         }
 
-        throwRuleConflictIfNeeded(error);
+        throwMileageRuleConflictIfNeeded(error);
         throw error;
       }
     }
@@ -298,15 +299,4 @@ function mapRuleSummary(rule: {
     displayOrder: rule.displayOrder,
     isActive: rule.isActive,
   };
-}
-
-function throwRuleConflictIfNeeded(error: unknown): asserts error is never {
-  if (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === 'P2002'
-  ) {
-    throw new ConflictException(
-      '같은 유형의 카테고리/항목명이 이미 존재합니다.',
-    );
-  }
 }

@@ -3,11 +3,23 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { FieldBlock, formatPhoneNumberInput, inputBase, inputBaseStyle } from '@/app/admin/components/account-form-shared'
+import {
+  AccountPageIntro,
+  AdminPanel,
+  DormBadge,
+  MetricChip,
+  StatusBadge,
+  filterLabelStyle,
+  monoCellStyle,
+  textCellStyle,
+} from '@/app/components/admin/account-ui-shared'
 import { Button } from '@/app/components/ui/button'
 import { EditIcon, SearchIcon, UserPlusCompactIcon } from '@/app/components/ui/icons'
 import { ListSkeleton } from '@/app/components/ui/list'
 import { Modal, ModalFooter } from '@/app/components/ui/modal'
 import { NoticeBox } from '@/app/components/ui/notice'
+import { RefetchWrapper } from '@/app/components/ui/primitives'
+import { useLoadingGate } from '@/app/components/ui/useLoadingGate'
 
 type TeacherRecord = {
   teacherId: string
@@ -37,6 +49,8 @@ export default function AdminTeacherList() {
   const [filters, setFilters] = useState<TeacherFilters>(INITIAL_FILTERS)
   const [teachers, setTeachers] = useState<TeacherRecord[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
+  const showLoading = useLoadingGate({ active: isLoading && !hasLoadedOnce })
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<{
     type: 'success' | 'error'
@@ -57,6 +71,7 @@ export default function AdminTeacherList() {
   )
 
   async function loadTeachers(nextFilters: TeacherFilters) {
+    let didLoadSuccessfully = false
     setIsLoading(true)
     setError(null)
 
@@ -84,10 +99,14 @@ export default function AdminTeacherList() {
       }
 
       setTeachers(Array.isArray(payload?.teachers) ? payload.teachers : [])
+      didLoadSuccessfully = true
     } catch {
       setError('교사 목록 조회 중 문제가 발생했습니다.')
     } finally {
       setIsLoading(false)
+      if (didLoadSuccessfully) {
+        setHasLoadedOnce(true)
+      }
     }
   }
 
@@ -234,26 +253,10 @@ export default function AdminTeacherList() {
   return (
     <div className="space-y-6">
       <section className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <h2
-            className="text-base font-semibold"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              color: 'var(--fg)',
-            }}
-          >
-            교사 관리
-          </h2>
-          <p
-            className="mt-1 text-xs"
-            style={{
-              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-              color: 'var(--fg-muted)',
-            }}
-          >
-            교사 계정을 검색하고, 사감 권한과 활성 상태를 함께 관리할 수 있습니다.
-          </p>
-        </div>
+        <AccountPageIntro
+          title="교사 관리"
+          description="교사 계정을 검색하고, 사감 권한과 활성 상태를 함께 관리할 수 있습니다."
+        />
 
         <div className="flex flex-wrap items-center gap-2">
           <MetricChip label="전체" value={teachers.length} />
@@ -278,13 +281,7 @@ export default function AdminTeacherList() {
         />
       )}
 
-      <section
-        className="rounded-2xl border p-4"
-        style={{
-          borderColor: 'var(--border)',
-          backgroundColor: 'var(--bg)',
-        }}
-      >
+      <AdminPanel>
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.6fr)_180px_auto]">
           <div>
             <label className={filterLabelStyle}>검색</label>
@@ -338,112 +335,110 @@ export default function AdminTeacherList() {
             </Button>
           </div>
         </div>
-      </section>
+      </AdminPanel>
 
-      <section
-        className="overflow-hidden rounded-2xl border"
-        style={{
-          borderColor: 'var(--border)',
-          backgroundColor: 'var(--bg)',
-        }}
-      >
+      <AdminPanel padded={false}>
         <div className="overflow-x-auto">
-          <table className="min-w-[860px] w-full text-sm" style={{ borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['아이디', '이름', '전화번호', '사감 교사', '상태', '작업'].map((label) => (
-                  <th
-                    key={label}
-                    scope="col"
-                    className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-widest"
-                    style={{
-                      color: 'var(--fg-muted)',
-                      fontFamily: 'var(--font-space-grotesk)',
-                    }}
-                  >
-                    {label}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-5">
-                    <ListSkeleton count={5} rowHeight="h-11" />
-                  </td>
+          {showLoading && (
+            <div className="px-4 py-5">
+              <ListSkeleton count={5} rowHeight="h-11" />
+            </div>
+          )}
+          <RefetchWrapper
+            isFetching={isLoading && hasLoadedOnce}
+            isInitialLoad={showLoading}
+          >
+            <table className="min-w-[860px] w-full text-sm" style={{ borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  {['아이디', '이름', '전화번호', '사감 교사', '상태', '작업'].map((label) => (
+                    <th
+                      key={label}
+                      scope="col"
+                      className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-widest"
+                      style={{
+                        color: 'var(--fg-muted)',
+                        fontFamily: 'var(--font-space-grotesk)',
+                      }}
+                    >
+                      {label}
+                    </th>
+                  ))}
                 </tr>
-              ) : error ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-10">
-                    <NoticeBox type="error" message={error} />
-                  </td>
-                </tr>
-              ) : teachers.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-4 py-14 text-center text-sm"
-                    style={{
-                      color: 'var(--fg-muted)',
-                      fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-                    }}
-                  >
-                    조건에 맞는 교사 계정이 없습니다.
-                  </td>
-                </tr>
-              ) : (
-                teachers.map((teacher) => (
-                  <tr
-                    key={teacher.teacherId}
-                    style={{
-                      borderBottom: '1px solid var(--border)',
-                      opacity: teacher.isActive ? 1 : 0.7,
-                    }}
-                  >
-                    <td className="px-4 py-3 text-xs" style={monoCellStyle}>
-                      {teacher.teacherId}
-                    </td>
-                    <td className="px-4 py-3 text-[13px] font-medium" style={textCellStyle}>
-                      {teacher.name}
-                    </td>
-                    <td className="px-4 py-3 text-xs" style={monoCellStyle}>
-                      {formatPhoneNumberInput(teacher.phone)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <DormBadge enabled={teacher.isDormTeacher} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge isActive={teacher.isActive} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          icon={<EditIcon />}
-                          onClick={() => openEditModal(teacher)}
-                        >
-                          수정
-                        </Button>
-                        <Button
-                          variant={teacher.isActive ? 'danger' : 'accent'}
-                          size="sm"
-                          loading={statusUpdatingId === teacher.teacherId}
-                          disabled={statusUpdatingId === teacher.teacherId}
-                          onClick={() => void toggleTeacherStatus(teacher)}
-                        >
-                          {teacher.isActive ? '비활성화' : '활성화'}
-                        </Button>
-                      </div>
+              </thead>
+              <tbody>
+                {error ? (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-10">
+                      <NoticeBox type="error" message={error} />
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : teachers.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-4 py-14 text-center text-sm"
+                      style={{
+                        color: 'var(--fg-muted)',
+                        fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+                      }}
+                    >
+                      조건에 맞는 교사 계정이 없습니다.
+                    </td>
+                  </tr>
+                ) : (
+                  teachers.map((teacher) => (
+                    <tr
+                      key={teacher.teacherId}
+                      style={{
+                        borderBottom: '1px solid var(--border)',
+                        opacity: teacher.isActive ? 1 : 0.7,
+                      }}
+                    >
+                      <td className="px-4 py-3 text-xs" style={monoCellStyle}>
+                        {teacher.teacherId}
+                      </td>
+                      <td className="px-4 py-3 text-[13px] font-medium" style={textCellStyle}>
+                        {teacher.name}
+                      </td>
+                      <td className="px-4 py-3 text-xs" style={monoCellStyle}>
+                        {formatPhoneNumberInput(teacher.phone)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <DormBadge enabled={teacher.isDormTeacher} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <StatusBadge isActive={teacher.isActive} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            icon={<EditIcon />}
+                            onClick={() => openEditModal(teacher)}
+                          >
+                            수정
+                          </Button>
+                          <Button
+                            variant={teacher.isActive ? 'danger' : 'accent'}
+                            size="sm"
+                            loading={statusUpdatingId === teacher.teacherId}
+                            disabled={statusUpdatingId === teacher.teacherId}
+                            onClick={() => void toggleTeacherStatus(teacher)}
+                          >
+                            {teacher.isActive ? '비활성화' : '활성화'}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </RefetchWrapper>
         </div>
-      </section>
+      </AdminPanel>
 
       <Modal
         open={editingTeacher !== null && editForm !== null}
@@ -515,75 +510,3 @@ export default function AdminTeacherList() {
     </div>
   )
 }
-
-function MetricChip({
-  label,
-  value,
-  accent = false,
-}: {
-  label: string
-  value: number
-  accent?: boolean
-}) {
-  return (
-    <div
-      className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs"
-      style={{
-        borderColor: accent ? 'var(--accent-border)' : 'var(--border)',
-        backgroundColor: accent ? 'var(--accent-subtle)' : 'var(--bg)',
-        color: accent ? 'var(--accent)' : 'var(--fg-muted)',
-        fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-      }}
-    >
-      <span>{label}</span>
-      <strong style={{ color: 'var(--fg)' }}>{value}</strong>
-    </div>
-  )
-}
-
-function DormBadge({ enabled }: { enabled: boolean }) {
-  return (
-    <span
-      className="inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold"
-      style={{
-        fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-        backgroundColor: enabled
-          ? 'rgba(59,130,246,0.12)'
-          : 'rgba(148,163,184,0.18)',
-        color: enabled ? '#1d4ed8' : 'var(--fg-muted)',
-      }}
-    >
-      {enabled ? '사용' : '미사용'}
-    </span>
-  )
-}
-
-function StatusBadge({ isActive }: { isActive: boolean }) {
-  return (
-    <span
-      className="inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold"
-      style={{
-        fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-        backgroundColor: isActive
-          ? 'rgba(34,197,94,0.12)'
-          : 'rgba(148,163,184,0.18)',
-        color: isActive ? '#15803d' : 'var(--fg-muted)',
-      }}
-    >
-      {isActive ? '활성' : '비활성'}
-    </span>
-  )
-}
-
-const filterLabelStyle =
-  'mb-1.5 block text-xs font-medium text-[var(--fg-muted)]'
-
-const monoCellStyle = {
-  color: 'var(--fg-muted)',
-  fontFamily: 'var(--font-space-grotesk)',
-} satisfies React.CSSProperties
-
-const textCellStyle = {
-  color: 'var(--fg)',
-  fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-} satisfies React.CSSProperties

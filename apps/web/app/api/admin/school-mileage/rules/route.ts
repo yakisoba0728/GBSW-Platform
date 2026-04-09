@@ -1,10 +1,15 @@
-import { NextRequest } from 'next/server'
+import {
+  createMethodProxyHandler,
+  createStaticProxyHandler,
+} from '@/lib/api-route-handlers'
 import { proxyAdminMileageGetRequest, proxyAdminMileageWriteRequest } from '@/lib/admin-api'
 
-export async function GET(request: NextRequest) {
-  return proxyAdminMileageGetRequest(request, '/school-mileage/rules')
-}
-
-export async function POST(request: NextRequest) {
-  return proxyAdminMileageWriteRequest(request, '/school-mileage/rules', 'POST')
-}
+export const GET = createStaticProxyHandler(
+  proxyAdminMileageGetRequest,
+  '/school-mileage/rules',
+)
+export const POST = createMethodProxyHandler(
+  proxyAdminMileageWriteRequest,
+  '/school-mileage/rules',
+  'POST',
+)

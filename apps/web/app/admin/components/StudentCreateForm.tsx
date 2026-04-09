@@ -19,14 +19,17 @@ import {
   formatPhoneNumberInput,
   STUDENT_INITIAL,
 } from './account-form-shared'
-import SuccessModal from '@/app/components/ui/success-modal'
+import {
+  AccountPageIntro,
+  AccountResultModal,
+  buildCreationResultDescription,
+  CLOSED_ACCOUNT_MODAL,
+} from '@/app/components/admin/account-ui-shared'
 
 export default function StudentCreateForm() {
   const [student, setStudent] = useState<StudentFormState>(STUDENT_INITIAL)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [modal, setModal] = useState<{
-    open: boolean; type: 'success' | 'error'; title: string; description: string
-  }>({ open: false, type: 'success', title: '', description: '' })
+  const [modal, setModal] = useState(CLOSED_ACCOUNT_MODAL)
   const [majorSubjectOptions, setMajorSubjectOptions] = useState<string[]>([])
   const [majorSubjectDraft, setMajorSubjectDraft] = useState('')
 
@@ -181,11 +184,11 @@ export default function StudentCreateForm() {
         open: true,
         type: 'success',
         title: '학생 계정 생성 완료',
-        description: [
-          payload?.message ?? '학생 계정이 생성되었습니다.',
-          `아이디: ${payload?.student?.studentId ?? studentId}`,
-          `임시 비밀번호: ${payload?.student?.temporaryPassword ?? ''}`,
-        ].join('\n'),
+        description: buildCreationResultDescription({
+          message: payload?.message ?? '학생 계정이 생성되었습니다.',
+          accountId: payload?.student?.studentId ?? studentId,
+          temporaryPassword: payload?.student?.temporaryPassword ?? '',
+        }),
       })
     } catch {
       setModal({
@@ -202,26 +205,10 @@ export default function StudentCreateForm() {
   return (
     <div className="max-w-[640px]">
       <div className="mb-7">
-        <h2
-          className="text-base font-semibold"
-          style={{
-            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            color: 'var(--fg)',
-          }}
-        >
-          학생 계정 생성
-        </h2>
-        <p
-          className="mt-1 text-xs"
-          style={{
-            fontFamily: 'var(--font-noto-sans-kr), sans-serif',
-            color: 'var(--fg-muted)',
-          }}
-        >
-          학생 아이디 생성 정보로 아이디를 만들고, 현재 년도/반/번호와
-          전공과목을 저장합니다. 임시 비밀번호는 계정 생성 직후 한 번만
-          표시되므로 반드시 복사해 두세요.
-        </p>
+        <AccountPageIntro
+          title="학생 계정 생성"
+          description="학생 아이디 생성 정보로 아이디를 만들고, 현재 년도/반/번호와 전공과목을 저장합니다. 임시 비밀번호는 계정 생성 직후 한 번만 표시되므로 반드시 복사해 두세요."
+        />
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -536,13 +523,9 @@ export default function StudentCreateForm() {
         />
       </form>
 
-      <SuccessModal
-        open={modal.open}
+      <AccountResultModal
+        modal={modal}
         onClose={() => setModal((prev) => ({ ...prev, open: false }))}
-        type={modal.type}
-        title={modal.title}
-        description={modal.description}
-        autoCloseMs={modal.type === 'success' ? 0 : 3000}
       />
     </div>
   )

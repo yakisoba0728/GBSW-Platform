@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Ip, Post } from '@nestjs/common';
+import { Body, Controller, Headers, Post } from '@nestjs/common';
 import { assertInternalApiRequest } from '../common/internal-api-auth';
 import { AuthService } from './auth.service';
 
@@ -9,12 +9,9 @@ export class AuthController {
   @Post('login')
   login(
     @Headers('x-real-ip') realIp: string | undefined,
-    @Ip() requestIp: string | undefined,
     @Body() body: Record<string, unknown>,
   ) {
-    return this.authService.login(body, {
-      realIp: realIp ?? requestIp,
-    });
+    return this.authService.login(body, { realIp });
   }
 
   @Post('change-password')

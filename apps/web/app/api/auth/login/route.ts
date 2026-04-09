@@ -75,6 +75,12 @@ export async function POST(request: NextRequest) {
   }
 }
 
+function forwardHeaderValue(name: 'x-real-ip', request: NextRequest) {
+  const value = request.headers.get(name)?.trim()
+
+  return value && value.length > 0 ? value : null
+}
+
 function getErrorMessage(payload: unknown, fallback: string) {
   if (
     payload &&
@@ -87,12 +93,6 @@ function getErrorMessage(payload: unknown, fallback: string) {
   }
 
   return fallback
-}
-
-function forwardHeaderValue(name: 'x-real-ip', request: NextRequest) {
-  const value = request.headers.get(name)?.trim()
-
-  return value && value.length > 0 ? value : null
 }
 
 function parseAuthSession(value: unknown): {

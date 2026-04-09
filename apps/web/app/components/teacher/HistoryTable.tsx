@@ -9,9 +9,22 @@ import {
 import { EditIcon, SearchIcon, TrashIcon } from '../ui/icons'
 import Tooltip from '../ui/tooltip'
 import { IconButton, MileageBadge, Pagination, RefetchWrapper } from '../ui/primitives'
-import type { SchoolMileageHistoryItem } from './school-mileage-types'
+import type { SharedMileageHistoryItem } from './shared-mileage-types'
 
-export default function HistoryTable({
+type Props<T extends SharedMileageHistoryItem> = {
+  items: T[]
+  isLoading: boolean
+  isFetching: boolean
+  page: number
+  pageCount: number
+  totalCount: number
+  onEdit?: (item: T) => void
+  onDelete?: (item: T) => void
+  onPageChange: (page: number) => void
+  animated?: boolean
+}
+
+export default function HistoryTable<T extends SharedMileageHistoryItem>({
   items,
   isLoading,
   isFetching,
@@ -22,18 +35,7 @@ export default function HistoryTable({
   onDelete,
   onPageChange,
   animated = true,
-}: {
-  items: SchoolMileageHistoryItem[]
-  isLoading: boolean
-  isFetching: boolean
-  page: number
-  pageCount: number
-  totalCount: number
-  onEdit?: (item: SchoolMileageHistoryItem) => void
-  onDelete?: (item: SchoolMileageHistoryItem) => void
-  onPageChange: (page: number) => void
-  animated?: boolean
-  }) {
+}: Props<T>) {
   return (
     <>
       <div className="relative hidden min-h-0 flex-1 overflow-x-auto overflow-y-auto md:block">
@@ -139,7 +141,8 @@ export default function HistoryTable({
                         </p>
                       </div>
                       <p className="mt-0.5 truncate text-[11px]" style={{ color: 'var(--fg-muted)' }}>
-                        {getSchoolLabel(item.school)} · {item.studentId}
+                        {item.school ? `${getSchoolLabel(item.school)} · ` : ''}
+                        {item.studentId}
                       </p>
                     </td>
 

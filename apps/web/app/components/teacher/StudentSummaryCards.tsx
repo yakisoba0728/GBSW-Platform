@@ -3,13 +3,13 @@
 import { motion } from 'framer-motion'
 import { Card, ScoreSummaryBar, StatCard } from '../mileage/shared'
 import { LoadingSpinner } from '../ui/list'
-import type { StudentMileageSummary } from './school-mileage-types'
+import type { SharedStudentMileageSummary } from './shared-mileage-types'
 
 export default function StudentSummaryCards({
   summary,
   isLoading,
 }: {
-  summary: StudentMileageSummary | null
+  summary: SharedStudentMileageSummary | null
   isLoading: boolean
 }) {
   if (isLoading) {

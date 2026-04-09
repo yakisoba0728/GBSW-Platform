@@ -11,6 +11,46 @@ export const rootDir = path.resolve(
 const envPath = path.join(rootDir, '.env');
 const envExamplePath = path.join(rootDir, '.env.example');
 
+export function resolveDirectApiOrigin(value, sourceName) {
+  let url;
+
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error(`${sourceName} must be an absolute URL.`);
+  }
+
+  const normalizedPathname = url.pathname.replace(/\/+$/, '') || '/';
+
+  if (normalizedPathname !== '/') {
+    throw new Error(
+      `${sourceName} must point directly to the Nest API origin and cannot include the path "${normalizedPathname}".`,
+    );
+  }
+
+  return url.origin;
+}
+
+export function readOptionalDirectApiOrigin(name) {
+  const value = process.env[name]?.trim();
+
+  if (!value) {
+    return undefined;
+  }
+
+  return resolveDirectApiOrigin(value, name);
+}
+
+export function readRequiredDirectApiOrigin(name, envFilePath = envPath) {
+  const value = process.env[name]?.trim();
+
+  if (!value) {
+    throw new Error(`${name} must be set in ${envFilePath}`);
+  }
+
+  return resolveDirectApiOrigin(value, name);
+}
+
 export function ensureEnvFile() {
   if (fs.existsSync(envPath)) {
     return;
@@ -24,8 +64,12 @@ export function loadEnv() {
   ensureEnvFile();
   dotenv.config({ path: envPath, quiet: true });
 
+  const apiInternalUrl = readOptionalDirectApiOrigin('API_INTERNAL_URL');
+  const publicApiUrl = readOptionalDirectApiOrigin('NEXT_PUBLIC_API_URL');
+
   return {
     apiPort: parsePort('API_PORT', 3001),
+    apiInternalUrl,
     envPath,
     pgAdminEmail: process.env.PGADMIN_DEFAULT_EMAIL ?? 'admin@gbsw.com',
     pgAdminPort: parsePort('PGADMIN_PORT', 5050),
@@ -34,6 +78,7 @@ export function loadEnv() {
     postgresPassword: process.env.POSTGRES_PASSWORD ?? 'gbsw',
     postgresPort: parsePort('POSTGRES_PORT', 5432),
     postgresUser: process.env.POSTGRES_USER ?? 'gbsw',
+    publicApiUrl,
     webPort: parsePort('WEB_PORT', 3000),
   };
 }

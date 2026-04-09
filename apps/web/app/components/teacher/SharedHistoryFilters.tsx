@@ -1,0 +1,160 @@
+'use client'
+
+import { Filter } from 'lucide-react'
+import { Button } from '../ui/button'
+import { Card, SCHOOL_OPTIONS, inputStyle } from '../mileage/shared'
+
+type SharedHistoryFiltersState = {
+  school?: string
+  type: string
+  year: string
+  startDate: string
+  endDate: string
+  studentName: string
+}
+
+function activeInputStyle(active: boolean) {
+  return active
+    ? { ...inputStyle, borderColor: 'var(--accent)' }
+    : inputStyle
+}
+
+export default function SharedHistoryFilters({
+  filters,
+  hasActiveFilters,
+  hasSchoolFilter = false,
+  onSchoolChange,
+  onTypeChange,
+  onYearChange,
+  onStartDateChange,
+  onEndDateChange,
+  onStudentNameChange,
+  onReset,
+}: {
+  filters: SharedHistoryFiltersState
+  hasActiveFilters: boolean
+  hasSchoolFilter?: boolean
+  onSchoolChange?: (value: string) => void
+  onTypeChange: (value: string) => void
+  onYearChange: (value: string) => void
+  onStartDateChange: (value: string) => void
+  onEndDateChange: (value: string) => void
+  onStudentNameChange: (value: string) => void
+  onReset: () => void
+}) {
+  return (
+    <Card>
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-shrink-0 items-center gap-1.5">
+          <Filter size={12} strokeWidth={2} style={{ color: 'var(--fg-muted)' }} aria-hidden="true" />
+          <span
+            className="text-xs font-semibold"
+            style={{
+              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+              color: 'var(--fg-muted)',
+            }}
+          >
+            필터
+          </span>
+        </div>
+        <div
+          className="h-4 w-px flex-shrink-0"
+          style={{ backgroundColor: 'var(--border)' }}
+        />
+
+        {hasSchoolFilter && onSchoolChange && (
+          <select
+            value={filters.school ?? ''}
+            onChange={(event) => onSchoolChange(event.target.value)}
+            className="h-8 rounded-md border pl-2.5 pr-6 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+            style={activeInputStyle(!!filters.school)}
+          >
+            <option value="">전체 학교</option>
+            {SCHOOL_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        )}
+
+        <select
+          value={filters.type}
+          onChange={(event) => onTypeChange(event.target.value)}
+          className="h-8 rounded-md border pl-2.5 pr-6 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+          style={activeInputStyle(!!filters.type)}
+        >
+          <option value="">전체 구분</option>
+          <option value="reward">상점</option>
+          <option value="penalty">벌점</option>
+        </select>
+
+        <select
+          value={filters.year}
+          onChange={(event) => onYearChange(event.target.value)}
+          className="h-8 rounded-md border pl-2.5 pr-6 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+          style={activeInputStyle(!!filters.year)}
+        >
+          <option value="">전체 학년</option>
+          <option value="1">1학년</option>
+          <option value="2">2학년</option>
+          <option value="3">3학년</option>
+        </select>
+
+        <div
+          className="flex h-8 items-center gap-1.5 rounded-md border px-2.5"
+          style={activeInputStyle(!!(filters.startDate || filters.endDate))}
+        >
+          <input
+            type="date"
+            value={filters.startDate}
+            onChange={(event) => onStartDateChange(event.target.value)}
+            className="bg-transparent py-1.5 text-xs outline-none"
+            style={{
+              color: 'var(--fg)',
+              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+              minWidth: 0,
+              width: '112px',
+            }}
+          />
+          <span
+            style={{
+              color: 'var(--fg-muted)',
+              fontSize: '0.7rem',
+              flexShrink: 0,
+            }}
+          >
+            ~
+          </span>
+          <input
+            type="date"
+            value={filters.endDate}
+            onChange={(event) => onEndDateChange(event.target.value)}
+            className="bg-transparent py-1.5 text-xs outline-none"
+            style={{
+              color: 'var(--fg)',
+              fontFamily: 'var(--font-noto-sans-kr), sans-serif',
+              minWidth: 0,
+              width: '112px',
+            }}
+          />
+        </div>
+
+        <input
+          type="text"
+          value={filters.studentName}
+          onChange={(event) => onStudentNameChange(event.target.value)}
+          placeholder="학생 이름"
+          className="h-8 rounded-md border px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+          style={{ ...activeInputStyle(!!filters.studentName), width: '100px' }}
+        />
+
+        {hasActiveFilters && (
+          <div className="ml-auto">
+            <Button variant="accent" size="sm" onClick={onReset}>초기화</Button>
+          </div>
+        )}
+      </div>
+    </Card>
+  )
+}

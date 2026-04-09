@@ -1,15 +1,9 @@
-import { NextRequest } from 'next/server'
+import { createParamMethodProxyHandler } from '@/lib/api-route-handlers'
 import { proxyAdminRequest } from '@/lib/admin-api'
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { id } = await params
-
-  return proxyAdminRequest(
-    request,
-    `/admin/teachers/${encodeURIComponent(id)}/deactivate`,
-    'PATCH',
-  )
-}
+export const PATCH = createParamMethodProxyHandler(
+  'id',
+  (id) => `/admin/teachers/${id}/deactivate`,
+  proxyAdminRequest,
+  'PATCH',
+)

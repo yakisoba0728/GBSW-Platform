@@ -11,16 +11,21 @@ import { Button } from '../ui/button'
 import type { SchoolCode } from './school-mileage-types'
 
 type Props = {
-  filterSchool: SchoolCode | ''
+  filterSchool?: SchoolCode | ''
   filterGrade: string
   filterClass: string
   filterName: string
-  onSchoolChange: (value: string) => void
+  onSchoolChange?: (value: string) => void
   onGradeChange: (value: string) => void
   onClassChange: (value: string) => void
   onNameChange: (value: string) => void
   onReload: () => void
   isLoading: boolean
+  showSchoolFilter?: boolean
+  title?: string
+  subtitle?: string
+  emptySchoolValueLabel?: string
+  disableReload?: boolean
 }
 
 export default function StudentSearchPanel({
@@ -34,28 +39,35 @@ export default function StudentSearchPanel({
   onNameChange,
   onReload,
   isLoading,
+  showSchoolFilter = true,
+  title = '학생별 조회',
+  subtitle = '학생을 검색하고 선택하면 누적 상벌점 요약과 처리 내역을 확인할 수 있습니다.',
+  emptySchoolValueLabel = '학교 선택',
+  disableReload = false,
 }: Props) {
   return (
     <Card>
       <SectionHeader
-        title="학생별 조회"
-        subtitle="학생을 검색하고 선택하면 누적 상벌점 요약과 처리 내역을 확인할 수 있습니다."
+        title={title}
+        subtitle={subtitle}
       />
       <div className="mt-4">
         <FilterRow>
-          <select
-            value={filterSchool}
-            onChange={(event) => onSchoolChange(event.target.value)}
-            className="rounded-lg border px-3 py-2 text-xs outline-none"
-            style={inputStyle}
-          >
-            <option value="">학교 선택</option>
-            {SCHOOL_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          {showSchoolFilter && onSchoolChange && (
+            <select
+              value={filterSchool ?? ''}
+              onChange={(event) => onSchoolChange(event.target.value)}
+              className="rounded-lg border px-3 py-2 text-xs outline-none"
+              style={inputStyle}
+            >
+              <option value="">{emptySchoolValueLabel}</option>
+              {SCHOOL_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          )}
 
           <select
             value={filterGrade}
@@ -96,7 +108,7 @@ export default function StudentSearchPanel({
             variant="primary"
             size="sm"
             loading={isLoading}
-            disabled={!filterSchool || isLoading}
+            disabled={disableReload || isLoading}
             onClick={onReload}
           >
             새로고침

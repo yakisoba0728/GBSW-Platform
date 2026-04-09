@@ -28,7 +28,8 @@ process.on('SIGTERM', () => {
 
 try {
   await run('node', ['scripts/prepare-db.mjs']);
-  await ensureApiPortAvailable();
+  await ensurePortAvailable(config.apiPort, 'API', isStaleApiProcess);
+  await ensurePortAvailable(config.webPort, 'Web', isStaleWebProcess);
 
   startProcess('API', ['start:dev'], apiDir);
   startProcess(
@@ -97,27 +98,27 @@ function run(command, args) {
   });
 }
 
-async function ensureApiPortAvailable() {
-  const listeners = await getListeningProcesses(config.apiPort);
+async function ensurePortAvailable(port, label, isStaleProcess) {
+  const listeners = await getListeningProcesses(port);
 
   if (listeners.length === 0) {
     return;
   }
 
   for (const listener of listeners) {
-    if (!isStaleApiProcess(listener.command)) {
+    if (!isStaleProcess(listener.command)) {
       throw new Error(
-        `API port ${config.apiPort} is already in use by pid ${listener.pid}: ${listener.command}`,
+        `${label} port ${port} is already in use by pid ${listener.pid}: ${listener.command}`,
       );
     }
 
     console.log(
-      `Stopping stale API process on port ${config.apiPort} (pid ${listener.pid})...`,
+      `Stopping stale ${label} process on port ${port} (pid ${listener.pid})...`,
     );
     process.kill(listener.pid, 'SIGTERM');
   }
 
-  await waitForPortRelease(config.apiPort);
+  await waitForPortRelease(port);
 }
 
 async function getListeningProcesses(port) {
@@ -166,6 +167,14 @@ function isStaleApiProcess(command) {
     command.includes(
       `${rootDir}/apps/api/node_modules/.bin/../@nestjs/cli/bin/nest.js start --watch`,
     )
+  );
+}
+
+function isStaleWebProcess(command) {
+  return (
+    command.includes(`${rootDir}/apps/web`) &&
+    (command.includes('next/dist/bin/next') ||
+      command.includes(`${rootDir}/apps/web/server.js`))
   );
 }
 

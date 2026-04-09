@@ -50,6 +50,9 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        INTERNAL_API_SECRET: build-internal-secret
     restart: unless-stopped
     depends_on:
       api:

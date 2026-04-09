@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { proxyApiRequest } from './api-proxy'
+import { createRoleProxyRequest } from './api-proxy'
 
 type AdminPath =
   | '/admin/students'
@@ -79,16 +79,7 @@ export async function proxyAdminRequest(
   pathname: AdminPath,
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
 ) {
-  return proxyApiRequest(request, {
-    pathname,
-    method,
-    allowedRole: 'super-admin',
-    unauthorizedMessage: '최고관리자 로그인이 필요합니다.',
-    proxyFailureMessage: '관리자 요청을 처리하지 못했습니다.',
-    actorHeaders: (session) => ({
-      'x-actor-super-admin-id': session.accountId,
-    }),
-  })
+  return proxyAdminRoleRequest(request, pathname, method)
 }
 
 async function proxyAdminMileageRequest(
@@ -96,14 +87,23 @@ async function proxyAdminMileageRequest(
   pathname: AdminMileageGetPath | AdminMileageWritePath,
   method: 'GET' | 'POST' | 'PATCH',
 ) {
-  return proxyApiRequest(request, {
-    pathname,
-    method,
-    allowedRole: 'super-admin',
-    unauthorizedMessage: '최고관리자 로그인이 필요합니다.',
-    proxyFailureMessage: '상벌점 항목 요청을 처리하지 못했습니다.',
-    actorHeaders: (session) => ({
-      'x-actor-super-admin-id': session.accountId,
-    }),
-  })
+  return proxyAdminMileageRoleRequest(request, pathname, method)
 }
+
+const buildSuperAdminHeaders = (session: { accountId: string }) => ({
+  'x-actor-super-admin-id': session.accountId,
+})
+
+const proxyAdminRoleRequest = createRoleProxyRequest({
+  allowedRole: 'super-admin',
+  unauthorizedMessage: '최고관리자 로그인이 필요합니다.',
+  proxyFailureMessage: '관리자 요청을 처리하지 못했습니다.',
+  actorHeaders: buildSuperAdminHeaders,
+})
+
+const proxyAdminMileageRoleRequest = createRoleProxyRequest({
+  allowedRole: 'super-admin',
+  unauthorizedMessage: '최고관리자 로그인이 필요합니다.',
+  proxyFailureMessage: '상벌점 항목 요청을 처리하지 못했습니다.',
+  actorHeaders: buildSuperAdminHeaders,
+})

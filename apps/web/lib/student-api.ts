@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { proxyApiRequest } from './api-proxy'
+import { createRoleProxyRequest } from './api-proxy'
 
 type StudentPath =
   | '/school-mileage/my/summary'
@@ -13,14 +13,14 @@ export async function proxyStudentGetRequest(
   request: NextRequest,
   pathname: StudentPath,
 ) {
-  return proxyApiRequest(request, {
-    pathname,
-    method: 'GET',
-    allowedRole: 'student',
-    unauthorizedMessage: '학생 로그인이 필요합니다.',
-    proxyFailureMessage: '학생 상벌점 요청을 처리하지 못했습니다.',
-    actorHeaders: (session) => ({
-      'x-actor-student-id': session.accountId,
-    }),
-  })
+  return proxyStudentRoleRequest(request, pathname, 'GET')
 }
+
+const proxyStudentRoleRequest = createRoleProxyRequest({
+  allowedRole: 'student',
+  unauthorizedMessage: '학생 로그인이 필요합니다.',
+  proxyFailureMessage: '학생 상벌점 요청을 처리하지 못했습니다.',
+  actorHeaders: (session) => ({
+    'x-actor-student-id': session.accountId,
+  }),
+})

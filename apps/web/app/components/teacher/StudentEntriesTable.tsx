@@ -7,11 +7,11 @@ import {
   TableRowSkeleton,
 } from '../ui/list'
 import { Pagination } from '../ui/primitives'
-import type { SchoolMileageHistoryItem } from './school-mileage-types'
+import type { SharedMileageHistoryItem } from './shared-mileage-types'
 
 type Props = {
   studentName: string
-  entries: SchoolMileageHistoryItem[]
+  entries: SharedMileageHistoryItem[]
   isLoading: boolean
   totalEntryCount: number
   page: number

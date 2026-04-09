@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { proxyApiRequest } from './api-proxy'
+import { createRoleProxyRequest } from './api-proxy'
 
 type TeacherGetPath =
   | '/school-mileage/rules'
@@ -44,14 +44,14 @@ async function proxyTeacherRequest(
   pathname: TeacherGetPath | TeacherWritePath,
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
 ) {
-  return proxyApiRequest(request, {
-    pathname,
-    method,
-    allowedRole: 'teacher',
-    unauthorizedMessage: '교사 로그인이 필요합니다.',
-    proxyFailureMessage: '상벌점 요청을 처리하지 못했습니다.',
-    actorHeaders: (session) => ({
-      'x-actor-teacher-id': session.accountId,
-    }),
-  })
+  return proxyTeacherRoleRequest(request, pathname, method)
 }
+
+const proxyTeacherRoleRequest = createRoleProxyRequest({
+  allowedRole: 'teacher',
+  unauthorizedMessage: '교사 로그인이 필요합니다.',
+  proxyFailureMessage: '상벌점 요청을 처리하지 못했습니다.',
+  actorHeaders: (session) => ({
+    'x-actor-teacher-id': session.accountId,
+  }),
+})

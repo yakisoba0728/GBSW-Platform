@@ -1,9 +1,7 @@
-import { NextRequest } from 'next/server'
+import { createStaticProxyHandler } from '@/lib/api-route-handlers'
 import { proxyTeacherGetRequest } from '@/lib/teacher-api'
 
-export async function GET(request: NextRequest) {
-  return proxyTeacherGetRequest(
-    request,
-    '/school-mileage/analytics/classes',
-  )
-}
+export const GET = createStaticProxyHandler(
+  proxyTeacherGetRequest,
+  '/school-mileage/analytics/classes',
+)
