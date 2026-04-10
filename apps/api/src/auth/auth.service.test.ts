@@ -167,7 +167,9 @@ describe('AuthService.refreshOnboardingSession', () => {
       } as unknown as PrismaService['authSession'],
       student: {
         findFirst: vi.fn().mockResolvedValue({ school: 'GBSW' }),
-        findUnique: vi.fn().mockResolvedValue({ hasLinkedEmail: true, hasLinkedPhone: false }),
+        findUnique: vi
+          .fn()
+          .mockResolvedValue({ hasLinkedEmail: true, hasLinkedPhone: false }),
       } as unknown as PrismaService['student'],
     });
 
@@ -229,7 +231,8 @@ describe('AuthService.changePassword - mustChangePassword throttle bypass', () =
         create: sessionCreate,
       } as unknown as PrismaService['authSession'],
       student: {
-        findFirst: vi.fn()
+        findFirst: vi
+          .fn()
           .mockResolvedValueOnce({ school: 'GBSW' })
           .mockResolvedValueOnce({
             studentId: 'GB260101',
@@ -249,16 +252,20 @@ describe('AuthService.changePassword - mustChangePassword throttle bypass', () =
       } as unknown as PrismaService['loginThrottle'],
     });
 
-    await service.changePassword('sess1', {
-      currentPassword: undefined,
-      newPassword: 'NewPass123!',
-    }).catch(() => {
-      // Password verification will fail since we mock the hash — that's OK
-    });
+    await service
+      .changePassword('sess1', {
+        currentPassword: undefined,
+        newPassword: 'NewPass123!',
+      })
+      .catch(() => {
+        // Password verification will fail since we mock the hash — that's OK
+      });
 
     expect(findUnique).not.toHaveBeenCalledWith(
       expect.objectContaining({
-        where: expect.objectContaining({ key: expect.stringContaining('change-pwd') }),
+        where: expect.objectContaining({
+          key: expect.stringContaining('change-pwd'),
+        }),
       }),
     );
   });
@@ -338,9 +345,14 @@ describe('AuthService.linkEmail', () => {
         findFirst: vi.fn().mockResolvedValue({ school: 'GBSW' }),
         update: updateStudentFn,
       } as unknown as PrismaService['student'],
-      $transaction: vi.fn().mockImplementation((fn: (tx: unknown) => Promise<unknown>) =>
-        fn({ student: { update: updateStudentFn }, authSession: { update: updateSessionFn } }),
-      ),
+      $transaction: vi
+        .fn()
+        .mockImplementation((fn: (tx: unknown) => Promise<unknown>) =>
+          fn({
+            student: { update: updateStudentFn },
+            authSession: { update: updateSessionFn },
+          }),
+        ),
     } as unknown as PrismaService);
 
     const result = await service.linkEmail('sess1', {
@@ -387,9 +399,14 @@ describe('AuthService.linkPhone', () => {
         findFirst: vi.fn().mockResolvedValue({ teacherId: 'teacher1' }),
         update: updateTeacherFn,
       } as unknown as PrismaService['teacher'],
-      $transaction: vi.fn().mockImplementation((fn: (tx: unknown) => Promise<unknown>) =>
-        fn({ teacher: { update: updateTeacherFn }, authSession: { update: updateSessionFn } }),
-      ),
+      $transaction: vi
+        .fn()
+        .mockImplementation((fn: (tx: unknown) => Promise<unknown>) =>
+          fn({
+            teacher: { update: updateTeacherFn },
+            authSession: { update: updateSessionFn },
+          }),
+        ),
     } as unknown as PrismaService);
 
     const result = await service.linkPhone('sess1', { phone: '01012345678' });
@@ -415,7 +432,9 @@ describe('AuthService.createSession', () => {
       hasLinkedPhone: false,
       expiresAt: new Date(Date.now() + 3_600_000),
     });
-    const service = createAuthService({ authSession: { create } as unknown as PrismaService['authSession'] });
+    const service = createAuthService({
+      authSession: { create } as unknown as PrismaService['authSession'],
+    });
 
     await callPrivate(service, 'createSession', {
       accountId: 'student-1',
@@ -446,7 +465,9 @@ describe('AuthService.createSession', () => {
       hasLinkedPhone: false,
       expiresAt: new Date(Date.now() + 3_600_000),
     });
-    const service = createAuthService({ authSession: { create } as unknown as PrismaService['authSession'] });
+    const service = createAuthService({
+      authSession: { create } as unknown as PrismaService['authSession'],
+    });
 
     await callPrivate(service, 'createSession', {
       accountId: 'admin',

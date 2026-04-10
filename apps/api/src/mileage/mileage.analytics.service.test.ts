@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { PrismaService } from '../prisma/prisma.service';
 import { MileageAnalyticsService } from './mileage.analytics.service';
 
 describe('MileageAnalyticsService - zero mileage student inclusion', () => {
   it('includes students with no entries in the export result', async () => {
-    const service = new MileageAnalyticsService({
+    const prisma = {
       authSession: {
         findFirst: vi.fn().mockResolvedValue({ id: 'session-1' }),
       },
@@ -43,7 +44,9 @@ describe('MileageAnalyticsService - zero mileage student inclusion', () => {
           },
         ]),
       },
-    } as any);
+    } as unknown as PrismaService;
+
+    const service = new MileageAnalyticsService(prisma);
 
     vi.spyOn(service, 'getOverview').mockResolvedValue({
       summary: { totalCount: 1 },
@@ -60,7 +63,9 @@ describe('MileageAnalyticsService - zero mileage student inclusion', () => {
 
     expect(result.students).toHaveLength(2);
 
-    const zeroStudent = result.students.find((s: any) => s.studentId === 'GB240102');
+    const zeroStudent = result.students.find(
+      (s: { studentId: string }) => s.studentId === 'GB240102',
+    );
     expect(zeroStudent).toMatchObject({
       studentId: 'GB240102',
       rewardTotal: 0,

@@ -1105,10 +1105,10 @@ export default function AdminDbClient() {
 
         .admin-db-mobile-blocker {
           display: none;
-          align-items: center;
+          align-items: flex-start;
           justify-content: center;
           min-height: calc(100vh - 60px);
-          padding: 20px;
+          padding: max(64px, 8vh) 20px 40px;
         }
 
         .admin-db-mobile-blocker__card {

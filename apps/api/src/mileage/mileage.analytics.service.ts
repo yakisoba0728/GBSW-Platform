@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { MileageScope, MileageType, Prisma } from '@prisma/client';
 import {
   buildMileageEntryWhere,
-  buildMileageEntryWhereSql,
   buildMileageOverviewSummary,
   buildMileageSummaryFromTotals,
   buildStudentTotalsByStudentId,
@@ -25,10 +24,7 @@ import {
 } from './mileage.mappers';
 import { parseAnalyticsFilters } from './mileage.parsers';
 import { findStudentsByFilters } from './mileage.students.data';
-import type {
-  MileageApiType,
-  StudentMileageSummary,
-} from './mileage.types';
+import type { StudentMileageSummary } from './mileage.types';
 
 type OverviewAggregateRow = MileageOverviewSummary;
 type CategoryAggregateRow = MileageCategoryAggregateRow<MileageType>;
@@ -145,7 +141,6 @@ export class MileageAnalyticsService {
     );
 
     const summaries = students
-      .filter((student) => totalsByStudentId.has(student.studentId))
       .map((student) =>
         toStudentMileageSummary(
           student,
@@ -195,8 +190,7 @@ export class MileageAnalyticsService {
     const studentsByClassNumber = new Map<number, StudentMileageSummary[]>();
 
     for (const student of students) {
-      const nextStudents =
-        studentsByClassNumber.get(student.classNumber) ?? [];
+      const nextStudents = studentsByClassNumber.get(student.classNumber) ?? [];
       nextStudents.push(
         toStudentMileageSummary(
           student,
@@ -300,8 +294,7 @@ export class MileageAnalyticsService {
 
     const groupedEntries = await this.prisma.mileageEntry.groupBy({
       where: {
-        scope,
-        ...buildMileageEntryWhere(filters, studentIds),
+        ...buildMileageEntryWhere(scope, filters, studentIds),
       },
       by: ['studentId', 'type'],
       _count: {
@@ -379,9 +372,7 @@ function buildMileageEntryWhereSqlWithScope(
   }
 
   if (studentIds?.length) {
-    conditions.push(
-      Prisma.sql`e.student_id IN (${Prisma.join(studentIds)})`,
-    );
+    conditions.push(Prisma.sql`e.student_id IN (${Prisma.join(studentIds)})`);
   }
 
   return Prisma.sql`WHERE ${Prisma.join(conditions, ' AND ')}`;

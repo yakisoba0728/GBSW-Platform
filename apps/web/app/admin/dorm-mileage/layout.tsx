@@ -4,7 +4,7 @@ import { DormRulesProvider } from '@/app/components/mileage/rules-context'
 
 export default function AdminDormMileageLayout({ children }: { children: React.ReactNode }) {
   return (
-    <DormRulesProvider apiPath="/api/admin/dorm-mileage/rules">
+    <DormRulesProvider apiPath="/api/admin/dorm/rules">
       {children}
     </DormRulesProvider>
   )

@@ -1,0 +1,76 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - img [ref=e7]
+          - generic [ref=e8]:
+            - paragraph [ref=e9]: GBSW Platform
+            - paragraph [ref=e10]: 최고관리자
+        - navigation [ref=e11]:
+          - generic [ref=e12]:
+            - paragraph [ref=e13]: 계정 관리
+            - button "교사 관리" [ref=e14] [cursor=pointer]:
+              - img [ref=e16]
+              - generic [ref=e21]: 교사 관리
+              - img [ref=e23]
+            - generic [ref=e25]:
+              - link [ref=e26] [cursor=pointer]:
+                - /url: /admin/teachers/create
+                - text: 교사 생성
+              - link [ref=e28] [cursor=pointer]:
+                - /url: /admin/teachers
+                - text: 교사 목록
+          - generic [ref=e30]:
+            - paragraph [ref=e31]: 마일리지 관리
+            - button "그린 마일리지" [ref=e32] [cursor=pointer]:
+              - img [ref=e34]
+              - generic [ref=e37]: 그린 마일리지
+              - img [ref=e39]
+            - link [ref=e42] [cursor=pointer]:
+              - /url: /admin/school/rules
+              - text: 상벌점 항목
+          - generic [ref=e44]:
+            - button "기숙사 상벌점" [ref=e45] [cursor=pointer]:
+              - img [ref=e47]
+              - generic [ref=e50]: 기숙사 상벌점
+              - img [ref=e52]
+            - generic [ref=e54]:
+              - link [ref=e55] [cursor=pointer]:
+                - /url: /admin/dorm/rules
+                - text: 기숙사 상벌점 항목
+              - link [ref=e57] [cursor=pointer]:
+                - /url: /admin/dorm-mileage/teachers
+                - text: 사감 교사 관리
+          - generic [ref=e59]:
+            - paragraph [ref=e60]: 시스템
+            - button "DB 관리" [expanded] [ref=e61] [cursor=pointer]:
+              - img [ref=e63]
+              - generic [ref=e67]: DB 관리
+              - img [ref=e69]
+            - link "DB 관리" [ref=e74] [cursor=pointer]:
+              - /url: /admin/db
+              - text: DB 관리
+          - generic [ref=e76]:
+            - button "보안" [ref=e77] [cursor=pointer]:
+              - img [ref=e79]
+              - generic [ref=e82]: 보안
+              - img [ref=e84]
+            - link [ref=e87] [cursor=pointer]:
+              - /url: /admin/security
+              - text: 관리자 보안
+        - generic [ref=e90]:
+          - button "다크 모드로 전환" [ref=e91] [cursor=pointer]:
+            - img [ref=e93]
+            - img [ref=e104]
+          - button "로그아웃" [ref=e106] [cursor=pointer]:
+            - generic [ref=e107]:
+              - img [ref=e108]
+              - text: 로그아웃
+    - generic [ref=e111]:
+      - banner [ref=e112]:
+        - paragraph [ref=e113]: DB 관리
+      - main [ref=e114]
+  - button "Open Next.js Dev Tools" [ref=e122] [cursor=pointer]:
+    - img [ref=e123]
+  - alert [ref=e126]

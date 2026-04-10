@@ -207,6 +207,7 @@ export default function SharedMileageRulesView<
             disabled={readOnly || toggleRuleId === rule.id}
             onClick={() => void handleToggle(rule)}
             style={{
+              whiteSpace: 'nowrap',
               fontFamily: 'var(--font-noto-sans-kr), sans-serif',
               backgroundColor: rule.isActive
                 ? 'var(--reward-subtle)'

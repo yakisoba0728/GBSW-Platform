@@ -1,0 +1,111 @@
+- generic [ref=e1]:
+  - generic [ref=e69]:
+    - complementary [ref=e70]:
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - img [ref=e73]
+          - generic [ref=e74]:
+            - paragraph [ref=e75]: GBSW Platform
+            - paragraph [ref=e76]: 최고관리자
+        - navigation [ref=e77]:
+          - generic [ref=e78]:
+            - paragraph [ref=e79]: 계정 관리
+            - button "교사 관리" [expanded] [ref=e80] [cursor=pointer]:
+              - img [ref=e82]
+              - generic [ref=e87]: 교사 관리
+              - img [ref=e89]
+            - generic [ref=e93]:
+              - link "교사 생성" [ref=e94] [cursor=pointer]:
+                - /url: /admin/teachers/create
+                - text: 교사 생성
+              - link "교사 목록" [ref=e96] [cursor=pointer]:
+                - /url: /admin/teachers
+                - text: 교사 목록
+          - generic [ref=e98]:
+            - paragraph [ref=e99]: 마일리지 관리
+            - button "그린 마일리지" [expanded] [ref=e100] [cursor=pointer]:
+              - img [ref=e102]
+              - generic [ref=e105]: 그린 마일리지
+              - img [ref=e107]
+            - link "상벌점 항목" [ref=e277] [cursor=pointer]:
+              - /url: /admin/school/rules
+              - text: 상벌점 항목
+          - generic [ref=e112]:
+            - button "기숙사 상벌점" [expanded] [ref=e113] [cursor=pointer]:
+              - img [ref=e115]
+              - generic [ref=e118]: 기숙사 상벌점
+              - img [ref=e120]
+            - generic [ref=e122]:
+              - link "기숙사 상벌점 항목" [ref=e1532] [cursor=pointer]:
+                - /url: /admin/dorm/rules
+                - text: 기숙사 상벌점 항목
+              - link "사감 교사 관리" [ref=e1533] [cursor=pointer]:
+                - /url: /admin/dorm-mileage/teachers
+                - text: 사감 교사 관리
+          - generic [ref=e127]:
+            - paragraph [ref=e128]: 시스템
+            - button "DB 관리" [expanded] [ref=e129] [cursor=pointer]:
+              - img [ref=e131]
+              - generic [ref=e135]: DB 관리
+              - img [ref=e137]
+            - link "DB 관리" [ref=e2318] [cursor=pointer]:
+              - /url: /admin/db
+              - text: DB 관리
+          - generic [ref=e142]:
+            - button "보안" [expanded] [active] [ref=e143] [cursor=pointer]:
+              - img [ref=e145]
+              - generic [ref=e148]: 보안
+              - img [ref=e150]
+            - link "관리자 보안" [ref=e2357] [cursor=pointer]:
+              - /url: /admin/security
+              - text: 관리자 보안
+        - generic [ref=e156]:
+          - button "다크 모드로 전환" [ref=e157] [cursor=pointer]:
+            - img [ref=e159]
+            - img [ref=e170]
+          - button "로그아웃" [ref=e172] [cursor=pointer]:
+            - generic [ref=e173]:
+              - img [ref=e174]
+              - text: 로그아웃
+    - generic [ref=e177]:
+      - banner [ref=e178]:
+        - paragraph [ref=e179]: DB 관리
+      - main [ref=e180]:
+        - generic [ref=e2321]:
+          - generic [ref=e2322]:
+            - generic [ref=e2323]:
+              - strong [ref=e2324]: 관리자 DB 콘솔
+              - generic [ref=e2325]: 개발 환경입니다. 운영과 동일한 위험 기준으로 조작하세요.
+            - generic [ref=e2326]:
+              - generic [ref=e2327]: 테이블
+              - generic [ref=e2328]:
+                - button "auth_sessions" [ref=e2329] [cursor=pointer]
+                - button "login_throttles" [ref=e2330] [cursor=pointer]
+                - button "mileage_entries" [ref=e2331] [cursor=pointer]
+                - button "mileage_rules" [ref=e2332] [cursor=pointer]
+                - button "students" [ref=e2333] [cursor=pointer]
+                - button "teachers" [ref=e2334] [cursor=pointer]
+          - main [ref=e2335]:
+            - generic [ref=e2336]:
+              - generic [ref=e2337]:
+                - generic [ref=e2338]: super-admin 전용
+                - heading "운영 DB 콘솔" [level=1] [ref=e2339]
+              - generic [ref=e2340]:
+                - generic [ref=e2341]: 실행 전 확인
+                - generic [ref=e2342]: 모든 변경/SQL 작업은 비밀번호 재확인과 사유 기록이 필요합니다
+            - generic [ref=e2343]:
+              - generic [ref=e2344]:
+                - generic [ref=e2345]: 최고관리자 비밀번호 확인
+                - textbox "최고관리자 비밀번호 확인" [ref=e2346]:
+                  - /placeholder: 민감 작업 실행 전 입력
+              - generic [ref=e2347]:
+                - generic [ref=e2348]: 작업 사유
+                - textbox "작업 사유" [ref=e2349]:
+                  - /placeholder: "예: 운영 데이터 이상 확인, 잘못 입력된 행 수정"
+            - generic [ref=e2350]:
+              - button "테이블 뷰" [ref=e2351] [cursor=pointer]
+              - button "SQL" [ref=e2352] [cursor=pointer]
+            - generic [ref=e2354]: 왼쪽에서 테이블을 선택하세요.
+  - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e11]

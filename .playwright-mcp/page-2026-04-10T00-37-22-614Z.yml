@@ -1,0 +1,141 @@
+- generic [ref=e1]:
+  - main [ref=e12]:
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - img [ref=e15]
+        - generic [ref=e16]: GBSW Platform
+      - generic [ref=e17]:
+        - img "경북소프트웨어마이스터고등학교 로고" [ref=e19]
+        - generic [ref=e20]:
+          - paragraph [ref=e21]: 경북소프트웨어마이스터고등학교 · 봉양중학교
+          - heading "학교 생활의 모든 것을 한 곳에." [level=1] [ref=e22]:
+            - text: 학교 생활의
+            - text: 모든 것을
+            - text: 한 곳에.
+          - paragraph [ref=e23]:
+            - text: 상벌점 관리, 학생 정보, 보고서까지
+            - text: 교사와 학생을 위한 통합 플랫폼.
+      - generic [ref=e24]:
+        - paragraph [ref=e25]: ⓒ 2026. 경북소프트웨어마이스터고등학교 All Rights Reserved.
+        - paragraph [ref=e26]: Made by 김동혁
+    - generic [ref=e28]:
+      - button "다크 모드로 전환" [ref=e30] [cursor=pointer]:
+        - img [ref=e32]
+        - img [ref=e43]
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - heading "다시 돌아오셨군요" [level=2] [ref=e48]
+          - paragraph [ref=e49]: 아이디와 비밀번호를 입력해 로그인하세요.
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - generic [ref=e52]: 아이디
+            - generic [ref=e53]:
+              - generic:
+                - img
+              - textbox "아이디" [ref=e54]:
+                - /placeholder: 아이디를 입력하세요
+                - text: yakihyuk0728admin
+          - generic [ref=e55]:
+            - generic [ref=e56]: 비밀번호
+            - generic [ref=e57]:
+              - generic:
+                - img
+              - textbox "비밀번호" [ref=e58]:
+                - /placeholder: 비밀번호를 입력하세요
+                - text: YaKi@Hyuk!6230
+              - button "비밀번호 표시" [ref=e60] [cursor=pointer]:
+                - img [ref=e61]
+          - paragraph [ref=e69]: 로그인에 실패했습니다.
+          - button "로그인" [ref=e70] [cursor=pointer]:
+            - generic [ref=e71]: 로그인
+        - paragraph [ref=e68]: 정보를 찾을 수 없나요? 학생회로 문의해 주세요.
+  - generic [active]:
+    - generic [ref=e74]:
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - navigation [ref=e77]:
+            - button "previous" [disabled] [ref=e78]:
+              - img "previous" [ref=e79]
+            - generic [ref=e81]:
+              - generic [ref=e82]: 1/
+              - text: "1"
+            - button "next" [disabled] [ref=e83]:
+              - img "next" [ref=e84]
+          - img
+        - generic [ref=e86]:
+          - link "Next.js 16.2.1 (stale) Turbopack" [ref=e87] [cursor=pointer]:
+            - /url: https://nextjs.org/docs/messages/version-staleness
+            - img [ref=e88]
+            - generic "There is a newer version (16.2.3) available, upgrade recommended!" [ref=e90]: Next.js 16.2.1 (stale)
+            - generic [ref=e91]: Turbopack
+          - img
+      - dialog "Build Error" [ref=e93]:
+        - generic [ref=e96]:
+          - generic [ref=e97]:
+            - generic [ref=e98]:
+              - generic [ref=e100]: Build Error
+              - generic [ref=e101]:
+                - button "Copy Error Info" [ref=e102] [cursor=pointer]:
+                  - img [ref=e103]
+                - button "No related documentation found" [disabled] [ref=e105]:
+                  - img [ref=e106]
+                - button "Attach Node.js inspector" [ref=e108] [cursor=pointer]:
+                  - img [ref=e109]
+            - generic [ref=e118]: Export getResponseMessage doesn't exist in target module
+          - generic [ref=e120]:
+            - generic [ref=e122]:
+              - img [ref=e124]
+              - generic [ref=e128]: ./apps/web/app/api/auth/login/route.ts (2:1)
+              - button "Open in editor" [ref=e129] [cursor=pointer]:
+                - img [ref=e131]
+            - generic [ref=e134]:
+              - generic [ref=e135]: Export getResponseMessage doesn't exist in target module
+              - generic [ref=e136]: 1 |
+              - text: import
+              - generic [ref=e137]: "{"
+              - text: NextRequest
+              - generic [ref=e138]: ","
+              - text: NextResponse
+              - generic [ref=e139]: "}"
+              - text: from 'next/server' >
+              - generic [ref=e140]: 2 |
+              - text: import
+              - generic [ref=e141]: "{"
+              - generic [ref=e142]: "|"
+              - text: ^^^^^^^ >
+              - generic [ref=e143]: 3 |
+              - generic [ref=e144]: getResponseMessage,
+              - generic [ref=e145]: "|"
+              - text: ^^^^^^^^^^^^^^^^^^^^^ >
+              - generic [ref=e146]: 4 |
+              - generic [ref=e147]: readJsonRequestBody,
+              - generic [ref=e148]: "|"
+              - text: ^^^^^^^^^^^^^^^^^^^^^^ >
+              - generic [ref=e149]: 5 |
+              - generic [ref=e150]: readResponseBody,
+              - generic [ref=e151]: "|"
+              - text: ^^^^^^^^^^^^^^^^^^^ >
+              - generic [ref=e152]: 6 |
+              - generic [ref=e153]: "}"
+              - text: from '@/lib/api-proxy'
+              - generic [ref=e154]: "|"
+              - text: ^^^^^^^^^^^^^^^^^^^^^^^^
+              - generic [ref=e155]: 7 |
+              - text: import
+              - generic [ref=e156]: "{"
+              - generic [ref=e157]: 8 |
+              - text: AUTH_SESSION_COOKIE
+              - generic [ref=e158]: ","
+              - generic [ref=e159]: 9 |
+              - generic [ref=e160]: getRedirectPathForSession, The export getResponseMessage was not found in module [project]/apps/web/lib/api-proxy.ts [app-route] (ecmascript). Did you mean to import createRoleProxyRequest? All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+        - generic [ref=e161]: "1"
+        - generic [ref=e162]: "2"
+    - generic [ref=e167] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e168]:
+        - img [ref=e169]
+      - button "Open issues overlay" [ref=e173]:
+        - generic [ref=e174]:
+          - generic [ref=e175]: "0"
+          - generic [ref=e176]: "1"
+        - generic [ref=e177]: Issue
+  - alert [ref=e11]

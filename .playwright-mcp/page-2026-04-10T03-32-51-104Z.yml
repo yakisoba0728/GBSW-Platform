@@ -1,0 +1,1185 @@
+- generic [ref=e1]:
+  - generic [ref=e69]:
+    - complementary [ref=e70]:
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - img [ref=e73]
+          - generic [ref=e74]:
+            - paragraph [ref=e75]: GBSW Platform
+            - paragraph [ref=e76]: 최고관리자
+        - navigation [ref=e77]:
+          - generic [ref=e78]:
+            - paragraph [ref=e79]: 계정 관리
+            - button "교사 관리" [expanded] [ref=e80] [cursor=pointer]:
+              - img [ref=e82]
+              - generic [ref=e87]: 교사 관리
+              - img [ref=e89]
+            - generic [ref=e93]:
+              - link "교사 생성" [ref=e94] [cursor=pointer]:
+                - /url: /admin/teachers/create
+                - text: 교사 생성
+              - link "교사 목록" [ref=e96] [cursor=pointer]:
+                - /url: /admin/teachers
+                - text: 교사 목록
+          - generic [ref=e98]:
+            - paragraph [ref=e99]: 마일리지 관리
+            - button "그린 마일리지" [expanded] [ref=e100] [cursor=pointer]:
+              - img [ref=e102]
+              - generic [ref=e105]: 그린 마일리지
+              - img [ref=e107]
+            - link "상벌점 항목" [ref=e277] [cursor=pointer]:
+              - /url: /admin/school/rules
+              - text: 상벌점 항목
+          - generic [ref=e112]:
+            - button "기숙사 상벌점" [expanded] [active] [ref=e113] [cursor=pointer]:
+              - img [ref=e115]
+              - generic [ref=e118]: 기숙사 상벌점
+              - img [ref=e120]
+            - generic [ref=e122]:
+              - link "기숙사 상벌점 항목" [ref=e1532] [cursor=pointer]:
+                - /url: /admin/dorm/rules
+                - text: 기숙사 상벌점 항목
+              - link "사감 교사 관리" [ref=e1533] [cursor=pointer]:
+                - /url: /admin/dorm-mileage/teachers
+                - text: 사감 교사 관리
+          - generic [ref=e127]:
+            - paragraph [ref=e128]: 시스템
+            - button "DB 관리" [ref=e129] [cursor=pointer]:
+              - img [ref=e131]
+              - generic [ref=e135]: DB 관리
+              - img [ref=e137]
+            - link [ref=e140] [cursor=pointer]:
+              - /url: /admin/db
+              - text: DB 관리
+          - generic [ref=e142]:
+            - button "보안" [ref=e143] [cursor=pointer]:
+              - img [ref=e145]
+              - generic [ref=e148]: 보안
+              - img [ref=e150]
+            - link [ref=e153] [cursor=pointer]:
+              - /url: /admin/security
+              - text: 관리자 보안
+        - generic [ref=e156]:
+          - button "다크 모드로 전환" [ref=e157] [cursor=pointer]:
+            - img [ref=e159]
+            - img [ref=e170]
+          - button "로그아웃" [ref=e172] [cursor=pointer]:
+            - generic [ref=e173]:
+              - img [ref=e174]
+              - text: 로그아웃
+    - generic [ref=e177]:
+      - banner [ref=e178]:
+        - paragraph [ref=e179]: 상벌점 항목
+      - main [ref=e180]:
+        - generic [ref=e280]:
+          - generic [ref=e282]:
+            - generic [ref=e283]:
+              - heading "상벌점 항목" [level=2] [ref=e284]
+              - paragraph [ref=e285]: 현재 등록된 상벌점 규칙을 관리합니다.
+            - button "항목 추가" [ref=e287] [cursor=pointer]:
+              - generic [ref=e288]:
+                - img [ref=e290]
+                - text: 항목 추가
+          - generic [ref=e292]:
+            - generic [ref=e293]:
+              - img
+              - textbox "항목명 또는 카테고리 검색" [ref=e294]
+            - combobox [ref=e295]:
+              - option "전체 유형" [selected]
+              - option "상점"
+              - option "벌점"
+            - combobox [ref=e296]:
+              - option "전체 카테고리" [selected]
+              - option "교내 생활"
+              - option "교내 환경"
+              - option "교외 생활"
+              - option "명예 표창"
+              - option "선행 질서"
+              - option "수업 관련"
+              - option "스쿨 캠핑장"
+              - option "야간 자습 시간"
+              - option "용의복장"
+              - option "출결 수업"
+              - option "학교 활동"
+              - option "흡연 음주 약물"
+            - generic [ref=e297]: 71건
+          - table [ref=e302]:
+            - rowgroup [ref=e312]:
+              - row "ID 유형 카테고리 항목명 기본점수 순서 상태 작업" [ref=e313]:
+                - columnheader "ID" [ref=e314]
+                - columnheader "유형" [ref=e315]
+                - columnheader "카테고리" [ref=e316]
+                - columnheader "항목명" [ref=e317]
+                - columnheader "기본점수" [ref=e318]
+                - columnheader "순서" [ref=e319]
+                - columnheader "상태" [ref=e320]
+                - columnheader "작업" [ref=e321]
+            - rowgroup [ref=e322]:
+              - row "1 상점 교내 환경 봉사활동으로 교내 청소를 열심히 한 학생 +2점 1 사용 중 수정" [ref=e323]:
+                - cell "1" [ref=e324]
+                - cell "상점" [ref=e325]:
+                  - generic [ref=e326]: 상점
+                - cell "교내 환경" [ref=e327]
+                - cell "봉사활동으로 교내 청소를 열심히 한 학생" [ref=e328]
+                - cell "+2점" [ref=e329]
+                - cell "1" [ref=e330]
+                - cell "사용 중" [ref=e331]:
+                  - button "사용 중" [ref=e332] [cursor=pointer]
+                - cell "수정" [ref=e333]:
+                  - button "수정" [ref=e334] [cursor=pointer]:
+                    - generic [ref=e335]:
+                      - img [ref=e337]
+                      - text: 수정
+              - row "2 상점 교내 환경 솔선수범하여 학급 청소를 하거나, 학급 비품 관리, 쓰레기 분리수거 등을 잘한 학생 +2점 2 사용 중 수정" [ref=e340]:
+                - cell "2" [ref=e341]
+                - cell "상점" [ref=e342]:
+                  - generic [ref=e343]: 상점
+                - cell "교내 환경" [ref=e344]
+                - cell "솔선수범하여 학급 청소를 하거나, 학급 비품 관리, 쓰레기 분리수거 등을 잘한 학생" [ref=e345]
+                - cell "+2점" [ref=e346]
+                - cell "2" [ref=e347]
+                - cell "사용 중" [ref=e348]:
+                  - button "사용 중" [ref=e349] [cursor=pointer]
+                - cell "수정" [ref=e350]:
+                  - button "수정" [ref=e351] [cursor=pointer]:
+                    - generic [ref=e352]:
+                      - img [ref=e354]
+                      - text: 수정
+              - row "3 상점 교내 환경 솔선수범하여 바닥에 떨어진 쓰레기를 자주 줍는 학생 +2점 3 사용 중 수정" [ref=e357]:
+                - cell "3" [ref=e358]
+                - cell "상점" [ref=e359]:
+                  - generic [ref=e360]: 상점
+                - cell "교내 환경" [ref=e361]
+                - cell "솔선수범하여 바닥에 떨어진 쓰레기를 자주 줍는 학생" [ref=e362]
+                - cell "+2점" [ref=e363]
+                - cell "3" [ref=e364]
+                - cell "사용 중" [ref=e365]:
+                  - button "사용 중" [ref=e366] [cursor=pointer]
+                - cell "수정" [ref=e367]:
+                  - button "수정" [ref=e368] [cursor=pointer]:
+                    - generic [ref=e369]:
+                      - img [ref=e371]
+                      - text: 수정
+              - row "4 상점 명예 표창 학교 홍보에 열심히 참여한 학생 +5점 4 사용 중 수정" [ref=e374]:
+                - cell "4" [ref=e375]
+                - cell "상점" [ref=e376]:
+                  - generic [ref=e377]: 상점
+                - cell "명예 표창" [ref=e378]
+                - cell "학교 홍보에 열심히 참여한 학생" [ref=e379]
+                - cell "+5점" [ref=e380]
+                - cell "4" [ref=e381]
+                - cell "사용 중" [ref=e382]:
+                  - button "사용 중" [ref=e383] [cursor=pointer]
+                - cell "수정" [ref=e384]:
+                  - button "수정" [ref=e385] [cursor=pointer]:
+                    - generic [ref=e386]:
+                      - img [ref=e388]
+                      - text: 수정
+              - row "5 상점 명예 표창 프로그램 개발을 통한 학교 발전 및 학생 생활에 도움을 준 학생 +10점 5 사용 중 수정" [ref=e391]:
+                - cell "5" [ref=e392]
+                - cell "상점" [ref=e393]:
+                  - generic [ref=e394]: 상점
+                - cell "명예 표창" [ref=e395]
+                - cell "프로그램 개발을 통한 학교 발전 및 학생 생활에 도움을 준 학생" [ref=e396]
+                - cell "+10점" [ref=e397]
+                - cell "5" [ref=e398]
+                - cell "사용 중" [ref=e399]:
+                  - button "사용 중" [ref=e400] [cursor=pointer]
+                - cell "수정" [ref=e401]:
+                  - button "수정" [ref=e402] [cursor=pointer]:
+                    - generic [ref=e403]:
+                      - img [ref=e405]
+                      - text: 수정
+              - row "6 상점 선행 질서 분실된 교구, 분실물을 습득 및 신고를 하여 타의 모범이 된 학생 +2점 6 사용 중 수정" [ref=e408]:
+                - cell "6" [ref=e409]
+                - cell "상점" [ref=e410]:
+                  - generic [ref=e411]: 상점
+                - cell "선행 질서" [ref=e412]
+                - cell "분실된 교구, 분실물을 습득 및 신고를 하여 타의 모범이 된 학생" [ref=e413]
+                - cell "+2점" [ref=e414]
+                - cell "6" [ref=e415]
+                - cell "사용 중" [ref=e416]:
+                  - button "사용 중" [ref=e417] [cursor=pointer]
+                - cell "수정" [ref=e418]:
+                  - button "수정" [ref=e419] [cursor=pointer]:
+                    - generic [ref=e420]:
+                      - img [ref=e422]
+                      - text: 수정
+              - row "7 상점 선행 질서 벌점 규정 항목 대상 학생을 신고한 학생 +2점 7 사용 중 수정" [ref=e425]:
+                - cell "7" [ref=e426]
+                - cell "상점" [ref=e427]:
+                  - generic [ref=e428]: 상점
+                - cell "선행 질서" [ref=e429]
+                - cell "벌점 규정 항목 대상 학생을 신고한 학생" [ref=e430]
+                - cell "+2점" [ref=e431]
+                - cell "7" [ref=e432]
+                - cell "사용 중" [ref=e433]:
+                  - button "사용 중" [ref=e434] [cursor=pointer]
+                - cell "수정" [ref=e435]:
+                  - button "수정" [ref=e436] [cursor=pointer]:
+                    - generic [ref=e437]:
+                      - img [ref=e439]
+                      - text: 수정
+              - row "8 상점 선행 질서 어려운 상황에 처한 친구를 제보하여 위험을 모면하게 도와준 학생 +5점 8 사용 중 수정" [ref=e442]:
+                - cell "8" [ref=e443]
+                - cell "상점" [ref=e444]:
+                  - generic [ref=e445]: 상점
+                - cell "선행 질서" [ref=e446]
+                - cell "어려운 상황에 처한 친구를 제보하여 위험을 모면하게 도와준 학생" [ref=e447]
+                - cell "+5점" [ref=e448]
+                - cell "8" [ref=e449]
+                - cell "사용 중" [ref=e450]:
+                  - button "사용 중" [ref=e451] [cursor=pointer]
+                - cell "수정" [ref=e452]:
+                  - button "수정" [ref=e453] [cursor=pointer]:
+                    - generic [ref=e454]:
+                      - img [ref=e456]
+                      - text: 수정
+              - row "9 상점 선행 질서 선행, 효행, 단체 활동, 불우이웃돕기, 일손 돕기 등의 봉사활동을 하여 공인된 외부기관에서 모범 표창을 받은 경우 +10점 9 사용 중 수정" [ref=e459]:
+                - cell "9" [ref=e460]
+                - cell "상점" [ref=e461]:
+                  - generic [ref=e462]: 상점
+                - cell "선행 질서" [ref=e463]
+                - cell "선행, 효행, 단체 활동, 불우이웃돕기, 일손 돕기 등의 봉사활동을 하여 공인된 외부기관에서 모범 표창을 받은 경우" [ref=e464]
+                - cell "+10점" [ref=e465]
+                - cell "9" [ref=e466]
+                - cell "사용 중" [ref=e467]:
+                  - button "사용 중" [ref=e468] [cursor=pointer]
+                - cell "수정" [ref=e469]:
+                  - button "수정" [ref=e470] [cursor=pointer]:
+                    - generic [ref=e471]:
+                      - img [ref=e473]
+                      - text: 수정
+              - row "10 상점 선행 질서 타인을 위해 희생, 봉사적 활동을 한 학생 +3점 10 사용 중 수정" [ref=e476]:
+                - cell "10" [ref=e477]
+                - cell "상점" [ref=e478]:
+                  - generic [ref=e479]: 상점
+                - cell "선행 질서" [ref=e480]
+                - cell "타인을 위해 희생, 봉사적 활동을 한 학생" [ref=e481]
+                - cell "+3점" [ref=e482]
+                - cell "10" [ref=e483]
+                - cell "사용 중" [ref=e484]:
+                  - button "사용 중" [ref=e485] [cursor=pointer]
+                - cell "수정" [ref=e486]:
+                  - button "수정" [ref=e487] [cursor=pointer]:
+                    - generic [ref=e488]:
+                      - img [ref=e490]
+                      - text: 수정
+              - row "11 상점 수업 관련 학습활동과 기본생활 영역에서 모범이 되는 행동을 하여 추천을 받은 학생 +2점 11 사용 중 수정" [ref=e493]:
+                - cell "11" [ref=e494]
+                - cell "상점" [ref=e495]:
+                  - generic [ref=e496]: 상점
+                - cell "수업 관련" [ref=e497]
+                - cell "학습활동과 기본생활 영역에서 모범이 되는 행동을 하여 추천을 받은 학생" [ref=e498]
+                - cell "+2점" [ref=e499]
+                - cell "11" [ref=e500]
+                - cell "사용 중" [ref=e501]:
+                  - button "사용 중" [ref=e502] [cursor=pointer]
+                - cell "수정" [ref=e503]:
+                  - button "수정" [ref=e504] [cursor=pointer]:
+                    - generic [ref=e505]:
+                      - img [ref=e507]
+                      - text: 수정
+              - row "12 상점 수업 관련 수업 시간에 바른 태도로 타의 모범이 된 학생 +2점 12 사용 중 수정" [ref=e510]:
+                - cell "12" [ref=e511]
+                - cell "상점" [ref=e512]:
+                  - generic [ref=e513]: 상점
+                - cell "수업 관련" [ref=e514]
+                - cell "수업 시간에 바른 태도로 타의 모범이 된 학생" [ref=e515]
+                - cell "+2점" [ref=e516]
+                - cell "12" [ref=e517]
+                - cell "사용 중" [ref=e518]:
+                  - button "사용 중" [ref=e519] [cursor=pointer]
+                - cell "수정" [ref=e520]:
+                  - button "수정" [ref=e521] [cursor=pointer]:
+                    - generic [ref=e522]:
+                      - img [ref=e524]
+                      - text: 수정
+              - row "13 상점 수업 관련 수업에서 교재, 교구, 기자재 관리 및 안전 관리에 모범적인 행동을 한 학생 +2점 13 사용 중 수정" [ref=e527]:
+                - cell "13" [ref=e528]
+                - cell "상점" [ref=e529]:
+                  - generic [ref=e530]: 상점
+                - cell "수업 관련" [ref=e531]
+                - cell "수업에서 교재, 교구, 기자재 관리 및 안전 관리에 모범적인 행동을 한 학생" [ref=e532]
+                - cell "+2점" [ref=e533]
+                - cell "13" [ref=e534]
+                - cell "사용 중" [ref=e535]:
+                  - button "사용 중" [ref=e536] [cursor=pointer]
+                - cell "수정" [ref=e537]:
+                  - button "수정" [ref=e538] [cursor=pointer]:
+                    - generic [ref=e539]:
+                      - img [ref=e541]
+                      - text: 수정
+              - row "14 상점 수업 관련 학습 준비물을 철저히 준비하여 수업 보조 도구로 활용되도록 한 학생 +2점 14 사용 중 수정" [ref=e544]:
+                - cell "14" [ref=e545]
+                - cell "상점" [ref=e546]:
+                  - generic [ref=e547]: 상점
+                - cell "수업 관련" [ref=e548]
+                - cell "학습 준비물을 철저히 준비하여 수업 보조 도구로 활용되도록 한 학생" [ref=e549]
+                - cell "+2점" [ref=e550]
+                - cell "14" [ref=e551]
+                - cell "사용 중" [ref=e552]:
+                  - button "사용 중" [ref=e553] [cursor=pointer]
+                - cell "수정" [ref=e554]:
+                  - button "수정" [ref=e555] [cursor=pointer]:
+                    - generic [ref=e556]:
+                      - img [ref=e558]
+                      - text: 수정
+              - row "15 상점 학교 활동 교사의 교육활동에 도움을 주는 학생 +1점 15 사용 중 수정" [ref=e561]:
+                - cell "15" [ref=e562]
+                - cell "상점" [ref=e563]:
+                  - generic [ref=e564]: 상점
+                - cell "학교 활동" [ref=e565]
+                - cell "교사의 교육활동에 도움을 주는 학생" [ref=e566]
+                - cell "+1점" [ref=e567]
+                - cell "15" [ref=e568]
+                - cell "사용 중" [ref=e569]:
+                  - button "사용 중" [ref=e570] [cursor=pointer]
+                - cell "수정" [ref=e571]:
+                  - button "수정" [ref=e572] [cursor=pointer]:
+                    - generic [ref=e573]:
+                      - img [ref=e575]
+                      - text: 수정
+              - row "16 상점 학교 활동 행사도우미, 학교행사 활동 등 교사의 교육활동에 적극적으로 도움을 주는 학생 +2점 16 사용 중 수정" [ref=e578]:
+                - cell "16" [ref=e579]
+                - cell "상점" [ref=e580]:
+                  - generic [ref=e581]: 상점
+                - cell "학교 활동" [ref=e582]
+                - cell "행사도우미, 학교행사 활동 등 교사의 교육활동에 적극적으로 도움을 주는 학생" [ref=e583]
+                - cell "+2점" [ref=e584]
+                - cell "16" [ref=e585]
+                - cell "사용 중" [ref=e586]:
+                  - button "사용 중" [ref=e587] [cursor=pointer]
+                - cell "수정" [ref=e588]:
+                  - button "수정" [ref=e589] [cursor=pointer]:
+                    - generic [ref=e590]:
+                      - img [ref=e592]
+                      - text: 수정
+              - row "17 상점 학교 활동 특별실 관리 또는 학교, 학급 활동에 모범이 되어 담당 교사의 추천을 받은 학생 +3점 17 사용 중 수정" [ref=e595]:
+                - cell "17" [ref=e596]
+                - cell "상점" [ref=e597]:
+                  - generic [ref=e598]: 상점
+                - cell "학교 활동" [ref=e599]
+                - cell "특별실 관리 또는 학교, 학급 활동에 모범이 되어 담당 교사의 추천을 받은 학생" [ref=e600]
+                - cell "+3점" [ref=e601]
+                - cell "17" [ref=e602]
+                - cell "사용 중" [ref=e603]:
+                  - button "사용 중" [ref=e604] [cursor=pointer]
+                - cell "수정" [ref=e605]:
+                  - button "수정" [ref=e606] [cursor=pointer]:
+                    - generic [ref=e607]:
+                      - img [ref=e609]
+                      - text: 수정
+              - row "18 상점 학교 활동 학교 행사 후 청소 및 정리정돈에 솔선수범하여 참여한 학생 +10점 18 사용 중 수정" [ref=e612]:
+                - cell "18" [ref=e613]
+                - cell "상점" [ref=e614]:
+                  - generic [ref=e615]: 상점
+                - cell "학교 활동" [ref=e616]
+                - cell "학교 행사 후 청소 및 정리정돈에 솔선수범하여 참여한 학생" [ref=e617]
+                - cell "+10점" [ref=e618]
+                - cell "18" [ref=e619]
+                - cell "사용 중" [ref=e620]:
+                  - button "사용 중" [ref=e621] [cursor=pointer]
+                - cell "수정" [ref=e622]:
+                  - button "수정" [ref=e623] [cursor=pointer]:
+                    - generic [ref=e624]:
+                      - img [ref=e626]
+                      - text: 수정
+              - row "19 벌점 교내 생활 가벼운 교육적 지시 사항을 어긴 학생 -1점 19 사용 중 수정" [ref=e629]:
+                - cell "19" [ref=e630]
+                - cell "벌점" [ref=e631]:
+                  - generic [ref=e632]: 벌점
+                - cell "교내 생활" [ref=e633]
+                - cell "가벼운 교육적 지시 사항을 어긴 학생" [ref=e634]
+                - cell "-1점" [ref=e635]
+                - cell "19" [ref=e636]
+                - cell "사용 중" [ref=e637]:
+                  - button "사용 중" [ref=e638] [cursor=pointer]
+                - cell "수정" [ref=e639]:
+                  - button "수정" [ref=e640] [cursor=pointer]:
+                    - generic [ref=e641]:
+                      - img [ref=e643]
+                      - text: 수정
+              - row "20 벌점 교내 생활 교사의 교육적인 지시 내용을 지속적으로 불이행한 학생 -10점 20 사용 중 수정" [ref=e646]:
+                - cell "20" [ref=e647]
+                - cell "벌점" [ref=e648]:
+                  - generic [ref=e649]: 벌점
+                - cell "교내 생활" [ref=e650]
+                - cell "교사의 교육적인 지시 내용을 지속적으로 불이행한 학생" [ref=e651]
+                - cell "-10점" [ref=e652]
+                - cell "20" [ref=e653]
+                - cell "사용 중" [ref=e654]:
+                  - button "사용 중" [ref=e655] [cursor=pointer]
+                - cell "수정" [ref=e656]:
+                  - button "수정" [ref=e657] [cursor=pointer]:
+                    - generic [ref=e658]:
+                      - img [ref=e660]
+                      - text: 수정
+              - row "21 벌점 교내 생활 소란행위를 한 학생 (고성, 괴성, 음악 크게 틀기, 복도에서 달리기 등) -2점 21 사용 중 수정" [ref=e663]:
+                - cell "21" [ref=e664]
+                - cell "벌점" [ref=e665]:
+                  - generic [ref=e666]: 벌점
+                - cell "교내 생활" [ref=e667]
+                - cell "소란행위를 한 학생 (고성, 괴성, 음악 크게 틀기, 복도에서 달리기 등)" [ref=e668]
+                - cell "-2점" [ref=e669]
+                - cell "21" [ref=e670]
+                - cell "사용 중" [ref=e671]:
+                  - button "사용 중" [ref=e672] [cursor=pointer]
+                - cell "수정" [ref=e673]:
+                  - button "수정" [ref=e674] [cursor=pointer]:
+                    - generic [ref=e675]:
+                      - img [ref=e677]
+                      - text: 수정
+              - row "22 벌점 교내 생활 쓰레기(음식물 포함)등을 교내 아무 곳에나 버리는 학생 -2점 22 사용 중 수정" [ref=e680]:
+                - cell "22" [ref=e681]
+                - cell "벌점" [ref=e682]:
+                  - generic [ref=e683]: 벌점
+                - cell "교내 생활" [ref=e684]
+                - cell "쓰레기(음식물 포함)등을 교내 아무 곳에나 버리는 학생" [ref=e685]
+                - cell "-2점" [ref=e686]
+                - cell "22" [ref=e687]
+                - cell "사용 중" [ref=e688]:
+                  - button "사용 중" [ref=e689] [cursor=pointer]
+                - cell "수정" [ref=e690]:
+                  - button "수정" [ref=e691] [cursor=pointer]:
+                    - generic [ref=e692]:
+                      - img [ref=e694]
+                      - text: 수정
+              - row "23 벌점 교내 생활 교내에서 껌이나 침을 아무데나 뱉거나 버리는 학생 -2점 23 사용 중 수정" [ref=e697]:
+                - cell "23" [ref=e698]
+                - cell "벌점" [ref=e699]:
+                  - generic [ref=e700]: 벌점
+                - cell "교내 생활" [ref=e701]
+                - cell "교내에서 껌이나 침을 아무데나 뱉거나 버리는 학생" [ref=e702]
+                - cell "-2점" [ref=e703]
+                - cell "23" [ref=e704]
+                - cell "사용 중" [ref=e705]:
+                  - button "사용 중" [ref=e706] [cursor=pointer]
+                - cell "수정" [ref=e707]:
+                  - button "수정" [ref=e708] [cursor=pointer]:
+                    - generic [ref=e709]:
+                      - img [ref=e711]
+                      - text: 수정
+              - row "24 벌점 교내 생활 급식실에서 질서를 지키지 않고 새치기를 하는 학생 -2점 24 사용 중 수정" [ref=e714]:
+                - cell "24" [ref=e715]
+                - cell "벌점" [ref=e716]:
+                  - generic [ref=e717]: 벌점
+                - cell "교내 생활" [ref=e718]
+                - cell "급식실에서 질서를 지키지 않고 새치기를 하는 학생" [ref=e719]
+                - cell "-2점" [ref=e720]
+                - cell "24" [ref=e721]
+                - cell "사용 중" [ref=e722]:
+                  - button "사용 중" [ref=e723] [cursor=pointer]
+                - cell "수정" [ref=e724]:
+                  - button "수정" [ref=e725] [cursor=pointer]:
+                    - generic [ref=e726]:
+                      - img [ref=e728]
+                      - text: 수정
+              - row "25 벌점 교내 생활 책·걸상, 학교 벽 등 학교 시설에 낙서를 한 학생 -2점 25 사용 중 수정" [ref=e731]:
+                - cell "25" [ref=e732]
+                - cell "벌점" [ref=e733]:
+                  - generic [ref=e734]: 벌점
+                - cell "교내 생활" [ref=e735]
+                - cell "책·걸상, 학교 벽 등 학교 시설에 낙서를 한 학생" [ref=e736]
+                - cell "-2점" [ref=e737]
+                - cell "25" [ref=e738]
+                - cell "사용 중" [ref=e739]:
+                  - button "사용 중" [ref=e740] [cursor=pointer]
+                - cell "수정" [ref=e741]:
+                  - button "수정" [ref=e742] [cursor=pointer]:
+                    - generic [ref=e743]:
+                      - img [ref=e745]
+                      - text: 수정
+              - row "26 벌점 교내 생활 청소 활동에 이유 없이 불참한 학생 -2점 26 사용 중 수정" [ref=e748]:
+                - cell "26" [ref=e749]
+                - cell "벌점" [ref=e750]:
+                  - generic [ref=e751]: 벌점
+                - cell "교내 생활" [ref=e752]
+                - cell "청소 활동에 이유 없이 불참한 학생" [ref=e753]
+                - cell "-2점" [ref=e754]
+                - cell "26" [ref=e755]
+                - cell "사용 중" [ref=e756]:
+                  - button "사용 중" [ref=e757] [cursor=pointer]
+                - cell "수정" [ref=e758]:
+                  - button "수정" [ref=e759] [cursor=pointer]:
+                    - generic [ref=e760]:
+                      - img [ref=e762]
+                      - text: 수정
+              - row "27 벌점 교내 생활 상습적으로 욕설 및 폭언, 음담패설 등을 하여 주변에 피해를 주는 학생 -2점 27 사용 중 수정" [ref=e765]:
+                - cell "27" [ref=e766]
+                - cell "벌점" [ref=e767]:
+                  - generic [ref=e768]: 벌점
+                - cell "교내 생활" [ref=e769]
+                - cell "상습적으로 욕설 및 폭언, 음담패설 등을 하여 주변에 피해를 주는 학생" [ref=e770]
+                - cell "-2점" [ref=e771]
+                - cell "27" [ref=e772]
+                - cell "사용 중" [ref=e773]:
+                  - button "사용 중" [ref=e774] [cursor=pointer]
+                - cell "수정" [ref=e775]:
+                  - button "수정" [ref=e776] [cursor=pointer]:
+                    - generic [ref=e777]:
+                      - img [ref=e779]
+                      - text: 수정
+              - row "28 벌점 교내 생활 교내,외에서 이성 간 풍기 문란한 행동을 한 학생 -5점 28 사용 중 수정" [ref=e782]:
+                - cell "28" [ref=e783]
+                - cell "벌점" [ref=e784]:
+                  - generic [ref=e785]: 벌점
+                - cell "교내 생활" [ref=e786]
+                - cell "교내,외에서 이성 간 풍기 문란한 행동을 한 학생" [ref=e787]
+                - cell "-5점" [ref=e788]
+                - cell "28" [ref=e789]
+                - cell "사용 중" [ref=e790]:
+                  - button "사용 중" [ref=e791] [cursor=pointer]
+                - cell "수정" [ref=e792]:
+                  - button "수정" [ref=e793] [cursor=pointer]:
+                    - generic [ref=e794]:
+                      - img [ref=e796]
+                      - text: 수정
+              - row "29 벌점 교내 생활 고데기 등 화재 위험성이 있는 전열기 소지 및 사용한 학생 -10점 29 사용 중 수정" [ref=e799]:
+                - cell "29" [ref=e800]
+                - cell "벌점" [ref=e801]:
+                  - generic [ref=e802]: 벌점
+                - cell "교내 생활" [ref=e803]
+                - cell "고데기 등 화재 위험성이 있는 전열기 소지 및 사용한 학생" [ref=e804]
+                - cell "-10점" [ref=e805]
+                - cell "29" [ref=e806]
+                - cell "사용 중" [ref=e807]:
+                  - button "사용 중" [ref=e808] [cursor=pointer]
+                - cell "수정" [ref=e809]:
+                  - button "수정" [ref=e810] [cursor=pointer]:
+                    - generic [ref=e811]:
+                      - img [ref=e813]
+                      - text: 수정
+              - row "30 벌점 교내 생활 불법사이트(토토 등), 화투, 카드 등을 이용하여 도박을 한 학생 -20점 30 사용 중 수정" [ref=e816]:
+                - cell "30" [ref=e817]
+                - cell "벌점" [ref=e818]:
+                  - generic [ref=e819]: 벌점
+                - cell "교내 생활" [ref=e820]
+                - cell "불법사이트(토토 등), 화투, 카드 등을 이용하여 도박을 한 학생" [ref=e821]
+                - cell "-20점" [ref=e822]
+                - cell "30" [ref=e823]
+                - cell "사용 중" [ref=e824]:
+                  - button "사용 중" [ref=e825] [cursor=pointer]
+                - cell "수정" [ref=e826]:
+                  - button "수정" [ref=e827] [cursor=pointer]:
+                    - generic [ref=e828]:
+                      - img [ref=e830]
+                      - text: 수정
+              - row "31 벌점 교내 생활 원동기나 차량을 운전해서 등·하교한 학생 -10점 31 사용 중 수정" [ref=e833]:
+                - cell "31" [ref=e834]
+                - cell "벌점" [ref=e835]:
+                  - generic [ref=e836]: 벌점
+                - cell "교내 생활" [ref=e837]
+                - cell "원동기나 차량을 운전해서 등·하교한 학생" [ref=e838]
+                - cell "-10점" [ref=e839]
+                - cell "31" [ref=e840]
+                - cell "사용 중" [ref=e841]:
+                  - button "사용 중" [ref=e842] [cursor=pointer]
+                - cell "수정" [ref=e843]:
+                  - button "수정" [ref=e844] [cursor=pointer]:
+                    - generic [ref=e845]:
+                      - img [ref=e847]
+                      - text: 수정
+              - row "32 벌점 교내 생활 교내 외 시설물, 차량 또는 물품을 고의로 파손한 학생 -20점 32 사용 중 수정" [ref=e850]:
+                - cell "32" [ref=e851]
+                - cell "벌점" [ref=e852]:
+                  - generic [ref=e853]: 벌점
+                - cell "교내 생활" [ref=e854]
+                - cell "교내 외 시설물, 차량 또는 물품을 고의로 파손한 학생" [ref=e855]
+                - cell "-20점" [ref=e856]
+                - cell "32" [ref=e857]
+                - cell "사용 중" [ref=e858]:
+                  - button "사용 중" [ref=e859] [cursor=pointer]
+                - cell "수정" [ref=e860]:
+                  - button "수정" [ref=e861] [cursor=pointer]:
+                    - generic [ref=e862]:
+                      - img [ref=e864]
+                      - text: 수정
+              - row "33 벌점 교내 생활 본인의 교실 외 타학년 및 타교실에 들어간 학생 -3점 33 사용 중 수정" [ref=e867]:
+                - cell "33" [ref=e868]
+                - cell "벌점" [ref=e869]:
+                  - generic [ref=e870]: 벌점
+                - cell "교내 생활" [ref=e871]
+                - cell "본인의 교실 외 타학년 및 타교실에 들어간 학생" [ref=e872]
+                - cell "-3점" [ref=e873]
+                - cell "33" [ref=e874]
+                - cell "사용 중" [ref=e875]:
+                  - button "사용 중" [ref=e876] [cursor=pointer]
+                - cell "수정" [ref=e877]:
+                  - button "수정" [ref=e878] [cursor=pointer]:
+                    - generic [ref=e879]:
+                      - img [ref=e881]
+                      - text: 수정
+              - row "34 벌점 교내 생활 급식실 외 공간(교실, 실습실, 복도)에서 간식 먹는 학생 -3점 34 사용 중 수정" [ref=e884]:
+                - cell "34" [ref=e885]
+                - cell "벌점" [ref=e886]:
+                  - generic [ref=e887]: 벌점
+                - cell "교내 생활" [ref=e888]
+                - cell "급식실 외 공간(교실, 실습실, 복도)에서 간식 먹는 학생" [ref=e889]
+                - cell "-3점" [ref=e890]
+                - cell "34" [ref=e891]
+                - cell "사용 중" [ref=e892]:
+                  - button "사용 중" [ref=e893] [cursor=pointer]
+                - cell "수정" [ref=e894]:
+                  - button "수정" [ref=e895] [cursor=pointer]:
+                    - generic [ref=e896]:
+                      - img [ref=e898]
+                      - text: 수정
+              - row "35 벌점 교내 생활 체육관 음식물 반입 금지를 어긴 학생 -3점 35 사용 중 수정" [ref=e901]:
+                - cell "35" [ref=e902]
+                - cell "벌점" [ref=e903]:
+                  - generic [ref=e904]: 벌점
+                - cell "교내 생활" [ref=e905]
+                - cell "체육관 음식물 반입 금지를 어긴 학생" [ref=e906]
+                - cell "-3점" [ref=e907]
+                - cell "35" [ref=e908]
+                - cell "사용 중" [ref=e909]:
+                  - button "사용 중" [ref=e910] [cursor=pointer]
+                - cell "수정" [ref=e911]:
+                  - button "수정" [ref=e912] [cursor=pointer]:
+                    - generic [ref=e913]:
+                      - img [ref=e915]
+                      - text: 수정
+              - row "36 벌점 교내 생활 교실 내 개인 물품이나 택배 상자 등을 방치하여 다른 학생에게 피해를 주는 학생 -3점 36 사용 중 수정" [ref=e918]:
+                - cell "36" [ref=e919]
+                - cell "벌점" [ref=e920]:
+                  - generic [ref=e921]: 벌점
+                - cell "교내 생활" [ref=e922]
+                - cell "교실 내 개인 물품이나 택배 상자 등을 방치하여 다른 학생에게 피해를 주는 학생" [ref=e923]
+                - cell "-3점" [ref=e924]
+                - cell "36" [ref=e925]
+                - cell "사용 중" [ref=e926]:
+                  - button "사용 중" [ref=e927] [cursor=pointer]
+                - cell "수정" [ref=e928]:
+                  - button "수정" [ref=e929] [cursor=pointer]:
+                    - generic [ref=e930]:
+                      - img [ref=e932]
+                      - text: 수정
+              - row "37 벌점 교내 생활 허락없이 교내 엘리베이터를 탑승하다 적발된 학생 -2점 37 사용 중 수정" [ref=e935]:
+                - cell "37" [ref=e936]
+                - cell "벌점" [ref=e937]:
+                  - generic [ref=e938]: 벌점
+                - cell "교내 생활" [ref=e939]
+                - cell "허락없이 교내 엘리베이터를 탑승하다 적발된 학생" [ref=e940]
+                - cell "-2점" [ref=e941]
+                - cell "37" [ref=e942]
+                - cell "사용 중" [ref=e943]:
+                  - button "사용 중" [ref=e944] [cursor=pointer]
+                - cell "수정" [ref=e945]:
+                  - button "수정" [ref=e946] [cursor=pointer]:
+                    - generic [ref=e947]:
+                      - img [ref=e949]
+                      - text: 수정
+              - row "38 벌점 교외 생활 출입이 금지된 구역(유흥업소 등)에 출입을 한 학생 -20점 38 사용 중 수정" [ref=e952]:
+                - cell "38" [ref=e953]
+                - cell "벌점" [ref=e954]:
+                  - generic [ref=e955]: 벌점
+                - cell "교외 생활" [ref=e956]
+                - cell "출입이 금지된 구역(유흥업소 등)에 출입을 한 학생" [ref=e957]
+                - cell "-20점" [ref=e958]
+                - cell "38" [ref=e959]
+                - cell "사용 중" [ref=e960]:
+                  - button "사용 중" [ref=e961] [cursor=pointer]
+                - cell "수정" [ref=e962]:
+                  - button "수정" [ref=e963] [cursor=pointer]:
+                    - generic [ref=e964]:
+                      - img [ref=e966]
+                      - text: 수정
+              - row "39 벌점 교외 생활 지역 주민, 경찰서 등으로부터 신고를 받은 학생 -10점 39 사용 중 수정" [ref=e969]:
+                - cell "39" [ref=e970]
+                - cell "벌점" [ref=e971]:
+                  - generic [ref=e972]: 벌점
+                - cell "교외 생활" [ref=e973]
+                - cell "지역 주민, 경찰서 등으로부터 신고를 받은 학생" [ref=e974]
+                - cell "-10점" [ref=e975]
+                - cell "39" [ref=e976]
+                - cell "사용 중" [ref=e977]:
+                  - button "사용 중" [ref=e978] [cursor=pointer]
+                - cell "수정" [ref=e979]:
+                  - button "수정" [ref=e980] [cursor=pointer]:
+                    - generic [ref=e981]:
+                      - img [ref=e983]
+                      - text: 수정
+              - row "40 벌점 교외 생활 무면허 운전(자동차, 원동기 등)신고접수 및 적발된 학생 -20점 40 사용 중 수정" [ref=e986]:
+                - cell "40" [ref=e987]
+                - cell "벌점" [ref=e988]:
+                  - generic [ref=e989]: 벌점
+                - cell "교외 생활" [ref=e990]
+                - cell "무면허 운전(자동차, 원동기 등)신고접수 및 적발된 학생" [ref=e991]
+                - cell "-20점" [ref=e992]
+                - cell "40" [ref=e993]
+                - cell "사용 중" [ref=e994]:
+                  - button "사용 중" [ref=e995] [cursor=pointer]
+                - cell "수정" [ref=e996]:
+                  - button "수정" [ref=e997] [cursor=pointer]:
+                    - generic [ref=e998]:
+                      - img [ref=e1000]
+                      - text: 수정
+              - row "41 벌점 교외 생활 불미스러운 행동으로 학교의 명예를 훼손한 학생 -20점 41 사용 중 수정" [ref=e1003]:
+                - cell "41" [ref=e1004]
+                - cell "벌점" [ref=e1005]:
+                  - generic [ref=e1006]: 벌점
+                - cell "교외 생활" [ref=e1007]
+                - cell "불미스러운 행동으로 학교의 명예를 훼손한 학생" [ref=e1008]
+                - cell "-20점" [ref=e1009]
+                - cell "41" [ref=e1010]
+                - cell "사용 중" [ref=e1011]:
+                  - button "사용 중" [ref=e1012] [cursor=pointer]
+                - cell "수정" [ref=e1013]:
+                  - button "수정" [ref=e1014] [cursor=pointer]:
+                    - generic [ref=e1015]:
+                      - img [ref=e1017]
+                      - text: 수정
+              - row "42 벌점 스쿨 캠핑장 스쿨 캠핑장 이용 시 기구 및 장소 청소 등 정리 정돈을 제대로 하지 않은 학생 -3점 42 사용 중 수정" [ref=e1020]:
+                - cell "42" [ref=e1021]
+                - cell "벌점" [ref=e1022]:
+                  - generic [ref=e1023]: 벌점
+                - cell "스쿨 캠핑장" [ref=e1024]
+                - cell "스쿨 캠핑장 이용 시 기구 및 장소 청소 등 정리 정돈을 제대로 하지 않은 학생" [ref=e1025]
+                - cell "-3점" [ref=e1026]
+                - cell "42" [ref=e1027]
+                - cell "사용 중" [ref=e1028]:
+                  - button "사용 중" [ref=e1029] [cursor=pointer]
+                - cell "수정" [ref=e1030]:
+                  - button "수정" [ref=e1031] [cursor=pointer]:
+                    - generic [ref=e1032]:
+                      - img [ref=e1034]
+                      - text: 수정
+              - row "43 벌점 스쿨 캠핑장 스쿨 캠핑장 물품을 파손한 학생 -5점 43 사용 중 수정" [ref=e1037]:
+                - cell "43" [ref=e1038]
+                - cell "벌점" [ref=e1039]:
+                  - generic [ref=e1040]: 벌점
+                - cell "스쿨 캠핑장" [ref=e1041]
+                - cell "스쿨 캠핑장 물품을 파손한 학생" [ref=e1042]
+                - cell "-5점" [ref=e1043]
+                - cell "43" [ref=e1044]
+                - cell "사용 중" [ref=e1045]:
+                  - button "사용 중" [ref=e1046] [cursor=pointer]
+                - cell "수정" [ref=e1047]:
+                  - button "수정" [ref=e1048] [cursor=pointer]:
+                    - generic [ref=e1049]:
+                      - img [ref=e1051]
+                      - text: 수정
+              - row "44 벌점 스쿨 캠핑장 스쿨 캠핑장 이용 신청 외 학생이 이용할 경우 -5점 44 사용 중 수정" [ref=e1054]:
+                - cell "44" [ref=e1055]
+                - cell "벌점" [ref=e1056]:
+                  - generic [ref=e1057]: 벌점
+                - cell "스쿨 캠핑장" [ref=e1058]
+                - cell "스쿨 캠핑장 이용 신청 외 학생이 이용할 경우" [ref=e1059]
+                - cell "-5점" [ref=e1060]
+                - cell "44" [ref=e1061]
+                - cell "사용 중" [ref=e1062]:
+                  - button "사용 중" [ref=e1063] [cursor=pointer]
+                - cell "수정" [ref=e1064]:
+                  - button "수정" [ref=e1065] [cursor=pointer]:
+                    - generic [ref=e1066]:
+                      - img [ref=e1068]
+                      - text: 수정
+              - row "45 벌점 야간 자습 시간 야간 자습 시간에 핸드폰, 노트북 등을 사용하여 게임을 하는 학생 -5점 45 사용 중 수정" [ref=e1071]:
+                - cell "45" [ref=e1072]
+                - cell "벌점" [ref=e1073]:
+                  - generic [ref=e1074]: 벌점
+                - cell "야간 자습 시간" [ref=e1075]
+                - cell "야간 자습 시간에 핸드폰, 노트북 등을 사용하여 게임을 하는 학생" [ref=e1076]
+                - cell "-5점" [ref=e1077]
+                - cell "45" [ref=e1078]
+                - cell "사용 중" [ref=e1079]:
+                  - button "사용 중" [ref=e1080] [cursor=pointer]
+                - cell "수정" [ref=e1081]:
+                  - button "수정" [ref=e1082] [cursor=pointer]:
+                    - generic [ref=e1083]:
+                      - img [ref=e1085]
+                      - text: 수정
+              - row "46 벌점 야간 자습 시간 야간 자습 시간에 학습 활동 외 활동(음악 크게 틀어서 듣기, 영상보며 떠들기, 잡담, 욕설 등)으로 주변 사람에게 피해를 주는 학생 -5점 46 사용 중 수정" [ref=e1088]:
+                - cell "46" [ref=e1089]
+                - cell "벌점" [ref=e1090]:
+                  - generic [ref=e1091]: 벌점
+                - cell "야간 자습 시간" [ref=e1092]
+                - cell "야간 자습 시간에 학습 활동 외 활동(음악 크게 틀어서 듣기, 영상보며 떠들기, 잡담, 욕설 등)으로 주변 사람에게 피해를 주는 학생" [ref=e1093]
+                - cell "-5점" [ref=e1094]
+                - cell "46" [ref=e1095]
+                - cell "사용 중" [ref=e1096]:
+                  - button "사용 중" [ref=e1097] [cursor=pointer]
+                - cell "수정" [ref=e1098]:
+                  - button "수정" [ref=e1099] [cursor=pointer]:
+                    - generic [ref=e1100]:
+                      - img [ref=e1102]
+                      - text: 수정
+              - row "47 벌점 야간 자습 시간 야간 자습 시간에 허락 없이 돌아다니는 학생 -3점 47 사용 중 수정" [ref=e1105]:
+                - cell "47" [ref=e1106]
+                - cell "벌점" [ref=e1107]:
+                  - generic [ref=e1108]: 벌점
+                - cell "야간 자습 시간" [ref=e1109]
+                - cell "야간 자습 시간에 허락 없이 돌아다니는 학생" [ref=e1110]
+                - cell "-3점" [ref=e1111]
+                - cell "47" [ref=e1112]
+                - cell "사용 중" [ref=e1113]:
+                  - button "사용 중" [ref=e1114] [cursor=pointer]
+                - cell "수정" [ref=e1115]:
+                  - button "수정" [ref=e1116] [cursor=pointer]:
+                    - generic [ref=e1117]:
+                      - img [ref=e1119]
+                      - text: 수정
+              - row "48 벌점 야간 자습 시간 야간 자습 시간에 지정된 공부 장소 외 공간에 허락 없이 있는 학생 -3점 48 사용 중 수정" [ref=e1122]:
+                - cell "48" [ref=e1123]
+                - cell "벌점" [ref=e1124]:
+                  - generic [ref=e1125]: 벌점
+                - cell "야간 자습 시간" [ref=e1126]
+                - cell "야간 자습 시간에 지정된 공부 장소 외 공간에 허락 없이 있는 학생" [ref=e1127]
+                - cell "-3점" [ref=e1128]
+                - cell "48" [ref=e1129]
+                - cell "사용 중" [ref=e1130]:
+                  - button "사용 중" [ref=e1131] [cursor=pointer]
+                - cell "수정" [ref=e1132]:
+                  - button "수정" [ref=e1133] [cursor=pointer]:
+                    - generic [ref=e1134]:
+                      - img [ref=e1136]
+                      - text: 수정
+              - row "49 벌점 야간 자습 시간 야간 자습 시간에 음식물을 취식하는 학생 -2점 49 사용 중 수정" [ref=e1139]:
+                - cell "49" [ref=e1140]
+                - cell "벌점" [ref=e1141]:
+                  - generic [ref=e1142]: 벌점
+                - cell "야간 자습 시간" [ref=e1143]
+                - cell "야간 자습 시간에 음식물을 취식하는 학생" [ref=e1144]
+                - cell "-2점" [ref=e1145]
+                - cell "49" [ref=e1146]
+                - cell "사용 중" [ref=e1147]:
+                  - button "사용 중" [ref=e1148] [cursor=pointer]
+                - cell "수정" [ref=e1149]:
+                  - button "수정" [ref=e1150] [cursor=pointer]:
+                    - generic [ref=e1151]:
+                      - img [ref=e1153]
+                      - text: 수정
+              - row "50 벌점 야간 자습 시간 야간 자습 시간 시작 후(19:10) 늦게 교실에 입실하는 학생 -2점 50 사용 중 수정" [ref=e1156]:
+                - cell "50" [ref=e1157]
+                - cell "벌점" [ref=e1158]:
+                  - generic [ref=e1159]: 벌점
+                - cell "야간 자습 시간" [ref=e1160]
+                - cell "야간 자습 시간 시작 후(19:10) 늦게 교실에 입실하는 학생" [ref=e1161]
+                - cell "-2점" [ref=e1162]
+                - cell "50" [ref=e1163]
+                - cell "사용 중" [ref=e1164]:
+                  - button "사용 중" [ref=e1165] [cursor=pointer]
+                - cell "수정" [ref=e1166]:
+                  - button "수정" [ref=e1167] [cursor=pointer]:
+                    - generic [ref=e1168]:
+                      - img [ref=e1170]
+                      - text: 수정
+              - row "51 벌점 야간 자습 시간 야간 자습 시간에 허락 없이 자리를 바꿔 앉는 학생 -2점 51 사용 중 수정" [ref=e1173]:
+                - cell "51" [ref=e1174]
+                - cell "벌점" [ref=e1175]:
+                  - generic [ref=e1176]: 벌점
+                - cell "야간 자습 시간" [ref=e1177]
+                - cell "야간 자습 시간에 허락 없이 자리를 바꿔 앉는 학생" [ref=e1178]
+                - cell "-2점" [ref=e1179]
+                - cell "51" [ref=e1180]
+                - cell "사용 중" [ref=e1181]:
+                  - button "사용 중" [ref=e1182] [cursor=pointer]
+                - cell "수정" [ref=e1183]:
+                  - button "수정" [ref=e1184] [cursor=pointer]:
+                    - generic [ref=e1185]:
+                      - img [ref=e1187]
+                      - text: 수정
+              - row "52 벌점 용의복장 복장 규정을 위반한 학생(넥타이 미착용) -1점 52 사용 중 수정" [ref=e1190]:
+                - cell "52" [ref=e1191]
+                - cell "벌점" [ref=e1192]:
+                  - generic [ref=e1193]: 벌점
+                - cell "용의복장" [ref=e1194]
+                - cell "복장 규정을 위반한 학생(넥타이 미착용)" [ref=e1195]
+                - cell "-1점" [ref=e1196]
+                - cell "52" [ref=e1197]
+                - cell "사용 중" [ref=e1198]:
+                  - button "사용 중" [ref=e1199] [cursor=pointer]
+                - cell "수정" [ref=e1200]:
+                  - button "수정" [ref=e1201] [cursor=pointer]:
+                    - generic [ref=e1202]:
+                      - img [ref=e1204]
+                      - text: 수정
+              - row "53 벌점 용의복장 액세서리(귀걸이)를 착용한 학생 (투명, 단순 귀걸이 허용) -2점 53 사용 중 수정" [ref=e1207]:
+                - cell "53" [ref=e1208]
+                - cell "벌점" [ref=e1209]:
+                  - generic [ref=e1210]: 벌점
+                - cell "용의복장" [ref=e1211]
+                - cell "액세서리(귀걸이)를 착용한 학생 (투명, 단순 귀걸이 허용)" [ref=e1212]
+                - cell "-2점" [ref=e1213]
+                - cell "53" [ref=e1214]
+                - cell "사용 중" [ref=e1215]:
+                  - button "사용 중" [ref=e1216] [cursor=pointer]
+                - cell "수정" [ref=e1217]:
+                  - button "수정" [ref=e1218] [cursor=pointer]:
+                    - generic [ref=e1219]:
+                      - img [ref=e1221]
+                      - text: 수정
+              - row "54 벌점 용의복장 용의 규정을 위반한 학생(염색) -5점 54 사용 중 수정" [ref=e1224]:
+                - cell "54" [ref=e1225]
+                - cell "벌점" [ref=e1226]:
+                  - generic [ref=e1227]: 벌점
+                - cell "용의복장" [ref=e1228]
+                - cell "용의 규정을 위반한 학생(염색)" [ref=e1229]
+                - cell "-5점" [ref=e1230]
+                - cell "54" [ref=e1231]
+                - cell "사용 중" [ref=e1232]:
+                  - button "사용 중" [ref=e1233] [cursor=pointer]
+                - cell "수정" [ref=e1234]:
+                  - button "수정" [ref=e1235] [cursor=pointer]:
+                    - generic [ref=e1236]:
+                      - img [ref=e1238]
+                      - text: 수정
+              - row "55 벌점 용의복장 문신을 가리지 않은 학생 -5점 55 사용 중 수정" [ref=e1241]:
+                - cell "55" [ref=e1242]
+                - cell "벌점" [ref=e1243]:
+                  - generic [ref=e1244]: 벌점
+                - cell "용의복장" [ref=e1245]
+                - cell "문신을 가리지 않은 학생" [ref=e1246]
+                - cell "-5점" [ref=e1247]
+                - cell "55" [ref=e1248]
+                - cell "사용 중" [ref=e1249]:
+                  - button "사용 중" [ref=e1250] [cursor=pointer]
+                - cell "수정" [ref=e1251]:
+                  - button "수정" [ref=e1252] [cursor=pointer]:
+                    - generic [ref=e1253]:
+                      - img [ref=e1255]
+                      - text: 수정
+              - row "56 벌점 용의복장 재학 기간 중 문신을 한 학생 -30점 56 사용 중 수정" [ref=e1258]:
+                - cell "56" [ref=e1259]
+                - cell "벌점" [ref=e1260]:
+                  - generic [ref=e1261]: 벌점
+                - cell "용의복장" [ref=e1262]
+                - cell "재학 기간 중 문신을 한 학생" [ref=e1263]
+                - cell "-30점" [ref=e1264]
+                - cell "56" [ref=e1265]
+                - cell "사용 중" [ref=e1266]:
+                  - button "사용 중" [ref=e1267] [cursor=pointer]
+                - cell "수정" [ref=e1268]:
+                  - button "수정" [ref=e1269] [cursor=pointer]:
+                    - generic [ref=e1270]:
+                      - img [ref=e1272]
+                      - text: 수정
+              - row "57 벌점 용의복장 복장 규정을 위반한 학생(셔츠, 바지 미착용) -2점 57 사용 중 수정" [ref=e1275]:
+                - cell "57" [ref=e1276]
+                - cell "벌점" [ref=e1277]:
+                  - generic [ref=e1278]: 벌점
+                - cell "용의복장" [ref=e1279]
+                - cell "복장 규정을 위반한 학생(셔츠, 바지 미착용)" [ref=e1280]
+                - cell "-2점" [ref=e1281]
+                - cell "57" [ref=e1282]
+                - cell "사용 중" [ref=e1283]:
+                  - button "사용 중" [ref=e1284] [cursor=pointer]
+                - cell "수정" [ref=e1285]:
+                  - button "수정" [ref=e1286] [cursor=pointer]:
+                    - generic [ref=e1287]:
+                      - img [ref=e1289]
+                      - text: 수정
+              - row "58 벌점 출결 수업 정규/방과 후 수업 중 태도 불량 학생(수면) -3점 58 사용 중 수정" [ref=e1292]:
+                - cell "58" [ref=e1293]
+                - cell "벌점" [ref=e1294]:
+                  - generic [ref=e1295]: 벌점
+                - cell "출결 수업" [ref=e1296]
+                - cell "정규/방과 후 수업 중 태도 불량 학생(수면)" [ref=e1297]
+                - cell "-3점" [ref=e1298]
+                - cell "58" [ref=e1299]
+                - cell "사용 중" [ref=e1300]:
+                  - button "사용 중" [ref=e1301] [cursor=pointer]
+                - cell "수정" [ref=e1302]:
+                  - button "수정" [ref=e1303] [cursor=pointer]:
+                    - generic [ref=e1304]:
+                      - img [ref=e1306]
+                      - text: 수정
+              - row "59 벌점 출결 수업 정규/방과 후 수업 중 태도 불량 학생(교과서, 준비물 미지참, 과제 불이행) -5점 59 사용 중 수정" [ref=e1309]:
+                - cell "59" [ref=e1310]
+                - cell "벌점" [ref=e1311]:
+                  - generic [ref=e1312]: 벌점
+                - cell "출결 수업" [ref=e1313]
+                - cell "정규/방과 후 수업 중 태도 불량 학생(교과서, 준비물 미지참, 과제 불이행)" [ref=e1314]
+                - cell "-5점" [ref=e1315]
+                - cell "59" [ref=e1316]
+                - cell "사용 중" [ref=e1317]:
+                  - button "사용 중" [ref=e1318] [cursor=pointer]
+                - cell "수정" [ref=e1319]:
+                  - button "수정" [ref=e1320] [cursor=pointer]:
+                    - generic [ref=e1321]:
+                      - img [ref=e1323]
+                      - text: 수정
+              - row "60 벌점 출결 수업 정규/방과 후 수업 중 태도 불량 학생(잡담, 욕설, 수업 방해) -5점 60 사용 중 수정" [ref=e1326]:
+                - cell "60" [ref=e1327]
+                - cell "벌점" [ref=e1328]:
+                  - generic [ref=e1329]: 벌점
+                - cell "출결 수업" [ref=e1330]
+                - cell "정규/방과 후 수업 중 태도 불량 학생(잡담, 욕설, 수업 방해)" [ref=e1331]
+                - cell "-5점" [ref=e1332]
+                - cell "60" [ref=e1333]
+                - cell "사용 중" [ref=e1334]:
+                  - button "사용 중" [ref=e1335] [cursor=pointer]
+                - cell "수정" [ref=e1336]:
+                  - button "수정" [ref=e1337] [cursor=pointer]:
+                    - generic [ref=e1338]:
+                      - img [ref=e1340]
+                      - text: 수정
+              - row "61 벌점 출결 수업 정규/방과 후 수업 시간 중 음식물을 취식한 학생 -4점 61 사용 중 수정" [ref=e1343]:
+                - cell "61" [ref=e1344]
+                - cell "벌점" [ref=e1345]:
+                  - generic [ref=e1346]: 벌점
+                - cell "출결 수업" [ref=e1347]
+                - cell "정규/방과 후 수업 시간 중 음식물을 취식한 학생" [ref=e1348]
+                - cell "-4점" [ref=e1349]
+                - cell "61" [ref=e1350]
+                - cell "사용 중" [ref=e1351]:
+                  - button "사용 중" [ref=e1352] [cursor=pointer]
+                - cell "수정" [ref=e1353]:
+                  - button "수정" [ref=e1354] [cursor=pointer]:
+                    - generic [ref=e1355]:
+                      - img [ref=e1357]
+                      - text: 수정
+              - row "62 벌점 출결 수업 정규/방과 후 수업 시간 중 화장행위를 한 학생 -5점 62 사용 중 수정" [ref=e1360]:
+                - cell "62" [ref=e1361]
+                - cell "벌점" [ref=e1362]:
+                  - generic [ref=e1363]: 벌점
+                - cell "출결 수업" [ref=e1364]
+                - cell "정규/방과 후 수업 시간 중 화장행위를 한 학생" [ref=e1365]
+                - cell "-5점" [ref=e1366]
+                - cell "62" [ref=e1367]
+                - cell "사용 중" [ref=e1368]:
+                  - button "사용 중" [ref=e1369] [cursor=pointer]
+                - cell "수정" [ref=e1370]:
+                  - button "수정" [ref=e1371] [cursor=pointer]:
+                    - generic [ref=e1372]:
+                      - img [ref=e1374]
+                      - text: 수정
+              - row "63 벌점 출결 수업 정규/방과 후 수업 시간 중 전자기기(핸드폰, 노트북, 웨어러블기기)를 사용 및 미제출한 학생 -10점 63 사용 중 수정" [ref=e1377]:
+                - cell "63" [ref=e1378]
+                - cell "벌점" [ref=e1379]:
+                  - generic [ref=e1380]: 벌점
+                - cell "출결 수업" [ref=e1381]
+                - cell "정규/방과 후 수업 시간 중 전자기기(핸드폰, 노트북, 웨어러블기기)를 사용 및 미제출한 학생" [ref=e1382]
+                - cell "-10점" [ref=e1383]
+                - cell "63" [ref=e1384]
+                - cell "사용 중" [ref=e1385]:
+                  - button "사용 중" [ref=e1386] [cursor=pointer]
+                - cell "수정" [ref=e1387]:
+                  - button "수정" [ref=e1388] [cursor=pointer]:
+                    - generic [ref=e1389]:
+                      - img [ref=e1391]
+                      - text: 수정
+              - row "64 벌점 출결 수업 정규/방과 후 수업 종료 전 퇴실한 학생 -4점 64 사용 중 수정" [ref=e1394]:
+                - cell "64" [ref=e1395]
+                - cell "벌점" [ref=e1396]:
+                  - generic [ref=e1397]: 벌점
+                - cell "출결 수업" [ref=e1398]
+                - cell "정규/방과 후 수업 종료 전 퇴실한 학생" [ref=e1399]
+                - cell "-4점" [ref=e1400]
+                - cell "64" [ref=e1401]
+                - cell "사용 중" [ref=e1402]:
+                  - button "사용 중" [ref=e1403] [cursor=pointer]
+                - cell "수정" [ref=e1404]:
+                  - button "수정" [ref=e1405] [cursor=pointer]:
+                    - generic [ref=e1406]:
+                      - img [ref=e1408]
+                      - text: 수정
+              - row "65 벌점 출결 수업 정규/방과 후 수업 미인정 외출, 지각(5분 이상), 화장실(10분 이상), 결과를 한 학생 -3점 65 사용 중 수정" [ref=e1411]:
+                - cell "65" [ref=e1412]
+                - cell "벌점" [ref=e1413]:
+                  - generic [ref=e1414]: 벌점
+                - cell "출결 수업" [ref=e1415]
+                - cell "정규/방과 후 수업 미인정 외출, 지각(5분 이상), 화장실(10분 이상), 결과를 한 학생" [ref=e1416]
+                - cell "-3점" [ref=e1417]
+                - cell "65" [ref=e1418]
+                - cell "사용 중" [ref=e1419]:
+                  - button "사용 중" [ref=e1420] [cursor=pointer]
+                - cell "수정" [ref=e1421]:
+                  - button "수정" [ref=e1422] [cursor=pointer]:
+                    - generic [ref=e1423]:
+                      - img [ref=e1425]
+                      - text: 수정
+              - row "66 벌점 출결 수업 정규/방과 후 수업 미인정 결석 및 조퇴를 한 학생 -5점 66 사용 중 수정" [ref=e1428]:
+                - cell "66" [ref=e1429]
+                - cell "벌점" [ref=e1430]:
+                  - generic [ref=e1431]: 벌점
+                - cell "출결 수업" [ref=e1432]
+                - cell "정규/방과 후 수업 미인정 결석 및 조퇴를 한 학생" [ref=e1433]
+                - cell "-5점" [ref=e1434]
+                - cell "66" [ref=e1435]
+                - cell "사용 중" [ref=e1436]:
+                  - button "사용 중" [ref=e1437] [cursor=pointer]
+                - cell "수정" [ref=e1438]:
+                  - button "수정" [ref=e1439] [cursor=pointer]:
+                    - generic [ref=e1440]:
+                      - img [ref=e1442]
+                      - text: 수정
+              - row "67 벌점 출결 수업 정규/방과 후 수업 시간 중 SNS(카카오 등)를 이용하여 대화를 주고 받는 것을 적발당한 학생 -3점 67 사용 중 수정" [ref=e1445]:
+                - cell "67" [ref=e1446]
+                - cell "벌점" [ref=e1447]:
+                  - generic [ref=e1448]: 벌점
+                - cell "출결 수업" [ref=e1449]
+                - cell "정규/방과 후 수업 시간 중 SNS(카카오 등)를 이용하여 대화를 주고 받는 것을 적발당한 학생" [ref=e1450]
+                - cell "-3점" [ref=e1451]
+                - cell "67" [ref=e1452]
+                - cell "사용 중" [ref=e1453]:
+                  - button "사용 중" [ref=e1454] [cursor=pointer]
+                - cell "수정" [ref=e1455]:
+                  - button "수정" [ref=e1456] [cursor=pointer]:
+                    - generic [ref=e1457]:
+                      - img [ref=e1459]
+                      - text: 수정
+              - row "68 벌점 출결 수업 조례시간(08:30~08:40)에 지각한 학생 -2점 68 사용 중 수정" [ref=e1462]:
+                - cell "68" [ref=e1463]
+                - cell "벌점" [ref=e1464]:
+                  - generic [ref=e1465]: 벌점
+                - cell "출결 수업" [ref=e1466]
+                - cell "조례시간(08:30~08:40)에 지각한 학생" [ref=e1467]
+                - cell "-2점" [ref=e1468]
+                - cell "68" [ref=e1469]
+                - cell "사용 중" [ref=e1470]:
+                  - button "사용 중" [ref=e1471] [cursor=pointer]
+                - cell "수정" [ref=e1472]:
+                  - button "수정" [ref=e1473] [cursor=pointer]:
+                    - generic [ref=e1474]:
+                      - img [ref=e1476]
+                      - text: 수정
+              - row "69 벌점 흡연 음주 약물 담배, 라이터, 음란물 등 소지 금지 물품을 소지한 학생 -10점 69 사용 중 수정" [ref=e1479]:
+                - cell "69" [ref=e1480]
+                - cell "벌점" [ref=e1481]:
+                  - generic [ref=e1482]: 벌점
+                - cell "흡연 음주 약물" [ref=e1483]
+                - cell "담배, 라이터, 음란물 등 소지 금지 물품을 소지한 학생" [ref=e1484]
+                - cell "-10점" [ref=e1485]
+                - cell "69" [ref=e1486]
+                - cell "사용 중" [ref=e1487]:
+                  - button "사용 중" [ref=e1488] [cursor=pointer]
+                - cell "수정" [ref=e1489]:
+                  - button "수정" [ref=e1490] [cursor=pointer]:
+                    - generic [ref=e1491]:
+                      - img [ref=e1493]
+                      - text: 수정
+              - row "70 벌점 흡연 음주 약물 교내·외에서 흡연이나 음주를 한 학생 -20점 70 사용 중 수정" [ref=e1496]:
+                - cell "70" [ref=e1497]
+                - cell "벌점" [ref=e1498]:
+                  - generic [ref=e1499]: 벌점
+                - cell "흡연 음주 약물" [ref=e1500]
+                - cell "교내·외에서 흡연이나 음주를 한 학생" [ref=e1501]
+                - cell "-20점" [ref=e1502]
+                - cell "70" [ref=e1503]
+                - cell "사용 중" [ref=e1504]:
+                  - button "사용 중" [ref=e1505] [cursor=pointer]
+                - cell "수정" [ref=e1506]:
+                  - button "수정" [ref=e1507] [cursor=pointer]:
+                    - generic [ref=e1508]:
+                      - img [ref=e1510]
+                      - text: 수정
+              - row "71 벌점 흡연 음주 약물 의학적 목적이 아닌 약물을 소지하거나 복용 및 흉기를 소지한 학생 -20점 71 사용 중 수정" [ref=e1513]:
+                - cell "71" [ref=e1514]
+                - cell "벌점" [ref=e1515]:
+                  - generic [ref=e1516]: 벌점
+                - cell "흡연 음주 약물" [ref=e1517]
+                - cell "의학적 목적이 아닌 약물을 소지하거나 복용 및 흉기를 소지한 학생" [ref=e1518]
+                - cell "-20점" [ref=e1519]
+                - cell "71" [ref=e1520]
+                - cell "사용 중" [ref=e1521]:
+                  - button "사용 중" [ref=e1522] [cursor=pointer]
+                - cell "수정" [ref=e1523]:
+                  - button "수정" [ref=e1524] [cursor=pointer]:
+                    - generic [ref=e1525]:
+                      - img [ref=e1527]
+                      - text: 수정
+  - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e11]

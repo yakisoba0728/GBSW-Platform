@@ -226,7 +226,6 @@ export class MileageService {
       scope,
       actorStudentId,
       actorSessionId,
-      query,
     );
   }
 
@@ -268,7 +267,6 @@ export class MileageService {
       scope,
       actorStudentId,
       actorSessionId,
-      query,
     );
   }
 

@@ -1,0 +1,102 @@
+- generic [ref=e1]:
+  - generic [ref=e69]:
+    - complementary [ref=e70]:
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - img [ref=e73]
+          - generic [ref=e74]:
+            - paragraph [ref=e75]: GBSW Platform
+            - paragraph [ref=e76]: 최고관리자
+        - navigation [ref=e77]:
+          - generic [ref=e78]:
+            - paragraph [ref=e79]: 계정 관리
+            - button "교사 관리" [expanded] [ref=e80] [cursor=pointer]:
+              - img [ref=e82]
+              - generic [ref=e87]: 교사 관리
+              - img [ref=e89]
+            - generic [ref=e93]:
+              - link "교사 생성" [ref=e94] [cursor=pointer]:
+                - /url: /admin/teachers/create
+                - text: 교사 생성
+              - link "교사 목록" [ref=e96] [cursor=pointer]:
+                - /url: /admin/teachers
+                - text: 교사 목록
+          - generic [ref=e98]:
+            - paragraph [ref=e99]: 마일리지 관리
+            - button "그린 마일리지" [expanded] [ref=e100] [cursor=pointer]:
+              - img [ref=e102]
+              - generic [ref=e105]: 그린 마일리지
+              - img [ref=e107]
+            - link "상벌점 항목" [ref=e277] [cursor=pointer]:
+              - /url: /admin/school/rules
+              - text: 상벌점 항목
+          - generic [ref=e112]:
+            - button "기숙사 상벌점" [expanded] [ref=e113] [cursor=pointer]:
+              - img [ref=e115]
+              - generic [ref=e118]: 기숙사 상벌점
+              - img [ref=e120]
+            - generic [ref=e122]:
+              - link "기숙사 상벌점 항목" [ref=e1532] [cursor=pointer]:
+                - /url: /admin/dorm/rules
+                - text: 기숙사 상벌점 항목
+              - link "사감 교사 관리" [active] [ref=e1533] [cursor=pointer]:
+                - /url: /admin/dorm-mileage/teachers
+                - text: 사감 교사 관리
+          - generic [ref=e127]:
+            - paragraph [ref=e128]: 시스템
+            - button "DB 관리" [ref=e129] [cursor=pointer]:
+              - img [ref=e131]
+              - generic [ref=e135]: DB 관리
+              - img [ref=e137]
+            - link [ref=e140] [cursor=pointer]:
+              - /url: /admin/db
+              - text: DB 관리
+          - generic [ref=e142]:
+            - button "보안" [ref=e143] [cursor=pointer]:
+              - img [ref=e145]
+              - generic [ref=e148]: 보안
+              - img [ref=e150]
+            - link [ref=e153] [cursor=pointer]:
+              - /url: /admin/security
+              - text: 관리자 보안
+        - generic [ref=e156]:
+          - button "다크 모드로 전환" [ref=e157] [cursor=pointer]:
+            - img [ref=e159]
+            - img [ref=e170]
+          - button "로그아웃" [ref=e172] [cursor=pointer]:
+            - generic [ref=e173]:
+              - img [ref=e174]
+              - text: 로그아웃
+    - generic [ref=e177]:
+      - banner [ref=e178]:
+        - paragraph [ref=e179]: 사감 교사 관리
+      - main [ref=e180]:
+        - generic [ref=e2277]:
+          - generic [ref=e2278]:
+            - paragraph [ref=e2279]: Dorm Mileage
+            - heading "사감 교사 관리" [level=2] [ref=e2280]
+            - paragraph [ref=e2281]: 사감 교사로 지정된 계정만 기숙사 상벌점을 부여하고 수정할 수 있습니다.
+          - table [ref=e2289]:
+            - rowgroup [ref=e2294]:
+              - row "아이디 이름 사감 교사" [ref=e2295]:
+                - columnheader "아이디" [ref=e2296]
+                - columnheader "이름" [ref=e2297]
+                - columnheader "사감 교사" [ref=e2298]
+            - rowgroup [ref=e2299]:
+              - row "teacher1 김교사 미사용" [ref=e2300]:
+                - cell "teacher1" [ref=e2301]
+                - cell "김교사" [ref=e2302]
+                - cell "미사용" [ref=e2303]:
+                  - generic [ref=e2304]:
+                    - generic [ref=e2305]: 미사용
+                    - switch [ref=e2306] [cursor=pointer]
+              - row "teacher2 박교사 미사용" [ref=e2308]:
+                - cell "teacher2" [ref=e2309]
+                - cell "박교사" [ref=e2310]
+                - cell "미사용" [ref=e2311]:
+                  - generic [ref=e2312]:
+                    - generic [ref=e2313]: 미사용
+                    - switch [ref=e2314] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e11]

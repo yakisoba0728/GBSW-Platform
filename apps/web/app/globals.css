@@ -209,7 +209,8 @@
     border-radius: 4px;
     font-size: 11px;
     font-weight: 700;
-    font-family: var(--font-space-grotesk);
+    font-family: var(--font-noto-sans-kr), sans-serif;
+    white-space: nowrap;
     background-color: var(--mileage-green-bg);
     color: var(--mileage-green);
     border: 1px solid var(--mileage-green-border);
@@ -223,7 +224,8 @@
     border-radius: 4px;
     font-size: 11px;
     font-weight: 700;
-    font-family: var(--font-space-grotesk);
+    font-family: var(--font-noto-sans-kr), sans-serif;
+    white-space: nowrap;
     background-color: var(--mileage-red-bg);
     color: var(--mileage-red);
     border: 1px solid var(--mileage-red-border);

@@ -40,7 +40,7 @@ describe('AdminService.createTeacher', () => {
       },
     } as unknown as PrismaService;
 
-    const service = new AdminService(prisma as PrismaService);
+    const service = new AdminService(prisma);
     const result = await service.createTeacher({
       teacherId: 'teacher01',
       name: '홍길동',

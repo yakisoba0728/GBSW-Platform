@@ -20,10 +20,17 @@ describe('MileageStudentsService.getStudentSummary', () => {
           teacherFindFirstCallCount += 1;
           if (teacherFindFirstCallCount === 1) {
             // First call: assertTeacherExists checks teacher is active
-            return Promise.resolve({ teacherId: 'teacher-1', name: '담당 교사' });
+            return Promise.resolve({
+              teacherId: 'teacher-1',
+              name: '담당 교사',
+            });
           }
           // Second call: assertTeacherReadAccess checks isDormTeacher — teacher is not a dorm teacher
-          return Promise.resolve({ teacherId: 'teacher-1', name: '담당 교사', isDormTeacher: false });
+          return Promise.resolve({
+            teacherId: 'teacher-1',
+            name: '담당 교사',
+            isDormTeacher: false,
+          });
         },
       },
     } as unknown as PrismaService;

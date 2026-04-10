@@ -269,7 +269,8 @@ export default function SharedStudentMileageHistoryView<
                 color: 'var(--fg)',
                 fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                 minWidth: 0,
-                width: '112px',
+                width: '100px',
+                flexShrink: 1,
               }}
             />
             <span
@@ -290,7 +291,8 @@ export default function SharedStudentMileageHistoryView<
                 color: 'var(--fg)',
                 fontFamily: 'var(--font-noto-sans-kr), sans-serif',
                 minWidth: 0,
-                width: '112px',
+                width: '100px',
+                flexShrink: 1,
               }}
             />
           </div>

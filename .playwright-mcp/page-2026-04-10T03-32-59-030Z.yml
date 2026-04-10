@@ -1,0 +1,727 @@
+- generic [ref=e1]:
+  - generic [ref=e69]:
+    - complementary [ref=e70]:
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - img [ref=e73]
+          - generic [ref=e74]:
+            - paragraph [ref=e75]: GBSW Platform
+            - paragraph [ref=e76]: 최고관리자
+        - navigation [ref=e77]:
+          - generic [ref=e78]:
+            - paragraph [ref=e79]: 계정 관리
+            - button "교사 관리" [expanded] [ref=e80] [cursor=pointer]:
+              - img [ref=e82]
+              - generic [ref=e87]: 교사 관리
+              - img [ref=e89]
+            - generic [ref=e93]:
+              - link "교사 생성" [ref=e94] [cursor=pointer]:
+                - /url: /admin/teachers/create
+                - text: 교사 생성
+              - link "교사 목록" [ref=e96] [cursor=pointer]:
+                - /url: /admin/teachers
+                - text: 교사 목록
+          - generic [ref=e98]:
+            - paragraph [ref=e99]: 마일리지 관리
+            - button "그린 마일리지" [expanded] [ref=e100] [cursor=pointer]:
+              - img [ref=e102]
+              - generic [ref=e105]: 그린 마일리지
+              - img [ref=e107]
+            - link "상벌점 항목" [ref=e277] [cursor=pointer]:
+              - /url: /admin/school/rules
+              - text: 상벌점 항목
+          - generic [ref=e112]:
+            - button "기숙사 상벌점" [expanded] [ref=e113] [cursor=pointer]:
+              - img [ref=e115]
+              - generic [ref=e118]: 기숙사 상벌점
+              - img [ref=e120]
+            - generic [ref=e122]:
+              - link "기숙사 상벌점 항목" [active] [ref=e1532] [cursor=pointer]:
+                - /url: /admin/dorm/rules
+                - text: 기숙사 상벌점 항목
+              - link "사감 교사 관리" [ref=e1533] [cursor=pointer]:
+                - /url: /admin/dorm-mileage/teachers
+                - text: 사감 교사 관리
+          - generic [ref=e127]:
+            - paragraph [ref=e128]: 시스템
+            - button "DB 관리" [ref=e129] [cursor=pointer]:
+              - img [ref=e131]
+              - generic [ref=e135]: DB 관리
+              - img [ref=e137]
+            - link [ref=e140] [cursor=pointer]:
+              - /url: /admin/db
+              - text: DB 관리
+          - generic [ref=e142]:
+            - button "보안" [ref=e143] [cursor=pointer]:
+              - img [ref=e145]
+              - generic [ref=e148]: 보안
+              - img [ref=e150]
+            - link [ref=e153] [cursor=pointer]:
+              - /url: /admin/security
+              - text: 관리자 보안
+        - generic [ref=e156]:
+          - button "다크 모드로 전환" [ref=e157] [cursor=pointer]:
+            - img [ref=e159]
+            - img [ref=e170]
+          - button "로그아웃" [ref=e172] [cursor=pointer]:
+            - generic [ref=e173]:
+              - img [ref=e174]
+              - text: 로그아웃
+    - generic [ref=e177]:
+      - banner [ref=e178]:
+        - paragraph [ref=e179]: 기숙사 상벌점 항목
+      - main [ref=e180]:
+        - generic [ref=e1536]:
+          - generic [ref=e1538]:
+            - generic [ref=e1539]:
+              - heading "기숙사 상벌점 항목" [level=2] [ref=e1540]
+              - paragraph [ref=e1541]: 현재 등록된 기숙사 상벌점 규칙을 관리합니다.
+            - button "항목 추가" [ref=e1543] [cursor=pointer]:
+              - generic [ref=e1544]:
+                - img [ref=e1546]
+                - text: 항목 추가
+          - generic [ref=e1548]:
+            - generic [ref=e1549]:
+              - img
+              - textbox "항목명 또는 카테고리 검색" [ref=e1550]
+            - combobox [ref=e1551]:
+              - option "전체 유형" [selected]
+              - option "상점"
+              - option "벌점"
+            - combobox [ref=e1552]:
+              - option "전체 카테고리" [selected]
+              - option "기숙사 규정"
+              - option "기숙사 생활"
+              - option "신고"
+              - option "자치회 임원"
+            - generic [ref=e1553]: 41건
+          - table [ref=e1558]:
+            - rowgroup [ref=e1568]:
+              - row "ID 유형 카테고리 항목명 기본점수 순서 상태 작업" [ref=e1569]:
+                - columnheader "ID" [ref=e1570]
+                - columnheader "유형" [ref=e1571]
+                - columnheader "카테고리" [ref=e1572]
+                - columnheader "항목명" [ref=e1573]
+                - columnheader "기본점수" [ref=e1574]
+                - columnheader "순서" [ref=e1575]
+                - columnheader "상태" [ref=e1576]
+                - columnheader "작업" [ref=e1577]
+            - rowgroup [ref=e1578]:
+              - row "72 상점 기숙사 생활 깨끗한 호실을 유지하는 호실 학생 전원 +3점 1 사용 중 수정" [ref=e1579]:
+                - cell "72" [ref=e1580]
+                - cell "상점" [ref=e1581]:
+                  - generic [ref=e1582]: 상점
+                - cell "기숙사 생활" [ref=e1583]
+                - cell "깨끗한 호실을 유지하는 호실 학생 전원" [ref=e1584]
+                - cell "+3점" [ref=e1585]
+                - cell "1" [ref=e1586]
+                - cell "사용 중" [ref=e1587]:
+                  - button "사용 중" [ref=e1588] [cursor=pointer]
+                - cell "수정" [ref=e1589]:
+                  - button "수정" [ref=e1590] [cursor=pointer]:
+                    - generic [ref=e1591]:
+                      - img [ref=e1593]
+                      - text: 수정
+              - 'row "73 상점 기숙사 생활 생활관 내 생활이 타의 모범이 되는 자 기본: 2점 (범위: 2~5) 2 사용 중 수정" [ref=e1596]':
+                - cell "73" [ref=e1597]
+                - cell "상점" [ref=e1598]:
+                  - generic [ref=e1599]: 상점
+                - cell "기숙사 생활" [ref=e1600]
+                - cell "생활관 내 생활이 타의 모범이 되는 자" [ref=e1601]
+                - 'cell "기본: 2점 (범위: 2~5)" [ref=e1602]'
+                - cell "2" [ref=e1603]
+                - cell "사용 중" [ref=e1604]:
+                  - button "사용 중" [ref=e1605] [cursor=pointer]
+                - cell "수정" [ref=e1606]:
+                  - button "수정" [ref=e1607] [cursor=pointer]:
+                    - generic [ref=e1608]:
+                      - img [ref=e1610]
+                      - text: 수정
+              - 'row "74 상점 기숙사 생활 건물 내의 환경 미화 및 공공 시설물에서의 노력 봉사자 기본: 1점 (범위: 1~3) 3 사용 중 수정" [ref=e1613]':
+                - cell "74" [ref=e1614]
+                - cell "상점" [ref=e1615]:
+                  - generic [ref=e1616]: 상점
+                - cell "기숙사 생활" [ref=e1617]
+                - cell "건물 내의 환경 미화 및 공공 시설물에서의 노력 봉사자" [ref=e1618]
+                - 'cell "기본: 1점 (범위: 1~3)" [ref=e1619]'
+                - cell "3" [ref=e1620]
+                - cell "사용 중" [ref=e1621]:
+                  - button "사용 중" [ref=e1622] [cursor=pointer]
+                - cell "수정" [ref=e1623]:
+                  - button "수정" [ref=e1624] [cursor=pointer]:
+                    - generic [ref=e1625]:
+                      - img [ref=e1627]
+                      - text: 수정
+              - 'row "75 상점 기숙사 생활 위 사항에 없는 사안 (운영위원회 협의) 기본: 1점 (범위: 1~5) 4 사용 중 수정" [ref=e1630]':
+                - cell "75" [ref=e1631]
+                - cell "상점" [ref=e1632]:
+                  - generic [ref=e1633]: 상점
+                - cell "기숙사 생활" [ref=e1634]
+                - cell "위 사항에 없는 사안 (운영위원회 협의)" [ref=e1635]
+                - 'cell "기본: 1점 (범위: 1~5)" [ref=e1636]'
+                - cell "4" [ref=e1637]
+                - cell "사용 중" [ref=e1638]:
+                  - button "사용 중" [ref=e1639] [cursor=pointer]
+                - cell "수정" [ref=e1640]:
+                  - button "수정" [ref=e1641] [cursor=pointer]:
+                    - generic [ref=e1642]:
+                      - img [ref=e1644]
+                      - text: 수정
+              - row "76 상점 신고 신고 (분실물 습득) +1점 5 사용 중 수정" [ref=e1647]:
+                - cell "76" [ref=e1648]
+                - cell "상점" [ref=e1649]:
+                  - generic [ref=e1650]: 상점
+                - cell "신고" [ref=e1651]
+                - cell "신고 (분실물 습득)" [ref=e1652]
+                - cell "+1점" [ref=e1653]
+                - cell "5" [ref=e1654]
+                - cell "사용 중" [ref=e1655]:
+                  - button "사용 중" [ref=e1656] [cursor=pointer]
+                - cell "수정" [ref=e1657]:
+                  - button "수정" [ref=e1658] [cursor=pointer]:
+                    - generic [ref=e1659]:
+                      - img [ref=e1661]
+                      - text: 수정
+              - row "77 상점 신고 신고 (사내 기물 파손) +1점 6 사용 중 수정" [ref=e1664]:
+                - cell "77" [ref=e1665]
+                - cell "상점" [ref=e1666]:
+                  - generic [ref=e1667]: 상점
+                - cell "신고" [ref=e1668]
+                - cell "신고 (사내 기물 파손)" [ref=e1669]
+                - cell "+1점" [ref=e1670]
+                - cell "6" [ref=e1671]
+                - cell "사용 중" [ref=e1672]:
+                  - button "사용 중" [ref=e1673] [cursor=pointer]
+                - cell "수정" [ref=e1674]:
+                  - button "수정" [ref=e1675] [cursor=pointer]:
+                    - generic [ref=e1676]:
+                      - img [ref=e1678]
+                      - text: 수정
+              - row "78 상점 신고 신고 (흡연, 음주 및 규정 위반) +2점 7 사용 중 수정" [ref=e1681]:
+                - cell "78" [ref=e1682]
+                - cell "상점" [ref=e1683]:
+                  - generic [ref=e1684]: 상점
+                - cell "신고" [ref=e1685]
+                - cell "신고 (흡연, 음주 및 규정 위반)" [ref=e1686]
+                - cell "+2점" [ref=e1687]
+                - cell "7" [ref=e1688]
+                - cell "사용 중" [ref=e1689]:
+                  - button "사용 중" [ref=e1690] [cursor=pointer]
+                - cell "수정" [ref=e1691]:
+                  - button "수정" [ref=e1692] [cursor=pointer]:
+                    - generic [ref=e1693]:
+                      - img [ref=e1695]
+                      - text: 수정
+              - row "79 상점 신고 신고 (폭력, 금품 갈취) +3점 8 사용 중 수정" [ref=e1698]:
+                - cell "79" [ref=e1699]
+                - cell "상점" [ref=e1700]:
+                  - generic [ref=e1701]: 상점
+                - cell "신고" [ref=e1702]
+                - cell "신고 (폭력, 금품 갈취)" [ref=e1703]
+                - cell "+3점" [ref=e1704]
+                - cell "8" [ref=e1705]
+                - cell "사용 중" [ref=e1706]:
+                  - button "사용 중" [ref=e1707] [cursor=pointer]
+                - cell "수정" [ref=e1708]:
+                  - button "수정" [ref=e1709] [cursor=pointer]:
+                    - generic [ref=e1710]:
+                      - img [ref=e1712]
+                      - text: 수정
+              - row "80 상점 자치회 임원 자치회 임원 (층장 포함) 및 봉사자 (학기당) +3점 9 사용 중 수정" [ref=e1715]:
+                - cell "80" [ref=e1716]
+                - cell "상점" [ref=e1717]:
+                  - generic [ref=e1718]: 상점
+                - cell "자치회 임원" [ref=e1719]
+                - cell "자치회 임원 (층장 포함) 및 봉사자 (학기당)" [ref=e1720]
+                - cell "+3점" [ref=e1721]
+                - cell "9" [ref=e1722]
+                - cell "사용 중" [ref=e1723]:
+                  - button "사용 중" [ref=e1724] [cursor=pointer]
+                - cell "수정" [ref=e1725]:
+                  - button "수정" [ref=e1726] [cursor=pointer]:
+                    - generic [ref=e1727]:
+                      - img [ref=e1729]
+                      - text: 수정
+              - row "81 벌점 기숙사 규정 정해진 호실 이외에서 숙박하는 행위 -20점 10 사용 중 수정" [ref=e1732]:
+                - cell "81" [ref=e1733]
+                - cell "벌점" [ref=e1734]:
+                  - generic [ref=e1735]: 벌점
+                - cell "기숙사 규정" [ref=e1736]
+                - cell "정해진 호실 이외에서 숙박하는 행위" [ref=e1737]
+                - cell "-20점" [ref=e1738]
+                - cell "10" [ref=e1739]
+                - cell "사용 중" [ref=e1740]:
+                  - button "사용 중" [ref=e1741] [cursor=pointer]
+                - cell "수정" [ref=e1742]:
+                  - button "수정" [ref=e1743] [cursor=pointer]:
+                    - generic [ref=e1744]:
+                      - img [ref=e1746]
+                      - text: 수정
+              - row "82 벌점 기숙사 규정 무단 외출 -20점 11 사용 중 수정" [ref=e1749]:
+                - cell "82" [ref=e1750]
+                - cell "벌점" [ref=e1751]:
+                  - generic [ref=e1752]: 벌점
+                - cell "기숙사 규정" [ref=e1753]
+                - cell "무단 외출" [ref=e1754]
+                - cell "-20점" [ref=e1755]
+                - cell "11" [ref=e1756]
+                - cell "사용 중" [ref=e1757]:
+                  - button "사용 중" [ref=e1758] [cursor=pointer]
+                - cell "수정" [ref=e1759]:
+                  - button "수정" [ref=e1760] [cursor=pointer]:
+                    - generic [ref=e1761]:
+                      - img [ref=e1763]
+                      - text: 수정
+              - row "83 벌점 기숙사 규정 도박 행위 (고리대금 행위 포함) -20점 12 사용 중 수정" [ref=e1766]:
+                - cell "83" [ref=e1767]
+                - cell "벌점" [ref=e1768]:
+                  - generic [ref=e1769]: 벌점
+                - cell "기숙사 규정" [ref=e1770]
+                - cell "도박 행위 (고리대금 행위 포함)" [ref=e1771]
+                - cell "-20점" [ref=e1772]
+                - cell "12" [ref=e1773]
+                - cell "사용 중" [ref=e1774]:
+                  - button "사용 중" [ref=e1775] [cursor=pointer]
+                - cell "수정" [ref=e1776]:
+                  - button "수정" [ref=e1777] [cursor=pointer]:
+                    - generic [ref=e1778]:
+                      - img [ref=e1780]
+                      - text: 수정
+              - row "84 벌점 기숙사 규정 흡연·음주·도박행위 동조 -20점 13 사용 중 수정" [ref=e1783]:
+                - cell "84" [ref=e1784]
+                - cell "벌점" [ref=e1785]:
+                  - generic [ref=e1786]: 벌점
+                - cell "기숙사 규정" [ref=e1787]
+                - cell "흡연·음주·도박행위 동조" [ref=e1788]
+                - cell "-20점" [ref=e1789]
+                - cell "13" [ref=e1790]
+                - cell "사용 중" [ref=e1791]:
+                  - button "사용 중" [ref=e1792] [cursor=pointer]
+                - cell "수정" [ref=e1793]:
+                  - button "수정" [ref=e1794] [cursor=pointer]:
+                    - generic [ref=e1795]:
+                      - img [ref=e1797]
+                      - text: 수정
+              - row "85 벌점 기숙사 규정 야간 자율시간 야간 출입 제한 구역 출입 -15점 14 사용 중 수정" [ref=e1800]:
+                - cell "85" [ref=e1801]
+                - cell "벌점" [ref=e1802]:
+                  - generic [ref=e1803]: 벌점
+                - cell "기숙사 규정" [ref=e1804]
+                - cell "야간 자율시간 야간 출입 제한 구역 출입" [ref=e1805]
+                - cell "-15점" [ref=e1806]
+                - cell "14" [ref=e1807]
+                - cell "사용 중" [ref=e1808]:
+                  - button "사용 중" [ref=e1809] [cursor=pointer]
+                - cell "수정" [ref=e1810]:
+                  - button "수정" [ref=e1811] [cursor=pointer]:
+                    - generic [ref=e1812]:
+                      - img [ref=e1814]
+                      - text: 수정
+              - row "86 벌점 기숙사 규정 흡연 도구 소지 -15점 15 사용 중 수정" [ref=e1817]:
+                - cell "86" [ref=e1818]
+                - cell "벌점" [ref=e1819]:
+                  - generic [ref=e1820]: 벌점
+                - cell "기숙사 규정" [ref=e1821]
+                - cell "흡연 도구 소지" [ref=e1822]
+                - cell "-15점" [ref=e1823]
+                - cell "15" [ref=e1824]
+                - cell "사용 중" [ref=e1825]:
+                  - button "사용 중" [ref=e1826] [cursor=pointer]
+                - cell "수정" [ref=e1827]:
+                  - button "수정" [ref=e1828] [cursor=pointer]:
+                    - generic [ref=e1829]:
+                      - img [ref=e1831]
+                      - text: 수정
+              - row "87 벌점 기숙사 규정 음란 서적·동영상 소유 또는 유포 -10점 16 사용 중 수정" [ref=e1834]:
+                - cell "87" [ref=e1835]
+                - cell "벌점" [ref=e1836]:
+                  - generic [ref=e1837]: 벌점
+                - cell "기숙사 규정" [ref=e1838]
+                - cell "음란 서적·동영상 소유 또는 유포" [ref=e1839]
+                - cell "-10점" [ref=e1840]
+                - cell "16" [ref=e1841]
+                - cell "사용 중" [ref=e1842]:
+                  - button "사용 중" [ref=e1843] [cursor=pointer]
+                - cell "수정" [ref=e1844]:
+                  - button "수정" [ref=e1845] [cursor=pointer]:
+                    - generic [ref=e1846]:
+                      - img [ref=e1848]
+                      - text: 수정
+              - row "88 벌점 기숙사 규정 사감 및 기숙사 담당 교사 지시 불이행 -10점 17 사용 중 수정" [ref=e1851]:
+                - cell "88" [ref=e1852]
+                - cell "벌점" [ref=e1853]:
+                  - generic [ref=e1854]: 벌점
+                - cell "기숙사 규정" [ref=e1855]
+                - cell "사감 및 기숙사 담당 교사 지시 불이행" [ref=e1856]
+                - cell "-10점" [ref=e1857]
+                - cell "17" [ref=e1858]
+                - cell "사용 중" [ref=e1859]:
+                  - button "사용 중" [ref=e1860] [cursor=pointer]
+                - cell "수정" [ref=e1861]:
+                  - button "수정" [ref=e1862] [cursor=pointer]:
+                    - generic [ref=e1863]:
+                      - img [ref=e1865]
+                      - text: 수정
+              - row "89 벌점 기숙사 규정 타인의 음식을 훔쳐 먹거나 물건을 무단 사용 -10점 18 사용 중 수정" [ref=e1868]:
+                - cell "89" [ref=e1869]
+                - cell "벌점" [ref=e1870]:
+                  - generic [ref=e1871]: 벌점
+                - cell "기숙사 규정" [ref=e1872]
+                - cell "타인의 음식을 훔쳐 먹거나 물건을 무단 사용" [ref=e1873]
+                - cell "-10점" [ref=e1874]
+                - cell "18" [ref=e1875]
+                - cell "사용 중" [ref=e1876]:
+                  - button "사용 중" [ref=e1877] [cursor=pointer]
+                - cell "수정" [ref=e1878]:
+                  - button "수정" [ref=e1879] [cursor=pointer]:
+                    - generic [ref=e1880]:
+                      - img [ref=e1882]
+                      - text: 수정
+              - row "90 벌점 기숙사 규정 기숙사 내외 시설 및 물품 고의 파손 -10점 19 사용 중 수정" [ref=e1885]:
+                - cell "90" [ref=e1886]
+                - cell "벌점" [ref=e1887]:
+                  - generic [ref=e1888]: 벌점
+                - cell "기숙사 규정" [ref=e1889]
+                - cell "기숙사 내외 시설 및 물품 고의 파손" [ref=e1890]
+                - cell "-10점" [ref=e1891]
+                - cell "19" [ref=e1892]
+                - cell "사용 중" [ref=e1893]:
+                  - button "사용 중" [ref=e1894] [cursor=pointer]
+                - cell "수정" [ref=e1895]:
+                  - button "수정" [ref=e1896] [cursor=pointer]:
+                    - generic [ref=e1897]:
+                      - img [ref=e1899]
+                      - text: 수정
+              - row "91 벌점 기숙사 규정 빈 타호실 출입 -10점 20 사용 중 수정" [ref=e1902]:
+                - cell "91" [ref=e1903]
+                - cell "벌점" [ref=e1904]:
+                  - generic [ref=e1905]: 벌점
+                - cell "기숙사 규정" [ref=e1906]
+                - cell "빈 타호실 출입" [ref=e1907]
+                - cell "-10점" [ref=e1908]
+                - cell "20" [ref=e1909]
+                - cell "사용 중" [ref=e1910]:
+                  - button "사용 중" [ref=e1911] [cursor=pointer]
+                - cell "수정" [ref=e1912]:
+                  - button "수정" [ref=e1913] [cursor=pointer]:
+                    - generic [ref=e1914]:
+                      - img [ref=e1916]
+                      - text: 수정
+              - row "92 벌점 기숙사 규정 취침 시간 이후 타인 수면 방해 -5점 21 사용 중 수정" [ref=e1919]:
+                - cell "92" [ref=e1920]
+                - cell "벌점" [ref=e1921]:
+                  - generic [ref=e1922]: 벌점
+                - cell "기숙사 규정" [ref=e1923]
+                - cell "취침 시간 이후 타인 수면 방해" [ref=e1924]
+                - cell "-5점" [ref=e1925]
+                - cell "21" [ref=e1926]
+                - cell "사용 중" [ref=e1927]:
+                  - button "사용 중" [ref=e1928] [cursor=pointer]
+                - cell "수정" [ref=e1929]:
+                  - button "수정" [ref=e1930] [cursor=pointer]:
+                    - generic [ref=e1931]:
+                      - img [ref=e1933]
+                      - text: 수정
+              - row "93 벌점 기숙사 규정 점호 이후 기숙사 내 이동 또는 타 호실 출입 -5점 22 사용 중 수정" [ref=e1936]:
+                - cell "93" [ref=e1937]
+                - cell "벌점" [ref=e1938]:
+                  - generic [ref=e1939]: 벌점
+                - cell "기숙사 규정" [ref=e1940]
+                - cell "점호 이후 기숙사 내 이동 또는 타 호실 출입" [ref=e1941]
+                - cell "-5점" [ref=e1942]
+                - cell "22" [ref=e1943]
+                - cell "사용 중" [ref=e1944]:
+                  - button "사용 중" [ref=e1945] [cursor=pointer]
+                - cell "수정" [ref=e1946]:
+                  - button "수정" [ref=e1947] [cursor=pointer]:
+                    - generic [ref=e1948]:
+                      - img [ref=e1950]
+                      - text: 수정
+              - row "94 벌점 기숙사 규정 허락 없이 포장 음식 반입 -5점 23 사용 중 수정" [ref=e1953]:
+                - cell "94" [ref=e1954]
+                - cell "벌점" [ref=e1955]:
+                  - generic [ref=e1956]: 벌점
+                - cell "기숙사 규정" [ref=e1957]
+                - cell "허락 없이 포장 음식 반입" [ref=e1958]
+                - cell "-5점" [ref=e1959]
+                - cell "23" [ref=e1960]
+                - cell "사용 중" [ref=e1961]:
+                  - button "사용 중" [ref=e1962] [cursor=pointer]
+                - cell "수정" [ref=e1963]:
+                  - button "수정" [ref=e1964] [cursor=pointer]:
+                    - generic [ref=e1965]:
+                      - img [ref=e1967]
+                      - text: 수정
+              - row "95 벌점 기숙사 규정 허락되지 않은 전열 기구 사용 -5점 24 사용 중 수정" [ref=e1970]:
+                - cell "95" [ref=e1971]
+                - cell "벌점" [ref=e1972]:
+                  - generic [ref=e1973]: 벌점
+                - cell "기숙사 규정" [ref=e1974]
+                - cell "허락되지 않은 전열 기구 사용" [ref=e1975]
+                - cell "-5점" [ref=e1976]
+                - cell "24" [ref=e1977]
+                - cell "사용 중" [ref=e1978]:
+                  - button "사용 중" [ref=e1979] [cursor=pointer]
+                - cell "수정" [ref=e1980]:
+                  - button "수정" [ref=e1981] [cursor=pointer]:
+                    - generic [ref=e1982]:
+                      - img [ref=e1984]
+                      - text: 수정
+              - row "96 벌점 기숙사 규정 공용 공간 쓰레기 투기 및 분리수거 미이행 -5점 25 사용 중 수정" [ref=e1987]:
+                - cell "96" [ref=e1988]
+                - cell "벌점" [ref=e1989]:
+                  - generic [ref=e1990]: 벌점
+                - cell "기숙사 규정" [ref=e1991]
+                - cell "공용 공간 쓰레기 투기 및 분리수거 미이행" [ref=e1992]
+                - cell "-5점" [ref=e1993]
+                - cell "25" [ref=e1994]
+                - cell "사용 중" [ref=e1995]:
+                  - button "사용 중" [ref=e1996] [cursor=pointer]
+                - cell "수정" [ref=e1997]:
+                  - button "수정" [ref=e1998] [cursor=pointer]:
+                    - generic [ref=e1999]:
+                      - img [ref=e2001]
+                      - text: 수정
+              - row "97 벌점 기숙사 규정 소란한 행위로 타인에게 피해 -5점 26 사용 중 수정" [ref=e2004]:
+                - cell "97" [ref=e2005]
+                - cell "벌점" [ref=e2006]:
+                  - generic [ref=e2007]: 벌점
+                - cell "기숙사 규정" [ref=e2008]
+                - cell "소란한 행위로 타인에게 피해" [ref=e2009]
+                - cell "-5점" [ref=e2010]
+                - cell "26" [ref=e2011]
+                - cell "사용 중" [ref=e2012]:
+                  - button "사용 중" [ref=e2013] [cursor=pointer]
+                - cell "수정" [ref=e2014]:
+                  - button "수정" [ref=e2015] [cursor=pointer]:
+                    - generic [ref=e2016]:
+                      - img [ref=e2018]
+                      - text: 수정
+              - row "98 벌점 기숙사 규정 야간 자율 시간 미준수 -5점 27 사용 중 수정" [ref=e2021]:
+                - cell "98" [ref=e2022]
+                - cell "벌점" [ref=e2023]:
+                  - generic [ref=e2024]: 벌점
+                - cell "기숙사 규정" [ref=e2025]
+                - cell "야간 자율 시간 미준수" [ref=e2026]
+                - cell "-5점" [ref=e2027]
+                - cell "27" [ref=e2028]
+                - cell "사용 중" [ref=e2029]:
+                  - button "사용 중" [ref=e2030] [cursor=pointer]
+                - cell "수정" [ref=e2031]:
+                  - button "수정" [ref=e2032] [cursor=pointer]:
+                    - generic [ref=e2033]:
+                      - img [ref=e2035]
+                      - text: 수정
+              - row "99 벌점 기숙사 규정 몰입실 사용 시간 미준수 -5점 28 사용 중 수정" [ref=e2038]:
+                - cell "99" [ref=e2039]
+                - cell "벌점" [ref=e2040]:
+                  - generic [ref=e2041]: 벌점
+                - cell "기숙사 규정" [ref=e2042]
+                - cell "몰입실 사용 시간 미준수" [ref=e2043]
+                - cell "-5점" [ref=e2044]
+                - cell "28" [ref=e2045]
+                - cell "사용 중" [ref=e2046]:
+                  - button "사용 중" [ref=e2047] [cursor=pointer]
+                - cell "수정" [ref=e2048]:
+                  - button "수정" [ref=e2049] [cursor=pointer]:
+                    - generic [ref=e2050]:
+                      - img [ref=e2052]
+                      - text: 수정
+              - row "100 벌점 기숙사 규정 허락되지 않은 공간에서 음식 섭취 -5점 29 사용 중 수정" [ref=e2055]:
+                - cell "100" [ref=e2056]
+                - cell "벌점" [ref=e2057]:
+                  - generic [ref=e2058]: 벌점
+                - cell "기숙사 규정" [ref=e2059]
+                - cell "허락되지 않은 공간에서 음식 섭취" [ref=e2060]
+                - cell "-5점" [ref=e2061]
+                - cell "29" [ref=e2062]
+                - cell "사용 중" [ref=e2063]:
+                  - button "사용 중" [ref=e2064] [cursor=pointer]
+                - cell "수정" [ref=e2065]:
+                  - button "수정" [ref=e2066] [cursor=pointer]:
+                    - generic [ref=e2067]:
+                      - img [ref=e2069]
+                      - text: 수정
+              - row "101 벌점 기숙사 규정 취식 후 뒷정리 미이행 -5점 30 사용 중 수정" [ref=e2072]:
+                - cell "101" [ref=e2073]
+                - cell "벌점" [ref=e2074]:
+                  - generic [ref=e2075]: 벌점
+                - cell "기숙사 규정" [ref=e2076]
+                - cell "취식 후 뒷정리 미이행" [ref=e2077]
+                - cell "-5점" [ref=e2078]
+                - cell "30" [ref=e2079]
+                - cell "사용 중" [ref=e2080]:
+                  - button "사용 중" [ref=e2081] [cursor=pointer]
+                - cell "수정" [ref=e2082]:
+                  - button "수정" [ref=e2083] [cursor=pointer]:
+                    - generic [ref=e2084]:
+                      - img [ref=e2086]
+                      - text: 수정
+              - row "102 벌점 기숙사 규정 몰입실(랩실) 면학 분위기 저해 -3점 31 사용 중 수정" [ref=e2089]:
+                - cell "102" [ref=e2090]
+                - cell "벌점" [ref=e2091]:
+                  - generic [ref=e2092]: 벌점
+                - cell "기숙사 규정" [ref=e2093]
+                - cell "몰입실(랩실) 면학 분위기 저해" [ref=e2094]
+                - cell "-3점" [ref=e2095]
+                - cell "31" [ref=e2096]
+                - cell "사용 중" [ref=e2097]:
+                  - button "사용 중" [ref=e2098] [cursor=pointer]
+                - cell "수정" [ref=e2099]:
+                  - button "수정" [ref=e2100] [cursor=pointer]:
+                    - generic [ref=e2101]:
+                      - img [ref=e2103]
+                      - text: 수정
+              - row "103 벌점 기숙사 규정 몰입실(랩실)에서 학습 이외의 활동 -3점 32 사용 중 수정" [ref=e2106]:
+                - cell "103" [ref=e2107]
+                - cell "벌점" [ref=e2108]:
+                  - generic [ref=e2109]: 벌점
+                - cell "기숙사 규정" [ref=e2110]
+                - cell "몰입실(랩실)에서 학습 이외의 활동" [ref=e2111]
+                - cell "-3점" [ref=e2112]
+                - cell "32" [ref=e2113]
+                - cell "사용 중" [ref=e2114]:
+                  - button "사용 중" [ref=e2115] [cursor=pointer]
+                - cell "수정" [ref=e2116]:
+                  - button "수정" [ref=e2117] [cursor=pointer]:
+                    - generic [ref=e2118]:
+                      - img [ref=e2120]
+                      - text: 수정
+              - row "104 벌점 기숙사 규정 기숙사 내에서 소란 (속옷 착용 등) -3점 33 사용 중 수정" [ref=e2123]:
+                - cell "104" [ref=e2124]
+                - cell "벌점" [ref=e2125]:
+                  - generic [ref=e2126]: 벌점
+                - cell "기숙사 규정" [ref=e2127]
+                - cell "기숙사 내에서 소란 (속옷 착용 등)" [ref=e2128]
+                - cell "-3점" [ref=e2129]
+                - cell "33" [ref=e2130]
+                - cell "사용 중" [ref=e2131]:
+                  - button "사용 중" [ref=e2132] [cursor=pointer]
+                - cell "수정" [ref=e2133]:
+                  - button "수정" [ref=e2134] [cursor=pointer]:
+                    - generic [ref=e2135]:
+                      - img [ref=e2137]
+                      - text: 수정
+              - row "105 벌점 기숙사 규정 아침 퇴실 시간 미준수 -5점 34 사용 중 수정" [ref=e2140]:
+                - cell "105" [ref=e2141]
+                - cell "벌점" [ref=e2142]:
+                  - generic [ref=e2143]: 벌점
+                - cell "기숙사 규정" [ref=e2144]
+                - cell "아침 퇴실 시간 미준수" [ref=e2145]
+                - cell "-5점" [ref=e2146]
+                - cell "34" [ref=e2147]
+                - cell "사용 중" [ref=e2148]:
+                  - button "사용 중" [ref=e2149] [cursor=pointer]
+                - cell "수정" [ref=e2150]:
+                  - button "수정" [ref=e2151] [cursor=pointer]:
+                    - generic [ref=e2152]:
+                      - img [ref=e2154]
+                      - text: 수정
+              - row "106 벌점 기숙사 규정 소등 시간 이후 점등 (호실원 전체) -3점 35 사용 중 수정" [ref=e2157]:
+                - cell "106" [ref=e2158]
+                - cell "벌점" [ref=e2159]:
+                  - generic [ref=e2160]: 벌점
+                - cell "기숙사 규정" [ref=e2161]
+                - cell "소등 시간 이후 점등 (호실원 전체)" [ref=e2162]
+                - cell "-3점" [ref=e2163]
+                - cell "35" [ref=e2164]
+                - cell "사용 중" [ref=e2165]:
+                  - button "사용 중" [ref=e2166] [cursor=pointer]
+                - cell "수정" [ref=e2167]:
+                  - button "수정" [ref=e2168] [cursor=pointer]:
+                    - generic [ref=e2169]:
+                      - img [ref=e2171]
+                      - text: 수정
+              - row "107 벌점 기숙사 규정 허락되지 않은 시간에 기숙사 무단 입실 -3점 36 사용 중 수정" [ref=e2174]:
+                - cell "107" [ref=e2175]
+                - cell "벌점" [ref=e2176]:
+                  - generic [ref=e2177]: 벌점
+                - cell "기숙사 규정" [ref=e2178]
+                - cell "허락되지 않은 시간에 기숙사 무단 입실" [ref=e2179]
+                - cell "-3점" [ref=e2180]
+                - cell "36" [ref=e2181]
+                - cell "사용 중" [ref=e2182]:
+                  - button "사용 중" [ref=e2183] [cursor=pointer]
+                - cell "수정" [ref=e2184]:
+                  - button "수정" [ref=e2185] [cursor=pointer]:
+                    - generic [ref=e2186]:
+                      - img [ref=e2188]
+                      - text: 수정
+              - row "108 벌점 기숙사 규정 침구 상태 및 사물 정리 정돈 불량 -3점 37 사용 중 수정" [ref=e2191]:
+                - cell "108" [ref=e2192]
+                - cell "벌점" [ref=e2193]:
+                  - generic [ref=e2194]: 벌점
+                - cell "기숙사 규정" [ref=e2195]
+                - cell "침구 상태 및 사물 정리 정돈 불량" [ref=e2196]
+                - cell "-3점" [ref=e2197]
+                - cell "37" [ref=e2198]
+                - cell "사용 중" [ref=e2199]:
+                  - button "사용 중" [ref=e2200] [cursor=pointer]
+                - cell "수정" [ref=e2201]:
+                  - button "수정" [ref=e2202] [cursor=pointer]:
+                    - generic [ref=e2203]:
+                      - img [ref=e2205]
+                      - text: 수정
+              - row "109 벌점 기숙사 규정 세탁물 수거 지연 또는 공용 물건 방치 -3점 38 사용 중 수정" [ref=e2208]:
+                - cell "109" [ref=e2209]
+                - cell "벌점" [ref=e2210]:
+                  - generic [ref=e2211]: 벌점
+                - cell "기숙사 규정" [ref=e2212]
+                - cell "세탁물 수거 지연 또는 공용 물건 방치" [ref=e2213]
+                - cell "-3점" [ref=e2214]
+                - cell "38" [ref=e2215]
+                - cell "사용 중" [ref=e2216]:
+                  - button "사용 중" [ref=e2217] [cursor=pointer]
+                - cell "수정" [ref=e2218]:
+                  - button "수정" [ref=e2219] [cursor=pointer]:
+                    - generic [ref=e2220]:
+                      - img [ref=e2222]
+                      - text: 수정
+              - row "110 벌점 기숙사 규정 냉장고 및 전자레인지 불량 사용 -3점 39 사용 중 수정" [ref=e2225]:
+                - cell "110" [ref=e2226]
+                - cell "벌점" [ref=e2227]:
+                  - generic [ref=e2228]: 벌점
+                - cell "기숙사 규정" [ref=e2229]
+                - cell "냉장고 및 전자레인지 불량 사용" [ref=e2230]
+                - cell "-3점" [ref=e2231]
+                - cell "39" [ref=e2232]
+                - cell "사용 중" [ref=e2233]:
+                  - button "사용 중" [ref=e2234] [cursor=pointer]
+                - cell "수정" [ref=e2235]:
+                  - button "수정" [ref=e2236] [cursor=pointer]:
+                    - generic [ref=e2237]:
+                      - img [ref=e2239]
+                      - text: 수정
+              - row "111 벌점 기숙사 규정 인원 점검 시 지각 -3점 40 사용 중 수정" [ref=e2242]:
+                - cell "111" [ref=e2243]
+                - cell "벌점" [ref=e2244]:
+                  - generic [ref=e2245]: 벌점
+                - cell "기숙사 규정" [ref=e2246]
+                - cell "인원 점검 시 지각" [ref=e2247]
+                - cell "-3점" [ref=e2248]
+                - cell "40" [ref=e2249]
+                - cell "사용 중" [ref=e2250]:
+                  - button "사용 중" [ref=e2251] [cursor=pointer]
+                - cell "수정" [ref=e2252]:
+                  - button "수정" [ref=e2253] [cursor=pointer]:
+                    - generic [ref=e2254]:
+                      - img [ref=e2256]
+                      - text: 수정
+              - row "112 벌점 기숙사 규정 허위 신고 -3점 41 사용 중 수정" [ref=e2259]:
+                - cell "112" [ref=e2260]
+                - cell "벌점" [ref=e2261]:
+                  - generic [ref=e2262]: 벌점
+                - cell "기숙사 규정" [ref=e2263]
+                - cell "허위 신고" [ref=e2264]
+                - cell "-3점" [ref=e2265]
+                - cell "41" [ref=e2266]
+                - cell "사용 중" [ref=e2267]:
+                  - button "사용 중" [ref=e2268] [cursor=pointer]
+                - cell "수정" [ref=e2269]:
+                  - button "수정" [ref=e2270] [cursor=pointer]:
+                    - generic [ref=e2271]:
+                      - img [ref=e2273]
+                      - text: 수정
+  - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e11]

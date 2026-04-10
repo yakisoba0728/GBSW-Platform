@@ -6,7 +6,10 @@ import {
 } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 import { AuthRole as PrismaAuthRole, School } from '@prisma/client';
-import { getSuperAdminCredentials, safeStringEqual } from '../config/runtime-env';
+import {
+  getSuperAdminCredentials,
+  safeStringEqual,
+} from '../config/runtime-env';
 import { parsePhone } from '../admin/admin.parsers';
 import { PrismaService } from '../prisma/prisma.service';
 import { hashPassword, verifyPassword } from './password';
@@ -389,7 +392,10 @@ export class AuthService {
   private findAuthenticatedSuperAdmin(id: string, password: string) {
     const credentials = getSuperAdminCredentials();
 
-    if (!safeStringEqual(id, credentials.id) || !safeStringEqual(password, credentials.password)) {
+    if (
+      !safeStringEqual(id, credentials.id) ||
+      !safeStringEqual(password, credentials.password)
+    ) {
       return null;
     }
 

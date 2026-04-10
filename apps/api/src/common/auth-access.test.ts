@@ -69,7 +69,10 @@ describe('auth-access helpers', () => {
     const prisma = {
       authSession: {
         findFirst: () =>
-          Promise.resolve({ id: 'session-1', credentialFingerprint: fingerprint }),
+          Promise.resolve({
+            id: 'session-1',
+            credentialFingerprint: fingerprint,
+          }),
         updateMany: vi.fn().mockResolvedValue({ count: 0 }),
       },
     };

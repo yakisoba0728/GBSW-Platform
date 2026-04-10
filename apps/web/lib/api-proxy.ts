@@ -21,6 +21,46 @@ type ProxyApiRequestOptions = {
 
 export type ProxyRequestMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE'
 
+type ResponseBody =
+  | { kind: 'json'; body: unknown }
+  | { kind: 'text'; body: string }
+  | { kind: 'empty' }
+
+export async function readJsonRequestBody(
+  request: NextRequest,
+): Promise<{ ok: true; body: unknown } | { ok: false }> {
+  try {
+    const body = await request.json()
+    return { ok: true, body }
+  } catch {
+    return { ok: false }
+  }
+}
+
+export async function readResponseBody(response: Response): Promise<ResponseBody> {
+  const contentType = response.headers.get('content-type') ?? ''
+  if (contentType.includes('application/json')) {
+    const body = await response.json().catch(() => null)
+    return { kind: 'json', body }
+  }
+  const text = await response.text().catch(() => '')
+  if (text.length === 0) return { kind: 'empty' }
+  return { kind: 'text', body: text }
+}
+
+export function getResponseMessage(
+  responseBody: ResponseBody,
+  defaultMessage: string,
+): string {
+  if (responseBody.kind === 'json') {
+    const payload = responseBody.body as Record<string, unknown> | null
+    if (typeof payload?.message === 'string' && payload.message.length > 0) {
+      return payload.message
+    }
+  }
+  return defaultMessage
+}
+
 type RoleProxyRequestOptions = Omit<ProxyApiRequestOptions, 'pathname' | 'method'>
 
 export async function proxyApiRequest(

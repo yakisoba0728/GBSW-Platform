@@ -30,6 +30,8 @@ pnpm test:watch       # vitest (watch mode)
 pnpm test:coverage    # vitest run --coverage
 pnpm lint             # eslint src/**/*.ts
 pnpm format           # prettier --write src/**/*.ts
+# Run a single test file:
+npx vitest run src/path/to/file.test.ts
 ```
 
 ### Web only (`apps/web`)
@@ -37,6 +39,8 @@ pnpm format           # prettier --write src/**/*.ts
 pnpm dev              # next dev --webpack (port 3000)
 pnpm test             # vitest run --passWithNoTests
 pnpm lint             # eslint
+# Run a single test file:
+npx vitest run lib/auth-session.test.ts
 ```
 
 ### Database
@@ -65,15 +69,17 @@ The API uses standard NestJS module architecture. Each domain has a dedicated mo
 
 - **`auth/`** — Login/logout, session management, login throttle, password change
 - **`admin/`** — Teacher/student account management, rule configuration
-- **`school-mileage/`** — School-wide points system; split into sub-services: `entries`, `rules`, `students`, `analytics`
-- **`dorm-mileage/`** — Dormitory points system; mirrors school-mileage structure
+- **`teacher/`** — Teacher-specific endpoints (separate from admin)
+- **`mileage/`** — Unified points system for both school and dorm scope; split into sub-services: `entries`, `rules`, `students`, `analytics`
 - **`prisma/`** — `PrismaService` (global singleton, injected across modules)
 - **`config/runtime-env.ts`** — Environment variable validation at startup
-- **`common/`** — shared auth/session guards, mileage analytics helpers, shared parsers, and rule conflict helpers
+- **`common/`** — Shared auth/session guards (`auth-access.ts`), mileage analytics helpers, shared parsers, rule conflict detection (`rule-conflicts.ts`), internal API auth (`internal-api-auth.ts`)
 
 **Auth flow**: Sessions are stored in the `AuthSession` DB table (not JWT). The web app calls `/api/*` Next.js route handlers which proxy to the NestJS API using `INTERNAL_API_SECRET` for server-to-server auth.
 
-**Roles**: `Student`, `Teacher`, `Admin` (super admin credentials are read from `SUPER_ADMIN_ID` / `SUPER_ADMIN_PASSWORD` runtime env vars).
+**Roles**: `Student`, `Teacher`, `SUPER_ADMIN` (super admin credentials are read from `SUPER_ADMIN_ID` / `SUPER_ADMIN_PASSWORD` runtime env vars; not stored in DB).
+
+**Login throttle**: Max 5 failed attempts in a 10-minute window per key (stored in `LoginThrottle` table).
 
 ### Web (`apps/web/app/`)
 
@@ -82,19 +88,26 @@ Uses Next.js App Router. Role-based route groups mirror API roles:
 - `/student/*` — Mileage history, rules list, personal stats
 - `/teacher/*` — Grant/deduct mileage for students
 - `/admin/*` — User management, rule configuration
-- `/change-password`
+- `/onboarding/*` — Change password, link email/phone flows (enforced before other pages)
 - `/api/*` — Route handlers that proxy to NestJS API (adds `INTERNAL_API_SECRET` header)
 
-Components are organized by role under `app/components/{admin,student,teacher,auth,mileage,dorm-mileage,ui}`.
+**Key lib files (`apps/web/lib/`):**
+- `api-proxy.ts` — HTTP client for NestJS calls with `INTERNAL_API_SECRET`
+- `api-route-handlers.ts` — Helper factories (`createStaticProxyHandler`, `createMethodProxyHandler`, `createParamProxyHandler`) used by all `/api/*` route files
+- `auth-session.ts` — Session resolve/revoke logic + onboarding redirect rules
+- `scope-utils.ts` — Helpers for distinguishing school vs dorm scope
+- `admin-api.ts`, `teacher-api.ts`, `student-api.ts` — Typed service clients for each role
 
 ### Database Models (Prisma)
 
-Key tables:
-- `Student`, `Teacher` — User accounts with hashed passwords
-- `AuthSession` — Active sessions (token + expiry)
-- `SchoolMileageRule`, `SchoolMileageEntry` — School points events
-- `DormMileageRule`, `DormMileageEntry` — Dorm points events
-- `LoginThrottle` — Failed login rate limiting
+Key tables (see `apps/api/prisma/schema.prisma`):
+- `Student`, `Teacher` — User accounts with hashed passwords, onboarding flags (`mustChangePassword`, `hasLinkedEmail`, `hasLinkedPhone`), soft-deactivation via `isActive`
+- `AuthSession` — Active sessions (CUID token, role, expiry, revocation)
+- `MileageRule` — Unified rules for both scopes; fields: `scope` (SCHOOL/DORM), `type` (REWARD/PENALTY), `category`, `name`, `defaultScore`, `displayOrder`, `isActive`
+- `MileageEntry` — Unified entries for both scopes; soft-deleted via `deletedAt`; tracks `createdByTeacherId`, `updatedByTeacherId`, `deletedByTeacherId` for audit trail
+- `LoginThrottle` — Rate limiting (`failedCount`, `windowStartedAt`, `lockedUntil`)
+
+**Enums**: `School` (GBSW, BYMS), `MileageScope` (SCHOOL, DORM), `MileageType` (REWARD, PENALTY), `AuthRole` (SUPER_ADMIN, STUDENT, TEACHER)
 
 ### Environment Variables
 

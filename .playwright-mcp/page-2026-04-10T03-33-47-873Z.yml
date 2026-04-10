@@ -1,0 +1,85 @@
+- generic [ref=e1]:
+  - generic [ref=e69]:
+    - complementary [ref=e70]:
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - img [ref=e73]
+          - generic [ref=e74]:
+            - paragraph [ref=e75]: GBSW Platform
+            - paragraph [ref=e76]: 최고관리자
+        - navigation [ref=e77]:
+          - generic [ref=e78]:
+            - paragraph [ref=e79]: 계정 관리
+            - button "교사 관리" [expanded] [ref=e80] [cursor=pointer]:
+              - img [ref=e82]
+              - generic [ref=e87]: 교사 관리
+              - img [ref=e89]
+            - generic [ref=e93]:
+              - link "교사 생성" [ref=e94] [cursor=pointer]:
+                - /url: /admin/teachers/create
+                - text: 교사 생성
+              - link "교사 목록" [ref=e96] [cursor=pointer]:
+                - /url: /admin/teachers
+                - text: 교사 목록
+          - generic [ref=e98]:
+            - paragraph [ref=e99]: 마일리지 관리
+            - button "그린 마일리지" [expanded] [ref=e100] [cursor=pointer]:
+              - img [ref=e102]
+              - generic [ref=e105]: 그린 마일리지
+              - img [ref=e107]
+            - link "상벌점 항목" [ref=e277] [cursor=pointer]:
+              - /url: /admin/school/rules
+              - text: 상벌점 항목
+          - generic [ref=e112]:
+            - button "기숙사 상벌점" [expanded] [ref=e113] [cursor=pointer]:
+              - img [ref=e115]
+              - generic [ref=e118]: 기숙사 상벌점
+              - img [ref=e120]
+            - generic [ref=e122]:
+              - link "기숙사 상벌점 항목" [ref=e1532] [cursor=pointer]:
+                - /url: /admin/dorm/rules
+                - text: 기숙사 상벌점 항목
+              - link "사감 교사 관리" [ref=e1533] [cursor=pointer]:
+                - /url: /admin/dorm-mileage/teachers
+                - text: 사감 교사 관리
+          - generic [ref=e127]:
+            - paragraph [ref=e128]: 시스템
+            - button "DB 관리" [expanded] [ref=e129] [cursor=pointer]:
+              - img [ref=e131]
+              - generic [ref=e135]: DB 관리
+              - img [ref=e137]
+            - link "DB 관리" [ref=e2318] [cursor=pointer]:
+              - /url: /admin/db
+              - text: DB 관리
+          - generic [ref=e142]:
+            - button "보안" [expanded] [ref=e143] [cursor=pointer]:
+              - img [ref=e145]
+              - generic [ref=e148]: 보안
+              - img [ref=e150]
+            - link "관리자 보안" [active] [ref=e2357] [cursor=pointer]:
+              - /url: /admin/security
+              - text: 관리자 보안
+        - generic [ref=e156]:
+          - button "다크 모드로 전환" [ref=e157] [cursor=pointer]:
+            - img [ref=e159]
+            - img [ref=e170]
+          - button "로그아웃" [ref=e172] [cursor=pointer]:
+            - generic [ref=e173]:
+              - img [ref=e174]
+              - text: 로그아웃
+    - generic [ref=e177]:
+      - banner [ref=e178]:
+        - paragraph [ref=e179]: 관리자 보안
+      - main [ref=e180]:
+        - generic [ref=e2359]:
+          - generic [ref=e2360]:
+            - heading "관리자 보안" [level=2] [ref=e2361]
+            - paragraph [ref=e2362]: 최고관리자 비밀번호는 앱 안에서 변경하지 않고 서버 환경변수로 관리합니다.
+          - generic [ref=e2364]:
+            - generic [ref=e2365]:
+              - heading "운영 변경 방법" [level=3] [ref=e2366]
+              - paragraph [ref=e2367]: "서버의 환경변수 파일에서 `SUPER_ADMIN_ID`, `SUPER_ADMIN_PASSWORD` 값을 수정한 뒤 재배포하면 새 값이 적용됩니다. `db:prepare`는 데이터베이스와 pgAdmin을 준비하는 명령이며, 최고관리자 계정을 따로 생성하거나 갱신하지 않습니다."
+            - generic [ref=e2368]: "학생과 교사 계정의 비밀번호 변경은 서비스 안에서 계속 지원되지만, 최고관리자 계정은 서버 설정과 함께 관리하는 구조입니다. 운영 환경에서는 `API_INTERNAL_URL`을 내부 API 주소로 두고, `NEXT_PUBLIC_API_URL`은 브라우저와 서버 사이드 호출 모두에서 사용할 수 있는 공개 Nest API 원본 주소일 때만 사용하세요."
+  - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e11]

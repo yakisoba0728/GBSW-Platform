@@ -13,7 +13,7 @@ import { assertInternalApiRequest } from '../common/internal-api-auth';
 import { MileageService } from './mileage.service';
 import { parseScopeParam } from './mileage.parsers';
 
-@Controller(':scope(school-mileage|dorm-mileage)')
+@Controller(':scope')
 export class MileageController {
   constructor(private readonly mileageService: MileageService) {}
 

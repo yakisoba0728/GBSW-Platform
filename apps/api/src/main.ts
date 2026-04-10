@@ -1,3 +1,6 @@
+import { config } from 'dotenv';
+config({ path: '../../.env' });
+
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { validateApiRuntimeEnv } from './config/runtime-env';
@@ -27,7 +30,6 @@ async function bootstrap() {
 void bootstrap();
 
 function readAllowedOrigins() {
-  const defaultOrigin = `http://localhost:${process.env.WEB_PORT ?? '3000'}`;
   const configuredOrigins = [
     process.env.WEB_ORIGINS,
     process.env.WEB_ORIGIN,
@@ -38,5 +40,10 @@ function readAllowedOrigins() {
     .map((origin) => origin.trim())
     .filter(Boolean);
 
-  return Array.from(new Set([defaultOrigin, ...configuredOrigins]));
+  if (process.env.NODE_ENV !== 'production') {
+    const defaultOrigin = `http://localhost:${process.env.WEB_PORT ?? '3000'}`;
+    configuredOrigins.push(defaultOrigin);
+  }
+
+  return Array.from(new Set(configuredOrigins));
 }

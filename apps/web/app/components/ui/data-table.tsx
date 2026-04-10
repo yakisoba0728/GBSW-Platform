@@ -113,7 +113,7 @@ export function DataTable<T>({
   // ── Loading state ──────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className={className}>
+      <div className={className} style={{ overflowX: 'auto' }}>
         <table style={tableStyle}>
           <colgroup>
             {columns.map((col) => (
@@ -151,13 +151,11 @@ export function DataTable<T>({
   // ── Empty state ────────────────────────────────────────────────────────
   if (data.length === 0) {
     return (
-      <div className={className}>
-        <EmptyStatePane
-          icon={emptyIcon}
-          title={emptyTitle}
-          description={emptyDescription}
-        />
-      </div>
+      <EmptyStatePane
+        icon={emptyIcon}
+        title={emptyTitle}
+        description={emptyDescription}
+      />
     )
   }
 
